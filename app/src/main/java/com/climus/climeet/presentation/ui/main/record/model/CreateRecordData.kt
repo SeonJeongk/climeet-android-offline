@@ -3,13 +3,14 @@ package com.climus.climeet.presentation.ui.main.record.model
 import com.climus.climeet.presentation.ui.intro.signup.climer.model.FollowCrag
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.temporal.ChronoUnit
+
+internal fun initialRecordDate(today: LocalDate): LocalDate = today.minusMonths(1)
 
 object CreateRecordData {
 
     val today = LocalDate.now()
 
-    var selectedDate: LocalDate = LocalDate.of(today.year, today.monthValue - 1, today.dayOfMonth)
+    var selectedDate: LocalDate = initialRecordDate(today)
         private set
 
     var selectedStartTime: LocalTime = LocalTime.of(11, 0, 0)
