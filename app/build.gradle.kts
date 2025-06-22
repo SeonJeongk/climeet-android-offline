@@ -29,11 +29,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BASE_DEV_URL", getProperty("baseDevUrl"))
         buildConfigField("String", "BASE_PROD_URL", getProperty("baseProdUrl"))
-        buildConfigField("String", "NAVER_CLIENT_ID", getProperty("naverClientId"))
-        buildConfigField("String", "NAVER_CLIENT_SECRET", getProperty("naverClientSecret"))
-        buildConfigField("String", "NAVER_CLIENT_NAME", getProperty("naverClientName"))
-        buildConfigField("String", "KAKAO_API_KEY", getProperty("kakaoAppKey"))
-        manifestPlaceholders["KAKAO_API_KEY"] = getProperty("kakaoAppKeyForManifest")
     }
 
     buildTypes {
@@ -107,12 +102,6 @@ dependencies {
     // Circle Indicator
     implementation("me.relex:circleindicator:2.1.6")
 
-    // naver login
-    implementation("com.navercorp.nid:oauth-jdk8:5.6.0")
-
-    // kakao login
-    implementation("com.kakao.sdk:v2-all:2.17.0")
-
     // CircleImageView
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
@@ -139,10 +128,6 @@ dependencies {
 
     // FCM
     implementation("com.google.firebase:firebase-messaging-ktx")
-
-    // DataStore
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-    implementation("androidx.datastore:datastore-core:1.0.0")
 
     // MPAndroidChart
     implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")

@@ -5,7 +5,7 @@ import com.climus.climeet.data.model.response.ShortsItem
 import com.climus.climeet.data.model.response.ShortsMainCommentItem
 import com.climus.climeet.data.model.response.ShortsSubCommentItem
 import com.climus.climeet.data.model.response.ShortsUpdatedFollowResponse
-import com.climus.climeet.presentation.ui.intro.signup.admin.model.SearchCragUiData
+import com.climus.climeet.presentation.ui.main.global.searchcrag.SearchCragUiData
 import com.climus.climeet.presentation.ui.main.shorts.adapter.LikeStatus
 import com.climus.climeet.presentation.ui.main.shorts.model.ShortsCommentUiData
 import com.climus.climeet.presentation.ui.main.shorts.model.ShortsThumbnailUiData

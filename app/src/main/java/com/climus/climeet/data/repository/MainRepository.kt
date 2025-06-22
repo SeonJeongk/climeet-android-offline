@@ -70,6 +70,8 @@ import retrofit2.http.Query
 
 interface MainRepository {
 
+    suspend fun climberNickNameCheck(nickName: String): BaseState<Boolean>
+
     suspend fun uploadFile(
         file: MultipartBody.Part
     ): BaseState<UploadImgResponse>

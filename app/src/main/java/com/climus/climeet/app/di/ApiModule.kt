@@ -1,7 +1,5 @@
 package com.climus.climeet.app.di
 
-import com.climus.climeet.data.remote.AuthApi
-import com.climus.climeet.data.remote.IntroApi
 import com.climus.climeet.data.remote.MainApi
 import dagger.Module
 import dagger.Provides
@@ -16,15 +14,6 @@ object ApiModule {
 
     @Singleton
     @Provides
-    fun provideIntroApi(retrofit: Retrofit): IntroApi = retrofit.create(IntroApi::class.java)
-
-
-    @Singleton
-    @Provides
     fun provideMainApi(retrofit: Retrofit): MainApi = retrofit.create(MainApi::class.java)
-
-    @Singleton
-    @Provides
-    fun provideAuthApi(retrofit: Retrofit): AuthApi = retrofit.create(AuthApi::class.java)
 
 }

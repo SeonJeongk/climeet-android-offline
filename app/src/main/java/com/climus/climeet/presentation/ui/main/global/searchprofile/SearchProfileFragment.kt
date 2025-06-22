@@ -18,7 +18,6 @@ import com.climus.climeet.presentation.ui.main.global.searchprofile.model.UserFo
 import com.climus.climeet.presentation.ui.main.global.searchprofile.adapter.FollowingRVAdapter
 import com.climus.climeet.presentation.ui.toClimerProfile
 import com.climus.climeet.presentation.ui.toGymProfile
-import com.climus.climeet.presentation.util.Constants
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -140,8 +139,6 @@ class SearchProfileFragment :
         App.sharedPreferences.edit().putLong("gymId", gymId)
             .apply()
         Log.d("gym_profile", "홈에서 암장 아이디 : $gymId")
-
-        val access = App.sharedPreferences.getString(Constants.X_MODE, null)
 
         findNavController().toGymProfile(gymId)
     }

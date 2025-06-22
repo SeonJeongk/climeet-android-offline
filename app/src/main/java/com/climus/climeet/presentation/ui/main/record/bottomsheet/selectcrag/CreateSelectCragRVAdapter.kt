@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.climus.climeet.databinding.ItemCragSearchCalendarBinding
-import com.climus.climeet.presentation.ui.intro.signup.climer.model.FollowCrag
 import com.climus.climeet.presentation.ui.main.record.calendar.createclimbingrecord.CreateClimbingRecordViewModel
 import com.climus.climeet.presentation.ui.main.record.model.CreateRecordData
 

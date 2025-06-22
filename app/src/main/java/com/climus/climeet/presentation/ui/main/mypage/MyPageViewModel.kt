@@ -4,10 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.climus.climeet.data.model.BaseState
-import com.climus.climeet.data.repository.AuthRepository
 import com.climus.climeet.data.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -16,7 +14,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 data class MyPageUiState(
@@ -29,23 +26,19 @@ data class MyPageUiState(
 )
 
 sealed class MyPageEvent {
-    data object NavigateToAccount : MyPageEvent()
     data object NavigateToAlarm : MyPageEvent()
     data object NavigateToAnnounce : MyPageEvent()
     data object NavigateToFollow : MyPageEvent()
-    data class NavigateToAdminMyProfile(val gymId: Long) : MyPageEvent()
     data object NavigateToClimerMyProfile : MyPageEvent()
     data object NavigateToMyShorts : MyPageEvent()
     data object NavigateToPolicy : MyPageEvent()
     data object NavigateToSendOpinion : MyPageEvent()
     data object NavigateToReview : MyPageEvent()
-    data object Logout : MyPageEvent()
 }
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
-    private val repository: MainRepository,
-    private val authRepository: AuthRepository,
+    private val repository: MainRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MyPageUiState())
@@ -53,12 +46,6 @@ class MyPageViewModel @Inject constructor(
 
     private val _event = MutableSharedFlow<MyPageEvent>()
     val event: SharedFlow<MyPageEvent> = _event.asSharedFlow()
-
-    val gymId = MutableStateFlow(0L)
-
-    init {
-        getAdminGymId()
-    }
 
     fun getProfileInfo() {
         viewModelScope.launch {
@@ -89,27 +76,6 @@ class MyPageViewModel @Inject constructor(
         }
     }
 
-    private fun getAdminGymId() {
-        viewModelScope.launch {
-            when (val result = repository.getAdminGymId()) {
-                is BaseState.Success -> {
-                    gymId.value = result.body.toLong()
-                    Log.d("gymIdTest", "${result.body}")
-                }
-
-                is BaseState.Error -> {
-                    Log.d("gymIdTest", result.msg)
-                }
-            }
-        }
-    }
-
-    fun navigateToAccount() {
-        viewModelScope.launch {
-            _event.emit(MyPageEvent.NavigateToAccount)
-        }
-    }
-
     fun navigateToAlarm() {
         viewModelScope.launch {
             _event.emit(MyPageEvent.NavigateToAlarm)
@@ -130,14 +96,7 @@ class MyPageViewModel @Inject constructor(
 
     fun navigateToMyProfile() {
         viewModelScope.launch {
-            val mode = authRepository.getLoginMode()
-
-            mode?.let {
-                when (it) {
-                    "CLIMER" -> _event.emit(MyPageEvent.NavigateToClimerMyProfile)
-                    "ADMIN" -> _event.emit(MyPageEvent.NavigateToAdminMyProfile(gymId.value))
-                }
-            } ?: run {}
+            _event.emit(MyPageEvent.NavigateToClimerMyProfile)
         }
     }
 
@@ -164,15 +123,5 @@ class MyPageViewModel @Inject constructor(
             _event.emit(MyPageEvent.NavigateToReview)
         }
     }
-
-    fun logout() {
-        viewModelScope.launch {
-            authRepository.deleteAccessToken()
-            authRepository.deleteRefreshToken()
-            authRepository.deleteLoginMode()
-            _event.emit(MyPageEvent.Logout)
-        }
-    }
-
 
 }

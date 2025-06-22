@@ -12,12 +12,8 @@ import com.climus.climeet.R
 import com.climus.climeet.app.App
 import com.climus.climeet.presentation.ui.splash.SplashActivity
 import com.climus.climeet.presentation.util.PushUtils
-import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -73,20 +69,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             createNotificationChannel(channel)
 
             notify(uniId, notificationBuilder.build())
-        }
-    }
-
-
-    suspend fun getFirebaseToken(): String = suspendCoroutine { continuation ->
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val token = task.result
-                continuation.resume(token)
-            } else {
-                continuation.resumeWithException(
-                    task.exception ?: RuntimeException("Error getting FCM token")
-                )
-            }
         }
     }
 

@@ -1,6 +1,5 @@
 package com.climus.climeet.presentation.ui.main.mypage
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
@@ -9,7 +8,6 @@ import androidx.navigation.fragment.findNavController
 import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentMypageBinding
 import com.climus.climeet.presentation.base.BaseFragment
-import com.climus.climeet.presentation.ui.intro.IntroActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -31,19 +29,13 @@ class MyPageFragment: BaseFragment<FragmentMypageBinding>(R.layout.fragment_mypa
         repeatOnStarted {
             viewModel.event.collect {
                 when (it) {
-                    is MyPageEvent.NavigateToAccount -> findNavController().toAccount()
                     is MyPageEvent.NavigateToAlarm -> findNavController().toAlarm()
                     is MyPageEvent.NavigateToAnnounce -> findNavController().toAnnounce()
                     is MyPageEvent.NavigateToFollow -> findNavController().toFollow()
-                    is MyPageEvent.NavigateToAdminMyProfile -> findNavController().toAdminMyProfile(it.gymId)
                     is MyPageEvent.NavigateToClimerMyProfile -> findNavController().toClimerMyProfile()
                     is MyPageEvent.NavigateToMyShorts -> findNavController().toMyShorts()
                     is MyPageEvent.NavigateToPolicy -> findNavController().toPolicy()
                     is MyPageEvent.NavigateToSendOpinion -> findNavController().toSendOpinion()
-                    is MyPageEvent.Logout -> {
-                        val intent = Intent(requireContext(),IntroActivity::class.java)
-                        startActivity(intent)
-                    }
                     is MyPageEvent.NavigateToReview -> findNavController().toReview()
                 }
             }
@@ -74,11 +66,6 @@ class MyPageFragment: BaseFragment<FragmentMypageBinding>(R.layout.fragment_mypa
 //    }
 
 
-    private fun NavController.toAccount(){
-        val action = MyPageFragmentDirections.actionMyPageFragmentToMyPageAccountFragment()
-        navigate(action)
-    }
-
     private fun NavController.toAlarm(){
         val action = MyPageFragmentDirections.actionMyPageFragmentToMyPageAlarmFragment()
         navigate(action)
@@ -91,11 +78,6 @@ class MyPageFragment: BaseFragment<FragmentMypageBinding>(R.layout.fragment_mypa
 
     private fun NavController.toFollow(){
         val action = MyPageFragmentDirections.actionMyPageFragmentToMyPageFollowFragment(viewModel.uiState.value.userId)
-        navigate(action)
-    }
-
-    private fun NavController.toAdminMyProfile(gymId: Long){
-        val action = MyPageFragmentDirections.actionMyPageFragmentToMyPageAdminMyProfileFragment(gymId)
         navigate(action)
     }
 

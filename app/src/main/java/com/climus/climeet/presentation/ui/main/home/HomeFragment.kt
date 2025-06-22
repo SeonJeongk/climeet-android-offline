@@ -37,7 +37,6 @@ import com.climus.climeet.presentation.ui.toGymProfile
 import com.climus.climeet.presentation.ui.toRouteFinding
 import com.climus.climeet.presentation.ui.toSearchProfile
 import com.climus.climeet.presentation.ui.toShortsPlayer
-import com.climus.climeet.presentation.util.Constants.X_MODE
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -297,8 +296,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         sharedPreferences.edit().putLong("gymId", gymId)
             .apply()
         Log.d("gym_profile", "홈에서 암장 아이디 : $gymId")
-
-        val access = sharedPreferences.getString(X_MODE, null)
 
         //todo 여기는 일단 구분 안해줘도 될듯!
         // - 암장관리자일때 선택한 프로필이 내 프로필일 경우만 암장관리자의 암장 프로필 접근 해야함
