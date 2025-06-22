@@ -54,7 +54,7 @@ class SelectGymAdapter(
                 binding.tvGymName.setBackgroundResource(R.drawable.rect_mainfill_nostroke_999radius_8elevation)
                 binding.tvGymName.setTextColor(Color.BLACK)
             } else {
-                binding.tvGymName.setBackgroundResource(com.kakao.sdk.friend.R.color.transparent)
+                binding.tvGymName.setBackgroundResource(android.R.color.transparent)
                 binding.tvGymName.setTextColor(Color.WHITE)
             }
 

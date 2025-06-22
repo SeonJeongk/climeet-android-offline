@@ -2,7 +2,6 @@ package com.climus.climeet.presentation.bindingadapters
 
 import android.content.res.ColorStateList
 import android.view.View
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
@@ -10,7 +9,6 @@ import androidx.databinding.BindingAdapter
 import androidx.media3.ui.PlayerView
 import com.climus.climeet.R
 import com.climus.climeet.presentation.ui.InputState
-import com.climus.climeet.presentation.ui.intro.SignUpState
 
 @BindingAdapter("viewStateColor")
 fun bindViewStateColor(v: View, state: InputState) {
@@ -35,19 +33,6 @@ fun bindViewStateColor(v: View, state: InputState) {
                 R.color.cm_red
             )
         )
-    }
-}
-
-@BindingAdapter("signUpProgress")
-fun bindSignUpProgress(pb: ProgressBar, state: SignUpState){
-    when(state){
-        is SignUpState.Empty -> {
-            pb.visibility = View.INVISIBLE
-        }
-        is SignUpState.InProgress -> {
-            pb.visibility = View.VISIBLE
-            pb.progress = state.progress
-        }
     }
 }
 

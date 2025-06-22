@@ -16,7 +16,6 @@ import com.climus.climeet.presentation.ui.main.home.bestclimer.viewpager.BestCli
 import com.climus.climeet.presentation.ui.main.home.popularcrags.viewpager.PopularCragsVPAdpater
 import com.climus.climeet.presentation.ui.toGymProfile
 import com.climus.climeet.presentation.ui.toSearchProfile
-import com.climus.climeet.presentation.util.Constants
 import com.google.android.material.tabs.TabLayoutMediator
 
 class PopularCragsFragment : BaseFragment<FragmentPopularCragsBinding>(R.layout.fragment_popular_crags) {
@@ -55,8 +54,6 @@ class PopularCragsFragment : BaseFragment<FragmentPopularCragsBinding>(R.layout.
 
         App.sharedPreferences.edit().putLong("gymId", gymId)
         //Log.d("gym_profile", "홈에서 암장 아이디 : $gymId)
-
-        val access = App.sharedPreferences.getString(Constants.X_MODE, null)
 
         //todo 여기는 일단 구분 안해줘도 될듯!
         // - 암장관리자일때 선택한 프로필이 내 프로필일 경우만 암장관리자의 암장 프로필 접근 해야함

@@ -25,7 +25,6 @@ import com.climus.climeet.presentation.base.BaseActivity
 import com.climus.climeet.presentation.customview.SelectImageMethodDialog
 import com.climus.climeet.presentation.ui.main.mypage.CameraImageForm
 import com.climus.climeet.presentation.ui.saveCameraImage
-import com.climus.climeet.presentation.ui.toMultiPart
 import com.climus.climeet.presentation.ui.toMultiPartImage
 import com.climus.climeet.presentation.ui.toVideoThumbnail
 import com.climus.climeet.presentation.util.Constants.CAMERA_PERMISSION
@@ -62,7 +61,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
         setBnv()
         initEventObserve()
-        viewModel.patchFcmToken()
     }
 
     private fun setBnv() {
@@ -304,20 +302,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                 viewModel.cameraImage.value = true
                 val bitmap = result.data?.extras?.get("data") as Bitmap
 
-                if(viewModel.checkUserMode()) {
-                    // admin
-                    bitmap.toMultiPart(this)?.let { image ->
-                        CameraImageForm.setImage(image)
-                    } ?: run {
-                        showToastMessage("카메라 이미지 파일 변환 실패")
-                    }
-                } else {
-                    // user
-                    bitmap.toMultiPartImage(this)?.let { image ->
-                        CameraImageForm.setImage(image)
-                    } ?: run {
-                        showToastMessage("카메라 이미지 파일 변환 실패")
-                    }
+                bitmap.toMultiPartImage(this)?.let { image ->
+                    CameraImageForm.setImage(image)
+                } ?: run {
+                    showToastMessage("카메라 이미지 파일 변환 실패")
                 }
 
                 bitmap.saveCameraImage(this).let { uri ->

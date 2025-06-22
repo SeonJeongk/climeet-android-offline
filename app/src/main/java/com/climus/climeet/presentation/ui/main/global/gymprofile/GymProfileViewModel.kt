@@ -5,9 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.climus.climeet.data.model.BaseState
-import com.climus.climeet.data.repository.AuthRepository
 import com.climus.climeet.data.repository.MainRepository
-import com.climus.climeet.presentation.ui.main.mypage.MyPageEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,8 +27,7 @@ data class GymProfileInfoUiState(
 
 @HiltViewModel
 class GymProfileViewModel @Inject constructor(
-    private val repository: MainRepository,
-    private val authRepository: AuthRepository
+    private val repository: MainRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GymProfileInfoUiState())
@@ -41,16 +38,6 @@ class GymProfileViewModel @Inject constructor(
     val followState = MutableStateFlow(false)
 
     var isModeClimer = MutableStateFlow(true)
-
-    init {
-        getLoginMode()
-    }
-
-    private fun getLoginMode() {
-        viewModelScope.launch {
-            isModeClimer.value = authRepository.getLoginMode() == "CLIMER"
-        }
-    }
 
     fun setGymId(id: Long) {
         viewModelScope.launch {

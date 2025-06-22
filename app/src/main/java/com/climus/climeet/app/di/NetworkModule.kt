@@ -1,10 +1,6 @@
 package com.climus.climeet.app.di
 
 import com.climus.climeet.BuildConfig
-import com.climus.climeet.data.config.AccessTokenInterceptor
-import com.climus.climeet.data.config.BearerInterceptor
-import com.climus.climeet.data.config.DataStoreManager
-import com.climus.climeet.data.repository.AuthRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,24 +32,12 @@ object NetworkModule {
     }
 
     @Provides
-    fun provideAccessTokenInterceptor(dataStoreManager: DataStoreManager): AccessTokenInterceptor =
-        AccessTokenInterceptor(dataStoreManager)
-
-    @Provides
-    fun provideBearerInterceptor(dataStoreManager: DataStoreManager): BearerInterceptor =
-        BearerInterceptor(dataStoreManager)
-
-    @Provides
     fun provideOkHttpClient(
-        httpLoggingInterceptor: HttpLoggingInterceptor,
-        accessTokenInterceptor: AccessTokenInterceptor,
-        bearerInterceptor: BearerInterceptor
+        httpLoggingInterceptor: HttpLoggingInterceptor
     ): OkHttpClient = OkHttpClient.Builder()
         .readTimeout(30000, TimeUnit.MILLISECONDS)
         .connectTimeout(30000, TimeUnit.MILLISECONDS)
         .addInterceptor(httpLoggingInterceptor)
-        .addNetworkInterceptor(accessTokenInterceptor)
-        .addInterceptor(bearerInterceptor)
         .build()
 
 }
