@@ -4,7 +4,7 @@ import com.climus.climeet.data.model.response.SearchAvailableGymItem
 import com.climus.climeet.data.model.response.SearchGymItem
 import com.climus.climeet.data.model.response.UserHomeGymDetailResponse
 import com.climus.climeet.data.model.response.UserHomeGymSimpleResponse
-import com.climus.climeet.presentation.ui.intro.signup.climer.model.FollowCrag
+import com.climus.climeet.presentation.ui.main.record.bottomsheet.selectcrag.FollowCrag
 import com.climus.climeet.presentation.util.Constants
 
 fun SearchAvailableGymItem.toFollowCrag(

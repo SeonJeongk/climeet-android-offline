@@ -1,7 +1,7 @@
 package com.climus.climeet.presentation.ui.intro.signup.admin
 
 import com.climus.climeet.data.model.response.SearchGymItem
-import com.climus.climeet.presentation.ui.intro.signup.admin.model.SearchCragUiData
+import com.climus.climeet.presentation.ui.main.global.searchcrag.SearchCragUiData
 import com.climus.climeet.presentation.util.Constants.TEST_IMG
 
 

@@ -8,10 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.climus.climeet.R
-import com.climus.climeet.databinding.ItemFollowCragsBinding
 import com.climus.climeet.databinding.ItemSearchProfileBinding
-import com.climus.climeet.presentation.ui.intro.signup.climer.ClimerSignupForm
-import com.climus.climeet.presentation.ui.intro.signup.climer.model.FollowCrag
 import com.climus.climeet.presentation.ui.main.global.searchprofile.model.SearchProfileUiData
 
 @Suppress("DEPRECATION")

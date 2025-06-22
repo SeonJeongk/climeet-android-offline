@@ -76,6 +76,11 @@ import retrofit2.http.QueryMap
 
 interface MainApi {
 
+    @GET("api/climber/check-nickname/{nickName}")
+    suspend fun climberNickNameCheck(
+        @Path("nickName") nickName: String
+    ): Response<Boolean>
+
     @Multipart
     @POST("api/file")
     suspend fun uploadFile(@Part file: MultipartBody.Part): Response<UploadImgResponse>

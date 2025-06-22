@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.climus.climeet.databinding.ItemCragSearchBinding
-import com.climus.climeet.presentation.ui.intro.signup.admin.model.SearchCragUiData
+import com.climus.climeet.presentation.ui.main.global.searchcrag.SearchCragUiData
 
 class SearchCragNameAdapter() : RecyclerView.Adapter<SearchCragNameViewHolder>() {
 

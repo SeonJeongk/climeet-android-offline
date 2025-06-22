@@ -7,14 +7,12 @@ import android.widget.TextView
 import androidx.core.view.children
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentCalendarBinding
 import com.climus.climeet.presentation.base.BaseFragment
 import com.climus.climeet.presentation.customview.selectdate.SelectDateBottomSheet
-import com.climus.climeet.presentation.ui.intro.signup.climer.setlevel.AdapterDecoration
 import com.climus.climeet.presentation.customview.selectdate.SelectDateBottomSheetViewModel
 import com.climus.climeet.presentation.ui.main.record.RecordFragmentDirections
 import com.climus.climeet.presentation.ui.main.record.calendar.createclimbingrecord.CreateClimbingRecordViewModel
@@ -201,5 +199,3 @@ class CalendarFragment : BaseFragment<FragmentCalendarBinding>(R.layout.fragment
     }
 
 }
-
-

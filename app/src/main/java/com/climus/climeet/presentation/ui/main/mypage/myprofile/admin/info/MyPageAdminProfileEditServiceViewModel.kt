@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.request.GymServiceUpdateRequest
 import com.climus.climeet.data.repository.MainRepository
-import com.climus.climeet.presentation.ui.intro.signup.admin.model.ServiceUiData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

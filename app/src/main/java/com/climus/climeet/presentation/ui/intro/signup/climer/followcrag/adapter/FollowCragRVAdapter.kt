@@ -9,9 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.climus.climeet.R
 import com.climus.climeet.databinding.ItemFollowCragsBinding
-import com.climus.climeet.presentation.ui.intro.signup.admin.model.SearchCragUiData
 import com.climus.climeet.presentation.ui.intro.signup.climer.ClimerSignupForm
-import com.climus.climeet.presentation.ui.intro.signup.climer.model.FollowCrag
+import com.climus.climeet.presentation.ui.main.record.bottomsheet.selectcrag.FollowCrag
 
 class FollowCragRVAdapter() : RecyclerView.Adapter<FollowCragRVAdapter.ViewHolder>(){
 

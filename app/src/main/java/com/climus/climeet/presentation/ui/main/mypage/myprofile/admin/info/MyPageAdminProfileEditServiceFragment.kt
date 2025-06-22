@@ -11,9 +11,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentMypageAdminProfileEditServiceBinding
 import com.climus.climeet.presentation.base.BaseFragment
-import com.climus.climeet.presentation.ui.intro.signup.admin.model.ServiceUiData
-import com.climus.climeet.presentation.ui.intro.signup.admin.service.OnServiceClickListener
-import com.climus.climeet.presentation.ui.intro.signup.admin.service.ServiceRVAdapter
 import com.climus.climeet.presentation.ui.main.global.gymprofile.info.GymProfileInfoViewModel
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.MyPageAdminMyProfileFragmentArgs
 import dagger.hilt.android.AndroidEntryPoint

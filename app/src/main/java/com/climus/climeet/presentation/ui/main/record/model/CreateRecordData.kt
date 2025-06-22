@@ -1,6 +1,6 @@
 package com.climus.climeet.presentation.ui.main.record.model
 
-import com.climus.climeet.presentation.ui.intro.signup.climer.model.FollowCrag
+import com.climus.climeet.presentation.ui.main.record.bottomsheet.selectcrag.FollowCrag
 import java.time.LocalDate
 import java.time.LocalTime
 

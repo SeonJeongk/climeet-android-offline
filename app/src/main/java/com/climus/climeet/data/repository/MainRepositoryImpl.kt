@@ -78,6 +78,9 @@ class MainRepositoryImpl @Inject constructor(
     private val routeRecordDao: RouteRecordDao
 ) : MainRepository {
 
+    override suspend fun climberNickNameCheck(nickName: String): BaseState<Boolean> =
+        runRemote { api.climberNickNameCheck(nickName) }
+
     override suspend fun uploadFile(
         file: MultipartBody.Part
     ): BaseState<UploadImgResponse> = runRemote { api.uploadFile(file) }

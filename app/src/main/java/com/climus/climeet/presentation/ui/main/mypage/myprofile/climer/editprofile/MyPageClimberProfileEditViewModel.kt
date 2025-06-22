@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.climus.climeet.data.model.BaseState
-import com.climus.climeet.data.repository.IntroRepository
 import com.climus.climeet.data.repository.MainRepository
 import com.climus.climeet.presentation.ui.InputState
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.climer.editprofile.ClimberEditProfileForm.getProfileImagePath
@@ -35,7 +34,6 @@ sealed class EditClimberProfileEvent {
 
 @HiltViewModel
 class MyPageClimberProfileEditViewModel @Inject constructor(
-    private val introRepository: IntroRepository,
     private val mainRepository: MainRepository,
 ) : ViewModel() {
 
@@ -79,7 +77,7 @@ class MyPageClimberProfileEditViewModel @Inject constructor(
     fun isNickNameDuplicated() {
         viewModelScope.launch {
             if (nickAvailable.value) {
-                introRepository.climberNickNameCheck(nickname.value).let {
+                mainRepository.climberNickNameCheck(nickname.value).let {
                     when (it) {
                         is BaseState.Success -> {
                             if (it.body) {

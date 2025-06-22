@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.repository.MainRepository
-import com.climus.climeet.presentation.ui.intro.signup.admin.model.SearchCragUiData
-import com.climus.climeet.presentation.ui.intro.signup.admin.toSearchCragUiData
 import com.climus.climeet.presentation.ui.main.shorts.toSearchCragUiData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job

@@ -19,7 +19,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.ui.intro.signup.climer.setclimerprofile.SetClimerProfileFragment">
+        tools:context=".presentation.ui.main.mypage.myprofile.admin.editprofile.MyPageAdminProfileEditFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout"
