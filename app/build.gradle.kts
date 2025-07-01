@@ -1,6 +1,38 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import java.io.FileInputStream
 import java.util.Properties
+
+val localProperties = Properties().apply {
+    rootProject.file("local.properties")
+        .takeIf { it.isFile }
+        ?.inputStream()
+        ?.use(::load)
+}
+
+fun configuredUrl(propertyKey: String): String {
+    val value = providers.gradleProperty(propertyKey).orNull
+        ?: localProperties.getProperty(propertyKey)
+        ?: "https://example.invalid/"
+    val normalized = value.trim().removeSurrounding("\"")
+
+    require(normalized.startsWith("http://") || normalized.startsWith("https://")) {
+        "$propertyKey must use http:// or https://"
+    }
+    require(normalized.endsWith('/')) {
+        "$propertyKey must end with a trailing slash"
+    }
+    return normalized
+}
+
+val testServerUrl = providers.gradleProperty("testServerUrl").orNull?.also { url ->
+    require(url.startsWith("http://") || url.startsWith("https://")) {
+        "testServerUrl must use http:// or https://"
+    }
+    require(url.endsWith('/')) {
+        "testServerUrl must end with a trailing slash"
+    }
+}
+
+fun buildConfigString(value: String): String =
+    "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
 
 plugins {
     id("com.android.application")
@@ -8,16 +40,18 @@ plugins {
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
     id("androidx.navigation.safeargs.kotlin")
-    id("com.google.gms.google-services")
 }
+
+if (file("google-services.json").isFile) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
+val baseDevUrl = configuredUrl("baseDevUrl")
+val baseProdUrl = configuredUrl("baseProdUrl")
 
 android {
     namespace = "com.climus.climeet"
     compileSdk = 34
-
-    Properties().apply {
-        load(FileInputStream("$rootDir/local.properties"))
-    }
 
     defaultConfig {
         applicationId = "com.climus.climeet"
@@ -27,12 +61,19 @@ android {
         versionName = "0.2.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "BASE_DEV_URL", getProperty("baseDevUrl"))
-        buildConfigField("String", "BASE_PROD_URL", getProperty("baseProdUrl"))
+        buildConfigField("String", "BASE_API_URL", buildConfigString("https://example.invalid/"))
     }
 
     buildTypes {
+        debug {
+            buildConfigField(
+                "String",
+                "BASE_API_URL",
+                buildConfigString(testServerUrl ?: baseDevUrl),
+            )
+        }
         release {
+            buildConfigField("String", "BASE_API_URL", buildConfigString(baseProdUrl))
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -51,10 +92,6 @@ android {
         dataBinding = true
         buildConfig = true
     }
-}
-
-fun getProperty(propertyKey: String): String {
-    return gradleLocalProperties(rootDir).getProperty(propertyKey)
 }
 
 dependencies {
