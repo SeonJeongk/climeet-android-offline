@@ -1,0 +1,18 @@
+{
+  "gymId": 1,
+  "date": "2026-08-12",
+  "time": "01:23:45",
+  "avgDifficulty": 1,
+  "routeRecordRequestDtoList": [
+    {
+      "routeId": 1001,
+      "attemptCount": 2,
+      "isCompleted": true
+    },
+    {
+      "routeId": 1002,
+      "attemptCount": 1,
+      "isCompleted": false
+    }
+  ]
+}

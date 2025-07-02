@@ -1,0 +1,112 @@
+{
+  "difficultyList": [
+    {
+      "climeetDifficultyName": "V0",
+      "difficulty": 0,
+      "gymDifficultyColor": "#FFFFFF",
+      "gymDifficultyName": "V0"
+    },
+    {
+      "climeetDifficultyName": "V1",
+      "difficulty": 1,
+      "gymDifficultyColor": "#F34040",
+      "gymDifficultyName": "V1"
+    },
+    {
+      "climeetDifficultyName": "V2",
+      "difficulty": 2,
+      "gymDifficultyColor": "#FF9000",
+      "gymDifficultyName": "V2"
+    },
+    {
+      "climeetDifficultyName": "V3",
+      "difficulty": 3,
+      "gymDifficultyColor": "#FDDA16",
+      "gymDifficultyName": "V3"
+    },
+    {
+      "climeetDifficultyName": "V4",
+      "difficulty": 4,
+      "gymDifficultyColor": "#63B75D",
+      "gymDifficultyName": "V4"
+    },
+    {
+      "climeetDifficultyName": "V5",
+      "difficulty": 5,
+      "gymDifficultyColor": "#0094FF",
+      "gymDifficultyName": "V5"
+    },
+    {
+      "climeetDifficultyName": "V6",
+      "difficulty": 6,
+      "gymDifficultyColor": "#393FD6",
+      "gymDifficultyName": "V6"
+    },
+    {
+      "climeetDifficultyName": "V7",
+      "difficulty": 7,
+      "gymDifficultyColor": "#A259FF",
+      "gymDifficultyName": "V7"
+    },
+    {
+      "climeetDifficultyName": "V8",
+      "difficulty": 8,
+      "gymDifficultyColor": "#6E4C41",
+      "gymDifficultyName": "V8"
+    },
+    {
+      "climeetDifficultyName": "V9",
+      "difficulty": 9,
+      "gymDifficultyColor": "#8B8B8B",
+      "gymDifficultyName": "V9"
+    },
+    {
+      "climeetDifficultyName": "C1",
+      "difficulty": 10,
+      "gymDifficultyColor": "#000000",
+      "gymDifficultyName": "C1"
+    },
+    {
+      "climeetDifficultyName": "C2",
+      "difficulty": 11,
+      "gymDifficultyColor": "#000000",
+      "gymDifficultyName": "C2"
+    },
+    {
+      "climeetDifficultyName": "C3",
+      "difficulty": 12,
+      "gymDifficultyColor": "#000000",
+      "gymDifficultyName": "C3"
+    }
+  ],
+  "maxFloor": 2,
+  "gymId": 1,
+  "layoutImageUrl": "https://example.invalid/images/layout-small-01.png",
+  "sectorList": [
+    {
+      "sectorId": 101,
+      "floor": 1,
+      "name": "Synthetic Sector 1A",
+      "sectorImageUrl": "https://example.invalid/images/sector-small-01.png"
+    },
+    {
+      "sectorId": 102,
+      "floor": 1,
+      "name": "Synthetic Sector 1B",
+      "sectorImageUrl": "https://example.invalid/images/sector-small-02.png"
+    },
+    {
+      "sectorId": 201,
+      "floor": 2,
+      "name": "Synthetic Sector 2A",
+      "sectorImageUrl": "https://example.invalid/images/sector-small-03.png"
+    },
+    {
+      "sectorId": 202,
+      "floor": 2,
+      "name": "Synthetic Sector 2B",
+      "sectorImageUrl": "https://example.invalid/images/sector-small-04.png"
+    }
+  ],
+  "timePoint": "2026-08-12"
+}

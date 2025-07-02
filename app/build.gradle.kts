@@ -121,6 +121,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:$okHttpVersion")
     implementation("com.squareup.okhttp3:logging-interceptor:$okHttpVersion")
     implementation("com.squareup.okhttp3:okhttp-urlconnection:$okHttpVersion")
+    testImplementation("com.squareup.okhttp3:mockwebserver:$okHttpVersion")
 
     // glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
