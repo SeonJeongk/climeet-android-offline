@@ -20,3 +20,5 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: Run unit tests
         run: ./gradlew :app:testDebugUnitTest
+      - name: Verify measurement aggregation tooling
+        run: python3 -m unittest discover -s tools/measurement -p 'test_*.py'
