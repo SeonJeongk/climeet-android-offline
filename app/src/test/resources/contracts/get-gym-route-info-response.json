@@ -1,0 +1,39 @@
+{
+  "page": 0,
+  "hasNext": true,
+  "result": [
+    {
+      "routeId": 1001,
+      "sectorId": 101,
+      "sectorName": "Synthetic Sector 1A",
+      "climeetDifficultyName": "V0",
+      "difficulty": 0,
+      "gymDifficultyName": "V0",
+      "gymDifficultyColor": "#FFFFFF",
+      "routeImageUrl": "https://example.invalid/images/route-small-01.png",
+      "holdColor": "#FFFFFF"
+    },
+    {
+      "routeId": 1002,
+      "sectorId": 102,
+      "sectorName": "Synthetic Sector 1B",
+      "climeetDifficultyName": "V1",
+      "difficulty": 1,
+      "gymDifficultyName": "V1",
+      "gymDifficultyColor": "#F34040",
+      "routeImageUrl": "https://example.invalid/images/route-medium-01.jpg",
+      "holdColor": "#F34040"
+    },
+    {
+      "routeId": 1003,
+      "sectorId": 201,
+      "sectorName": "Synthetic Sector 2A",
+      "climeetDifficultyName": "V2",
+      "difficulty": 2,
+      "gymDifficultyName": "V2",
+      "gymDifficultyColor": "#FF9000",
+      "routeImageUrl": "https://example.invalid/images/route-large-01.jpg",
+      "holdColor": "#FF9000"
+    }
+  ]
+}
