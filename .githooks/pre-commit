@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -eu
+
+repository_root=$(git rev-parse --show-toplevel)
+cd "$repository_root"
+
+if ! ./gradlew ktlintCheck; then
+    echo "ktlintCheck가 실패했습니다. 위반을 수동으로 수정한 뒤 ./gradlew ktlintCheck를 다시 실행해 주세요." >&2
+    exit 1
+fi
