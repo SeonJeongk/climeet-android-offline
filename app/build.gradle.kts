@@ -1,3 +1,5 @@
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import java.util.Properties
 
 val localProperties = Properties().apply {
@@ -40,6 +42,8 @@ plugins {
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
     id("androidx.navigation.safeargs.kotlin")
+    id("org.jlleitschuh.gradle.ktlint")
+    id("io.gitlab.arturbosch.detekt")
 }
 
 if (file("google-services.json").isFile) {
@@ -92,6 +96,52 @@ android {
         dataBinding = true
         buildConfig = true
     }
+}
+
+ktlint {
+    version.set("1.5.0")
+    android.set(true)
+    outputToConsole.set(true)
+    ignoreFailures.set(false)
+    baseline.set(file("config/ktlint/baseline.xml"))
+    filter {
+        exclude("**/build/**")
+        exclude("**/generated/**")
+    }
+    kotlinScriptAdditionalPaths {
+        include(
+            rootProject.fileTree(rootProject.projectDir) {
+                include("*.gradle.kts")
+            },
+        )
+    }
+}
+
+detekt {
+    toolVersion = "1.23.8"
+    source.setFrom("src/main/java", "src/test/java", "src/androidTest/java")
+    config.setFrom(rootProject.files("config/detekt/detekt.yml"))
+    baseline = rootProject.file("config/detekt/baseline.xml")
+    buildUponDefaultConfig = true
+    parallel = true
+    ignoreFailures = false
+}
+
+tasks.withType<Detekt>().configureEach {
+    jvmTarget = "1.8"
+    exclude("**/build/**", "**/generated/**")
+    reports {
+        xml.required.set(false)
+        html.required.set(false)
+        txt.required.set(false)
+        sarif.required.set(false)
+        md.required.set(false)
+    }
+}
+
+tasks.withType<DetektCreateBaselineTask>().configureEach {
+    jvmTarget = "1.8"
+    exclude("**/build/**", "**/generated/**")
 }
 
 dependencies {

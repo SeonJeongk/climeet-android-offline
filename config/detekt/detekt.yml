@@ -1,0 +1,57 @@
+build:
+  maxIssues: 0
+
+config:
+  validation: true
+  warningsAsErrors: false
+
+complexity:
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 20
+  LongMethod:
+    active: true
+    threshold: 60
+  LongParameterList:
+    active: true
+    functionThreshold: 6
+    constructorThreshold: 8
+  NestedBlockDepth:
+    active: true
+    threshold: 4
+
+coroutines:
+  GlobalCoroutineUsage:
+    active: true
+  SuspendFunSwallowedCancellation:
+    active: true
+
+exceptions:
+  SwallowedException:
+    active: true
+    ignoredExceptionTypes:
+      - InterruptedException
+      - MalformedURLException
+      - NumberFormatException
+      - ParseException
+  TooGenericExceptionCaught:
+    active: true
+    exceptionNames:
+      - ArrayIndexOutOfBoundsException
+      - Error
+      - Exception
+      - IllegalMonitorStateException
+      - IndexOutOfBoundsException
+      - NullPointerException
+      - RuntimeException
+      - Throwable
+
+potential-bugs:
+  UnreachableCode:
+    active: true
+  UnsafeCallOnNullableType:
+    active: true
+
+style:
+  WildcardImport:
+    active: true
