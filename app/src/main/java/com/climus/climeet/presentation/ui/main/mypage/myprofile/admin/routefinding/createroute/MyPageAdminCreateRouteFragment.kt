@@ -36,7 +36,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.io.OutputStream
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
@@ -173,17 +172,14 @@ class MyPageAdminCreateRouteFragment :
         val directory = requireContext().filesDir // 내부 저장소의 파일 디렉토리
         val file = File(directory, generateFileName())
 
-        var outputStream: OutputStream? = null
         try {
-            outputStream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            outputStream.flush()
+            FileOutputStream(file).use { outputStream ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                outputStream.flush()
+            }
             return file
         } catch (e: IOException) {
-            Log.d(TAG, e.message.toString())
-            e.printStackTrace()
-        } finally {
-            outputStream?.close()
+            Log.w(TAG, "루트 이미지 파일 저장에 실패했습니다", e)
         }
         return null
     }

@@ -35,7 +35,8 @@ exceptions:
       - NumberFormatException
       - ParseException
   TooGenericExceptionCaught:
-    active: true
+    # 오류 결과로 변환하는 경계에서는 포괄 예외 처리를 허용합니다.
+    active: false
     exceptionNames:
       - ArrayIndexOutOfBoundsException
       - Error

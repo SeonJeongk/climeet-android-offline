@@ -306,16 +306,10 @@
     <ID>MaxLineLength:UploadViewModel.kt$UploadViewModel$sectorId = if (uiState.value.selectedFilter.sectorId == -1L) null else uiState.value.selectedFilter.sectorId</ID>
     <ID>NestedBlockDepth:SetTimerClimbingRecordViewModel.kt$SetTimerClimbingRecordViewModel$private fun deleteRouteRecord(item: RouteUiData, isCompleted: Boolean)</ID>
     <ID>NestedBlockDepth:TextViewBindingAdapters.kt$@BindingAdapter("keyword", "searchResult") fun bindSearchResult(tv: TextView, keyword: String?, searchResult: String?)</ID>
-    <ID>PrintStackTrace:MyPageAdminCreateRouteFragment.kt$MyPageAdminCreateRouteFragment$e</ID>
     <ID>ReturnCount:CreateClimbingRecordViewModel.kt$CreateClimbingRecordViewModel$private fun getTimeDiff(): LocalTime</ID>
     <ID>ReturnCount:MainActivity.kt$MainActivity$override fun onRequestPermissionsResult( requestCode: Int, permissions: Array&lt;out String&gt;, grantResults: IntArray, )</ID>
     <ID>ReturnCount:MyPageAdminCreateRouteFragment.kt$MyPageAdminCreateRouteFragment$private fun getCroppedBitmapFromImageView(): Bitmap?</ID>
-    <ID>SwallowedException:DataExtensions.kt$e: Exception</ID>
-    <ID>SwallowedException:DataExtensions.kt$ex: Exception</ID>
     <ID>ThrowingExceptionsWithoutMessageOrCause:CreateClimbingRecordViewModel.kt$CreateClimbingRecordViewModel$IllegalArgumentException()</ID>
-    <ID>TooGenericExceptionCaught:BaseState.kt$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:DataExtensions.kt$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:DataExtensions.kt$ex: Exception</ID>
     <ID>TooManyFunctions:CalendarFragment.kt$CalendarFragment : BaseFragment</ID>
     <ID>TooManyFunctions:CreateClimbingRecordViewModel.kt$CreateClimbingRecordViewModel : ViewModel</ID>
     <ID>TooManyFunctions:GlobalMapper.kt$com.climus.climeet.presentation.ui.main.global.GlobalMapper.kt</ID>
