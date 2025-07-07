@@ -32,16 +32,20 @@ data class HomeUiState(
     val curFilter: SelectedFilter = SelectedFilter(),
     val page: Int = 0,
     val hasNext: Boolean = true,
-    val myProfile: UserProfileInfoResponse? = null
+    val myProfile: UserProfileInfoResponse? = null,
 )
 
 sealed class HomeEvent {
-    data class NavigateToShortsPlayer(val shortsId: Long, val position: Int) : HomeEvent()
+    data class NavigateToShortsPlayer(
+        val shortsId: Long,
+        val position: Int,
+    ) : HomeEvent()
 }
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
-
+class HomeViewModel @Inject constructor(
+    private val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
@@ -54,9 +58,7 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository) 
                 when (it) {
                     is BaseState.Success -> {
                         _uiState.update { state ->
-                            state.copy(
-                                bannerList = it.body
-                            )
+                            state.copy(bannerList = it.body)
                         }
                     }
 
@@ -75,9 +77,7 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository) 
                 when (it) {
                     is BaseState.Success -> {
                         _uiState.update { state ->
-                            state.copy(
-                                homegymList = it.body
-                            )
+                            state.copy(homegymList = it.body)
                         }
                     }
 
@@ -96,9 +96,7 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository) 
                 when (it) {
                     is BaseState.Success -> {
                         _uiState.update { state ->
-                            state.copy(
-                                followOrderCragList = it.body
-                            )
+                            state.copy(followOrderCragList = it.body)
                         }
                     }
 
@@ -117,9 +115,7 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository) 
                 when (it) {
                     is BaseState.Success -> {
                         _uiState.update { state ->
-                            state.copy(
-                                recordOrderCragList = it.body
-                            )
+                            state.copy(recordOrderCragList = it.body)
                         }
                     }
 
@@ -138,9 +134,7 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository) 
                 when (it) {
                     is BaseState.Success -> {
                         _uiState.update { state ->
-                            state.copy(
-                                routeList = it.body
-                            )
+                            state.copy(routeList = it.body)
                         }
                     }
 
@@ -159,9 +153,7 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository) 
                 when (it) {
                     is BaseState.Success -> {
                         _uiState.update { state ->
-                            state.copy(
-                                myProfile = it.body
-                            )
+                            state.copy(myProfile = it.body)
                         }
                     }
 
@@ -173,5 +165,4 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository) 
             }
         }
     }
-
 }

@@ -9,19 +9,26 @@ import com.climus.climeet.presentation.ui.main.shorts.adapter.ShortsDetailAdapte
 import com.climus.climeet.presentation.ui.main.shorts.model.ShortsUiData
 
 @BindingAdapter("list")
-fun <T, VH : RecyclerView.ViewHolder> bindList(recyclerView: RecyclerView, list: List<T>) {
+fun <T, VH : RecyclerView.ViewHolder> bindList(
+    recyclerView: RecyclerView,
+    list: List<T>,
+) {
     val adapter = recyclerView.adapter as ListAdapter<T, VH>
     adapter.submitList(list)
 }
 
 @SuppressLint("NotifyDataSetChanged")
 @BindingAdapter("shortsList", "currentPosition")
-fun bindShortsList(view: ViewPager2, list: List<ShortsUiData>, position: Int?){
-    (view.adapter as ShortsDetailAdapter).apply{
+fun bindShortsList(
+    view: ViewPager2,
+    list: List<ShortsUiData>,
+    position: Int?,
+) {
+    (view.adapter as ShortsDetailAdapter).apply {
         data = list
         notifyDataSetChanged()
     }
-    position?.let{
+    position?.let {
         view.setCurrentItem(it, false)
     }
 }

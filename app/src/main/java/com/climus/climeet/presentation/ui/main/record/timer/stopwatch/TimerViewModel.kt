@@ -12,14 +12,13 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.climus.climeet.app.App.Companion.sharedPreferences
-import com.climus.climeet.data.model.request.ClimbingRecord
-import com.climus.climeet.data.model.request.CreateTimerClimbingRecordRequest
-import com.climus.climeet.data.repository.MainRepository
 import com.climus.climeet.data.local.ClimbingRecordData
 import com.climus.climeet.data.local.RouteRecordData
 import com.climus.climeet.data.model.BaseState
+import com.climus.climeet.data.model.request.ClimbingRecord
+import com.climus.climeet.data.model.request.CreateTimerClimbingRecordRequest
+import com.climus.climeet.data.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -28,9 +27,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TimerViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _time = MutableLiveData<Long>().apply { value = 0L }
     val time: LiveData<Long> get() = _time
     var pauseState = MutableLiveData<String>()
@@ -47,7 +45,10 @@ class TimerViewModel @Inject constructor(
     // 스톱워치 경과시간과 일시정지 여부를 전달받음
     // pauseState를 String으로 전달받는 이유 : default값을 설정하지 않기 위해
     private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
+        override fun onReceive(
+            context: Context,
+            intent: Intent,
+        ) {
             _time.value = intent.getLongExtra("elapsedTime", 0L)
             val state = intent.getStringExtra("pauseState")
             if (state != null) {
@@ -120,12 +121,10 @@ class TimerViewModel @Inject constructor(
             }
 
             val hours = TimeUnit.MILLISECONDS.toHours(endTime)
-            val minutes = TimeUnit.MILLISECONDS.toMinutes(endTime) - TimeUnit.HOURS.toMinutes(
-                TimeUnit.MILLISECONDS.toHours(endTime)
-            )
-            val seconds = TimeUnit.MILLISECONDS.toSeconds(endTime) - TimeUnit.MINUTES.toSeconds(
-                TimeUnit.MILLISECONDS.toMinutes(endTime)
-            )
+            val minutes = TimeUnit.MILLISECONDS.toMinutes(endTime) -
+                TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(endTime))
+            val seconds = TimeUnit.MILLISECONDS.toSeconds(endTime) -
+                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(endTime))
 
             val formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds)
 
@@ -135,7 +134,7 @@ class TimerViewModel @Inject constructor(
                 date = recordData.date,
                 time = formattedTime!!,
                 avgDifficulty = avgDifficulty,
-                routeRecordRequestDtoList = routeRecords ?: listOf()
+                routeRecordRequestDtoList = routeRecords ?: listOf(),
             )
             // Log.d("recorddd", "리퀘스트 : $requestBody")
 
@@ -163,7 +162,8 @@ class TimerViewModel @Inject constructor(
 
     fun registerReceiver(context: Context) {
         LocalBroadcastManager.getInstance(context).registerReceiver(
-            broadcastReceiver, IntentFilter(STOPWATCH_UPDATE)
+            broadcastReceiver,
+            IntentFilter(STOPWATCH_UPDATE),
         )
     }
 

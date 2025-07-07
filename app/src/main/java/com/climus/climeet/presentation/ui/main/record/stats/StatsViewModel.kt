@@ -31,18 +31,22 @@ data class StatusUiState(
     val completedCountString: String = "0문제 완등",
     val attemptCountString: String = "100문제 도전!",
     val chartUiList: List<StickChartUiData> = emptyList(),
-    val gymList: List<SelectGymData> = emptyList()
+    val gymList: List<SelectGymData> = emptyList(),
 )
 
 sealed class StatsEvent {
     data object NavigateToSelectMonthYearBottomSheetFragment : StatsEvent()
+
     data object ShowPopupWindow : StatsEvent()
-    data class ShowToastMessage(val msg: String) : StatsEvent()
+
+    data class ShowToastMessage(
+        val msg: String,
+    ) : StatsEvent()
 }
 
 @HiltViewModel
 class StatsViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(StatusUiState())
     val uiState: StateFlow<StatusUiState> = _uiState.asStateFlow()
@@ -56,8 +60,7 @@ class StatsViewModel @Inject constructor(
     var selectedGymName = MutableStateFlow("클밋 기준")
 
     val selectedDate = MutableLiveData(LocalDate.now())
-    val curDate =
-        MutableStateFlow("${selectedDate.value?.year}년 ${selectedDate.value?.monthValue}월")
+    val curDate = MutableStateFlow("${selectedDate.value?.year}년 ${selectedDate.value?.monthValue}월")
     val cc = MutableStateFlow("0문제 완등")
     val ac = MutableStateFlow("100문제 도전!")
 
@@ -80,11 +83,10 @@ class StatsViewModel @Inject constructor(
                             Log.d(TAG, "${result.body}")
                             _uiState.update { state ->
                                 state.copy(
-                                    gymList = listOf(
-                                        SelectGymData(0, "클밋 기준", ::onGymClicked)
-                                    ) + result.body.map {
-                                        it.toSelectGymData(::onGymClicked)
-                                    }
+                                    gymList = listOf(SelectGymData(0, "클밋 기준", ::onGymClicked)) +
+                                        result.body.map {
+                                            it.toSelectGymData(::onGymClicked)
+                                        },
                                 )
                             }
                         }
@@ -92,9 +94,7 @@ class StatsViewModel @Inject constructor(
                         is BaseState.Error -> {
                             _uiState.update { state ->
                                 state.copy(
-                                    gymList = listOf(
-                                        SelectGymData(0, "클밋 기준", ::onGymClicked)
-                                    )
+                                    gymList = listOf(SelectGymData(0, "클밋 기준", ::onGymClicked)),
                                 )
                             }
                             _event.emit(StatsEvent.ShowToastMessage("암장을 불러오지 못했습니다!"))
@@ -145,7 +145,7 @@ class StatsViewModel @Inject constructor(
                             state.copy(
                                 totalTime = body.time,
                                 totalCompletedCount = body.totalCompletedCount,
-                                totalAttemptCount = body.attemptRouteCount
+                                totalAttemptCount = body.attemptRouteCount,
                             )
                         }
 
@@ -179,15 +179,13 @@ class StatsViewModel @Inject constructor(
                                     levelName = it.key,
                                     // todo 레벨에 대응되는 색상 hex 값
                                     levelHex = Constants.climeetColor[it.key],
-                                    levelStringColor = "#FFFFFF"
-                                )
+                                    levelStringColor = "#FFFFFF",
+                                ),
                             )
                         }
 
                         _uiState.update { state ->
-                            state.copy(
-                                chartUiList = list
-                            )
+                            state.copy(chartUiList = list)
                         }
 
                         // todo 여기까지
@@ -201,7 +199,7 @@ class StatsViewModel @Inject constructor(
                                 totalTime = "00:00:00",
                                 totalCompletedCount = 0,
                                 totalAttemptCount = 0,
-                                chartUiList = emptyList()
+                                chartUiList = emptyList(),
                             )
                         }
                         setProgress()
@@ -227,7 +225,7 @@ class StatsViewModel @Inject constructor(
                                 state.copy(
                                     totalTime = body.time,
                                     totalCompletedCount = body.totalCompletedCount,
-                                    totalAttemptCount = body.attemptRouteCount
+                                    totalAttemptCount = body.attemptRouteCount,
                                 )
                             }
 
@@ -244,7 +242,8 @@ class StatsViewModel @Inject constructor(
                                 val percent = if (it.count == 0) {
                                     0
                                 } else {
-                                    ((it.count.toFloat() / body.totalCompletedCount.toFloat()) * 100).roundToInt()
+                                    ((it.count.toFloat() / body.totalCompletedCount.toFloat()) * 100)
+                                        .roundToInt()
                                 }
 
                                 list.add(
@@ -253,15 +252,13 @@ class StatsViewModel @Inject constructor(
                                         percent = if (percent == 0) 0f else (it.count.toFloat() / maxPercent) * 1f,
                                         levelName = it.gymDifficultyName,
                                         levelHex = it.gymDifficultyColor,
-                                        levelStringColor = "#FFFFFF"
-                                    )
+                                        levelStringColor = "#FFFFFF",
+                                    ),
                                 )
                             }
 
                             _uiState.update { state ->
-                                state.copy(
-                                    chartUiList = list
-                                )
+                                state.copy(chartUiList = list)
                             }
 
                             setProgress()
@@ -273,7 +270,7 @@ class StatsViewModel @Inject constructor(
                                     totalTime = "00:00:00",
                                     totalCompletedCount = 0,
                                     totalAttemptCount = 0,
-                                    chartUiList = emptyList()
+                                    chartUiList = emptyList(),
                                 )
                             }
                             setProgress()
@@ -316,5 +313,4 @@ class StatsViewModel @Inject constructor(
             _event.emit(StatsEvent.ShowPopupWindow)
         }
     }
-
 }

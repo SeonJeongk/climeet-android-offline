@@ -5,5 +5,5 @@ data class MyPageShortsCommentUiData(
     val shortsId: Long = 0,
     val content: String = "",
     val profileImage: String? = "",
-    val createdAt: String = ""
+    val createdAt: String = "",
 )

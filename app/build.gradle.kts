@@ -33,8 +33,7 @@ val testServerUrl = providers.gradleProperty("testServerUrl").orNull?.also { url
     }
 }
 
-fun buildConfigString(value: String): String =
-    "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
+fun buildConfigString(value: String): String = "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
 
 plugins {
     id("com.android.application")
@@ -81,7 +80,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -103,7 +102,6 @@ ktlint {
     android.set(true)
     outputToConsole.set(true)
     ignoreFailures.set(false)
-    baseline.set(file("config/ktlint/baseline.xml"))
     filter {
         exclude("**/build/**")
         exclude("**/generated/**")
@@ -158,8 +156,8 @@ dependencies {
 
     // hilt
     val hiltVersion = "2.48"
-    implementation("com.google.dagger:hilt-android:${hiltVersion}")
-    kapt("com.google.dagger:hilt-android-compiler:${hiltVersion}")
+    implementation("com.google.dagger:hilt-android:$hiltVersion")
+    kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
 
     // retrofit
     val retrofitVersion = "2.9.0"
@@ -197,10 +195,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
 
     // Calendar
-    implementation ("com.kizitonwose.calendar:view:2.4.1")
+    implementation("com.kizitonwose.calendar:view:2.4.1")
 
     // View Pager
-    implementation ("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
 
     // firebase
     implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
@@ -218,5 +216,5 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging-ktx")
 
     // MPAndroidChart
-    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }

@@ -8,44 +8,44 @@ import androidx.recyclerview.widget.RecyclerView
 import com.climus.climeet.databinding.ItemRouteImageBinding
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
 
-class RouteImageAdapter :
-    ListAdapter<RouteUiData, RouteImageViewHolder>(diffCallback) {
-
+class RouteImageAdapter : ListAdapter<RouteUiData, RouteImageViewHolder>(diffCallback) {
     companion object {
         val diffCallback = object : DiffUtil.ItemCallback<RouteUiData>() {
             override fun areItemsTheSame(
                 oldItem: RouteUiData,
-                newItem: RouteUiData
-            ): Boolean {
-                return oldItem.sectorId == newItem.sectorId
-            }
+                newItem: RouteUiData,
+            ): Boolean = oldItem.sectorId == newItem.sectorId
 
             override fun areContentsTheSame(
                 oldItem: RouteUiData,
-                newItem: RouteUiData
-            ): Boolean {
-                return oldItem == newItem
-            }
+                newItem: RouteUiData,
+            ): Boolean = oldItem == newItem
         }
     }
 
-    override fun onBindViewHolder(holder: RouteImageViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RouteImageViewHolder,
+        position: Int,
+    ) {
         holder.bind(getItem(position))
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RouteImageViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RouteImageViewHolder =
         RouteImageViewHolder(
             ItemRouteImageBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
-                false
-            )
+                false,
+            ),
         )
 }
 
-class RouteImageViewHolder(private val binding: ItemRouteImageBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-
+class RouteImageViewHolder(
+    private val binding: ItemRouteImageBinding,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: RouteUiData) {
         binding.item = item
         binding.route.setHoldImage(item.holdImg)

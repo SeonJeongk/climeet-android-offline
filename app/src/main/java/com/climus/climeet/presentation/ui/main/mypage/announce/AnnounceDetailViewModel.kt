@@ -3,12 +3,9 @@ package com.climus.climeet.presentation.ui.main.mypage.announce
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bumptech.glide.Glide
-import com.climus.climeet.R
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -36,13 +33,19 @@ data class AnnounceDetailUiData(
 )
 
 sealed class AnnouncementDetailEvent {
-    data class SetRVAdapter(val imageList: List<String>) : AnnouncementDetailEvent()
-    data class ShowToastMessage(val msg: String) : AnnouncementDetailEvent()
+    data class SetRVAdapter(
+        val imageList: List<String>,
+    ) : AnnouncementDetailEvent()
+
+    data class ShowToastMessage(
+        val msg: String,
+    ) : AnnouncementDetailEvent()
 }
 
 @HiltViewModel
-class AnnounceDetailViewModel @Inject constructor(val repository: MainRepository) : ViewModel() {
-
+class AnnounceDetailViewModel @Inject constructor(
+    val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(AnnounceDetailUiData())
     val uiState: StateFlow<AnnounceDetailUiData> = _uiState.asStateFlow()
 
@@ -66,13 +69,12 @@ class AnnounceDetailViewModel @Inject constructor(val repository: MainRepository
                                 content = it.body.content,
                                 likeCount = it.body.likeCount.toString(),
                                 imageList = it.body.imageList,
-                                likeState = it.body.likeStatus
+                                likeState = it.body.likeStatus,
                             )
                         }
                         uiState.value.imageList?.let {
                             setImageList(it)
                         }
-
                     }
 
                     is BaseState.Error -> {
@@ -85,23 +87,17 @@ class AnnounceDetailViewModel @Inject constructor(val repository: MainRepository
 
     fun setLike() {
         _uiState.update { state ->
-            state.copy(
-                likeState = !uiState.value.likeState
-            )
+            state.copy(likeState = !uiState.value.likeState)
         }
 
         if (uiState.value.likeState) {
             _uiState.update { state ->
-                state.copy(
-                    likeCount = (uiState.value.likeCount.toInt() + 1).toString()
-                )
+                state.copy(likeCount = (uiState.value.likeCount.toInt() + 1).toString())
             }
             updateLike(true)
         } else {
             _uiState.update { state ->
-                state.copy(
-                    likeCount = (uiState.value.likeCount.toInt() - 1).toString()
-                )
+                state.copy(likeCount = (uiState.value.likeCount.toInt() - 1).toString())
             }
             updateLike(false)
         }
@@ -121,7 +117,7 @@ class AnnounceDetailViewModel @Inject constructor(val repository: MainRepository
                         }
                     }
                 }
-            } else{
+            } else {
                 repository.updateAnnouncementUnlike(uiState.value.boardId).let {
                     when (it) {
                         is BaseState.Success -> {

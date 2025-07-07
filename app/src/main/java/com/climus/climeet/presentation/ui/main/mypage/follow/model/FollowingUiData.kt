@@ -1,13 +1,13 @@
 package com.climus.climeet.presentation.ui.main.mypage.follow.model
 
-data class FollowingUiData (
+data class FollowingUiData(
     val userId: Long,
     val userName: String = "",
-    val profileImageUrl : String = "",
+    val profileImageUrl: String = "",
     var followerCount: Int = 0,
     var followingCount: Int = 0,
     var isFollowing: Boolean = false,
-    val navigateToProfile : (Long) -> Unit,
-    val follow : (Long) -> Unit,
-    val unFollow: (Long) -> Unit
+    val navigateToProfile: (Long) -> Unit,
+    val follow: (Long) -> Unit,
+    val unFollow: (Long) -> Unit,
 )

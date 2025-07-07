@@ -54,11 +54,12 @@ data class CreateClimbingRecordUiState(
     val selectedLevel: GymLevelUiData = GymLevelUiData {},
     val selectedRoute: RouteUiData = RouteUiData {},
     val selectedFilter: SelectedFilter = SelectedFilter(),
-    val clearBtnState: Boolean = false
+    val clearBtnState: Boolean = false,
 )
 
 sealed class CreateClimbingRecordEvent {
     data object ShowDatePicker : CreateClimbingRecordEvent()
+
     data object ShowTimePicker : CreateClimbingRecordEvent()
 
     data object NavigateToSelectCrag : CreateClimbingRecordEvent()
@@ -67,13 +68,14 @@ sealed class CreateClimbingRecordEvent {
 
     data object ClimbingComplete : CreateClimbingRecordEvent()
 
-    data class ShowToastMessage(val msg: String) : CreateClimbingRecordEvent()
-
+    data class ShowToastMessage(
+        val msg: String,
+    ) : CreateClimbingRecordEvent()
 }
 
 @HiltViewModel
 class CreateClimbingRecordViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CreateClimbingRecordUiState())
     val uiState: StateFlow<CreateClimbingRecordUiState> = _uiState.asStateFlow()
@@ -88,8 +90,9 @@ class CreateClimbingRecordViewModel @Inject constructor(
     }.asLiveData()
 
     val initDate = CreateRecordData.selectedDate
-    val datePickText =
-        MutableStateFlow("${initDate.year}년 ${initDate.monthValue}월 ${initDate.dayOfMonth}일 (${initDate.dayOfWeek})")
+    val datePickText = MutableStateFlow(
+        "${initDate.year}년 ${initDate.monthValue}월 ${initDate.dayOfMonth}일 (${initDate.dayOfWeek})",
+    )
     val selectedDate = MutableStateFlow(initDate)
 
     val defaultTimeText = "시간을 입력해주세요 (선택)"
@@ -124,7 +127,10 @@ class CreateClimbingRecordViewModel @Inject constructor(
         setDate()
     }
 
-    fun setSelectedTime(start: LocalTime, end: LocalTime) {
+    fun setSelectedTime(
+        start: LocalTime,
+        end: LocalTime,
+    ) {
         selectedStartTime.value = start
         selectedEndTime.value = end
         setTime()
@@ -198,7 +204,10 @@ class CreateClimbingRecordViewModel @Inject constructor(
         timePickText.value = "$startString - $endString"
     }
 
-    fun selectCrag(id: Long, name: String) {
+    fun selectCrag(
+        id: Long,
+        name: String,
+    ) {
         selectedCragEvent.value = Pair(id, name)
         cragId = id
         cragName = name
@@ -222,14 +231,14 @@ class CreateClimbingRecordViewModel @Inject constructor(
                             _uiState.update { state ->
                                 state.copy(
                                     isSingleFloor = true,
-                                    layoutImg = it.body.layoutImageUrl
+                                    layoutImg = it.body.layoutImageUrl,
                                 )
                             }
                         } else {
                             _uiState.update { state ->
                                 state.copy(
                                     isSingleFloor = false,
-                                    layoutImg = it.body.layoutImageUrl
+                                    layoutImg = it.body.layoutImageUrl,
                                 )
                             }
                         }
@@ -242,27 +251,31 @@ class CreateClimbingRecordViewModel @Inject constructor(
                     }
                 }
             }
-
         }
     }
 
     fun selectFloor(floor: Int) {
         _uiState.update { state ->
             state.copy(
-                secondFloorBtnState = if (floor == 2) FloorBtnState.FloorSelected else FloorBtnState.FloorUnSelected,
+                secondFloorBtnState = if (floor ==
+                    2
+                ) {
+                    FloorBtnState.FloorSelected
+                } else {
+                    FloorBtnState.FloorUnSelected
+                },
                 firstFloorBtnState = if (floor == 1) FloorBtnState.FloorSelected else FloorBtnState.FloorUnSelected,
                 curFloor = floor,
                 sectorNameList = sectorNameList.filter {
                     it.floor == floor
                 },
-                selectedRoute = RouteUiData {}
+                selectedRoute = RouteUiData {},
             )
         }
         setFloorInfo(floor)
     }
 
     private fun setFloorInfo(floor: Int) {
-
         viewModelScope.launch {
             repository.getGymRouteInfoList(cragId, GetGymRouteInfoRequest(0, 10, floor)).let {
                 when (it) {
@@ -274,7 +287,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
                                 routeList = it.body.result.map { data ->
                                     data.toRouteUiData(::selectRoute)
                                 },
-                                curFloor = 1
+                                curFloor = 1,
                             )
                         }
                     }
@@ -294,9 +307,14 @@ class CreateClimbingRecordViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             repository.getGymRouteInfoList(
-                cragId, GetGymRouteInfoRequest(
-                    0, 10, floor, sectorId, difficulty
-                )
+                cragId,
+                GetGymRouteInfoRequest(
+                    0,
+                    10,
+                    floor,
+                    sectorId,
+                    difficulty,
+                ),
             ).let {
                 when (it) {
                     is BaseState.Success -> {
@@ -304,7 +322,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
                             state.copy(
                                 routeList = it.body.result.map { data ->
                                     data.toRouteUiData(::selectRoute)
-                                }
+                                },
                             )
                         }
                     }
@@ -313,7 +331,6 @@ class CreateClimbingRecordViewModel @Inject constructor(
                         _event.emit(CreateClimbingRecordEvent.ShowToastMessage(it.msg))
                     }
                 }
-
             }
         }
     }
@@ -322,40 +339,35 @@ class CreateClimbingRecordViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 sectorNameList = state.sectorNameList.map {
-                    it.copy(
-                        isSelected = it.sectorId == item.sectorId
-                    )
+                    it.copy(isSelected = it.sectorId == item.sectorId)
                 },
                 selectedSector = item,
-                selectedRoute = RouteUiData {}
+                selectedRoute = RouteUiData {},
             )
         }
 
         getRouteList(
             uiState.value.curFloor,
             item.sectorId,
-            if (uiState.value.selectedLevel.difficulty != -1) uiState.value.selectedLevel.difficulty else null
+            if (uiState.value.selectedLevel.difficulty != -1) uiState.value.selectedLevel.difficulty else null,
         )
-
     }
 
     private fun selectGymLevel(item: GymLevelUiData) {
         _uiState.update { state ->
             state.copy(
                 gymLevelList = state.gymLevelList.map {
-                    it.copy(
-                        isSelected = it.difficulty == item.difficulty
-                    )
+                    it.copy(isSelected = it.difficulty == item.difficulty)
                 },
                 selectedLevel = item,
-                selectedRoute = RouteUiData {}
+                selectedRoute = RouteUiData {},
             )
         }
 
         getRouteList(
             uiState.value.curFloor,
             if (uiState.value.selectedSector.sectorId != -1L) uiState.value.selectedSector.sectorId else null,
-            item.difficulty
+            item.difficulty,
         )
     }
 
@@ -363,7 +375,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 selectedRoute = item,
-                clearBtnState = item.clearBtnState
+                clearBtnState = item.clearBtnState,
             )
         }
         challengeNumber.value = item.challengeNum
@@ -374,7 +386,13 @@ class CreateClimbingRecordViewModel @Inject constructor(
     fun addChallengeNum() {
         challengeNumber.value = challengeNumber.value + 1
         _items.value = _items.value.map {
-            if (it.routeId == uiState.value.selectedRoute.routeId) it.copy(challengeNum = it.challengeNum + 1) else it
+            if (it.routeId ==
+                uiState.value.selectedRoute.routeId
+            ) {
+                it.copy(challengeNum = it.challengeNum + 1)
+            } else {
+                it
+            }
         }
     }
 
@@ -384,9 +402,11 @@ class CreateClimbingRecordViewModel @Inject constructor(
             challengeNumber.value = currentValue - 1
         }
         _items.value = _items.value.map {
-            if (it.routeId == uiState.value.selectedRoute.routeId && it.challengeNum > 1) it.copy(
-                challengeNum = it.challengeNum - 1
-            ) else it
+            if (it.routeId == uiState.value.selectedRoute.routeId && it.challengeNum > 1) {
+                it.copy(challengeNum = it.challengeNum - 1)
+            } else {
+                it
+            }
         }
     }
 
@@ -407,16 +427,14 @@ class CreateClimbingRecordViewModel @Inject constructor(
 
     fun setClear() {
         _uiState.update { state ->
-            state.copy(
-                clearBtnState = !state.clearBtnState
-            )
+            state.copy(clearBtnState = !state.clearBtnState)
         }
         _items.value = _items.value.map {
             if (it.routeId == uiState.value.selectedRoute.routeId) {
-                it.copy(
-                    clearBtnState = !it.clearBtnState
-                )
-            } else it
+                it.copy(clearBtnState = !it.clearBtnState)
+            } else {
+                it
+            }
         }
 
         if (uiState.value.clearBtnState) {
@@ -433,11 +451,13 @@ class CreateClimbingRecordViewModel @Inject constructor(
             val newItem = item.copy()
             _items.value = _items.value + newItem
         } else {
-
         }
     }
 
-    fun showDeleteDialog(context: Context, id: Long) {
+    fun showDeleteDialog(
+        context: Context,
+        id: Long,
+    ) {
         val description = "기록이 삭제되면 복구할 수 없어요.\n정말 루트 기록을 삭제하시겠어요?"
         val rightText = "삭제"
         val leftText = "취소"
@@ -452,9 +472,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
     fun removeItem(id: Long) {
         _items.value = _items.value.filter { it.routeId != id }
         _uiState.update { state ->
-            state.copy(
-                selectedRoute = RouteUiData {}
-            )
+            state.copy(selectedRoute = RouteUiData {})
         }
     }
 
@@ -484,12 +502,11 @@ class CreateClimbingRecordViewModel @Inject constructor(
     }
 
     fun climbingComplete() {
-
         val climbingRecords: List<ClimbingRecord> = _items.value.map { routeUiData ->
             ClimbingRecord(
                 routeId = routeUiData.routeId,
                 attemptCount = routeUiData.challengeNum,
-                isCompleted = routeUiData.clearBtnState
+                isCompleted = routeUiData.clearBtnState,
             )
         }
 
@@ -499,23 +516,22 @@ class CreateClimbingRecordViewModel @Inject constructor(
             gymId = gymId,
             date = CreateRecordData.selectedDate.toString(),
             time = getTimeDiff().toString(),
-            avgDifficulty = _items.value.map { it.difficulty }.average().toInt(),
-            routeRecordRequestDtoList = climbingRecords
+            avgDifficulty = _items.value.map { it.difficulty }
+                .average()
+                .toInt(),
+            routeRecordRequestDtoList = climbingRecords,
         )
 
         viewModelScope.launch {
             repository.createTimerClimbingRecord(requestBody).let {
                 when (it) {
                     is BaseState.Success -> {
-                        _event.emit(
-                            CreateClimbingRecordEvent.ClimbingComplete
-                        )
+                        _event.emit(CreateClimbingRecordEvent.ClimbingComplete)
                     }
 
                     is BaseState.Error -> {
                         _event.emit(CreateClimbingRecordEvent.ShowToastMessage(it.msg))
                     }
-
                 }
             }
         }
@@ -550,5 +566,4 @@ class CreateClimbingRecordViewModel @Inject constructor(
         challengeNumber.value = 0
         isToggleOn.value = true
     }
-
 }

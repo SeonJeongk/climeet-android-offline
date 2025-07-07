@@ -24,15 +24,16 @@ import com.climus.climeet.presentation.ui.toShortsPlayer
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class GymProfileRouteFragment :
-    BaseFragment<FragmentGymProfileRouteBinding>(R.layout.fragment_gym_profile_route) {
-
+class GymProfileRouteFragment : BaseFragment<FragmentGymProfileRouteBinding>(R.layout.fragment_gym_profile_route) {
     private val parentViewModel: GymProfileViewModel by activityViewModels()
     private val sharedViewModel: ShortsPlayerViewModel by activityViewModels()
     private val dateViewModel: SelectDateBottomSheetViewModel by activityViewModels()
     private val viewModel: GymProfileRouteViewModel by viewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.svm = sharedViewModel
@@ -44,23 +45,28 @@ class GymProfileRouteFragment :
         initShortsEventObserve()
         addOnScrollListener()
 
-        viewModel.selectedDate.observe(viewLifecycleOwner, Observer { date ->
-            viewModel.setDate()
-        })
+        viewModel.selectedDate.observe(
+            viewLifecycleOwner,
+            Observer { date ->
+                viewModel.setDate()
+            },
+        )
     }
 
     private fun setRouteTab() {
-        parentViewModel.gymId.observe(viewLifecycleOwner, Observer { id ->
+        parentViewModel.gymId.observe(
+            viewLifecycleOwner,
+            Observer { id ->
 
-            sharedViewModel.setCurFilter(id)
-            sharedViewModel.getShorts(ShortsOption.NEW_SORT)
+                sharedViewModel.setCurFilter(id)
+                sharedViewModel.getShorts(ShortsOption.NEW_SORT)
 
-            viewModel.setCragInfo(id, parentViewModel.uiState.value.gymName)
-        })
+                viewModel.setCragInfo(id, parentViewModel.uiState.value.gymName)
+            },
+        )
     }
 
     private fun addOnScrollListener() {
-
         binding.layoutScrollview.setOnScrollChangeListener { v, _, scrollY, _, _ ->
             if (scrollY == binding.layoutScrollview.getChildAt(0).measuredHeight - v.measuredHeight) {
                 sharedViewModel.getShorts(ShortsOption.NEXT_PAGE)
@@ -87,13 +93,13 @@ class GymProfileRouteFragment :
                             requireContext(),
                             dateViewModel,
                             GymProfileData.selectedDate,
-                            GymProfileData::setSelectedDate
+                            GymProfileData::setSelectedDate,
                         ) { date ->
                             viewModel.setSelectedDate(date)
                         }.show()
                     }
 
-                    is GymProfileRouteEvent.deleteFilter -> {
+                    is GymProfileRouteEvent.DeleteFilter -> {
                         sharedViewModel.gymProfileDelete.value = true
                         sharedViewModel.deleteFilter()
                     }
@@ -115,10 +121,11 @@ class GymProfileRouteFragment :
             sharedViewModel.event.collect {
                 when (it) {
                     is ShortsPlayerEvent.ShowToastMessage -> showToastMessage(it.msg)
-                    is ShortsPlayerEvent.NavigateToShortsPlayer -> findNavController().toShortsPlayer(
-                        it.shortsId,
-                        it.position
-                    )
+                    is ShortsPlayerEvent.NavigateToShortsPlayer ->
+                        findNavController().toShortsPlayer(
+                            it.shortsId,
+                            it.position,
+                        )
                     else -> {}
                 }
             }

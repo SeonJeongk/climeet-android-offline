@@ -27,9 +27,8 @@ data class GymProfileInfoUiState(
 
 @HiltViewModel
 class GymProfileViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(GymProfileInfoUiState())
     val uiState: StateFlow<GymProfileInfoUiState> = _uiState.asStateFlow()
 
@@ -61,7 +60,7 @@ class GymProfileViewModel @Inject constructor(
                                 followerCount = result.body.followerCount,
                                 followingCount = result.body.followingCount,
                                 averageRating = result.body.averageRating,
-                                reviewCount = result.body.reviewCount
+                                reviewCount = result.body.reviewCount,
                             )
                         }
                         followState.value = result.body.isFollower
@@ -84,21 +83,16 @@ class GymProfileViewModel @Inject constructor(
                     if (followState.value) {
                         repository.followGym(id)
                         _uiState.update { state ->
-                            state.copy(
-                                followerCount = _uiState.value.followerCount + 1
-                            )
+                            state.copy(followerCount = _uiState.value.followerCount + 1)
                         }
                     } else {
                         repository.unFollowGym(id)
                         _uiState.update { state ->
-                            state.copy(
-                                followerCount = _uiState.value.followerCount - 1
-                            )
+                            state.copy(followerCount = _uiState.value.followerCount - 1)
                         }
                     }
                 }
             } ?: Log.d("gym_profile", "암장 아이디가 설정되지 않았습니다.")
         }
     }
-
 }

@@ -12,43 +12,44 @@ import com.climus.climeet.presentation.ui.main.record.model.SelectGymData
 
 class SelectGymAdapter(
     private val selectedItemId: Int,
-    private val itemClickListener: (SelectGymData) -> Unit
-) :
-    ListAdapter<SelectGymData, SelectGymAdapter.SelectGymViewHolder>(diffCallback) {
-
+    private val itemClickListener: (SelectGymData) -> Unit,
+) : ListAdapter<SelectGymData, SelectGymAdapter.SelectGymViewHolder>(diffCallback) {
     companion object {
         val diffCallback = object : DiffUtil.ItemCallback<SelectGymData>() {
             override fun areItemsTheSame(
                 oldItem: SelectGymData,
-                newItem: SelectGymData
-            ): Boolean {
-                return oldItem.id == newItem.id
-            }
+                newItem: SelectGymData,
+            ): Boolean = oldItem.id == newItem.id
 
             override fun areContentsTheSame(
                 oldItem: SelectGymData,
-                newItem: SelectGymData
-            ): Boolean {
-                return oldItem == newItem
-            }
+                newItem: SelectGymData,
+            ): Boolean = oldItem == newItem
         }
     }
 
-    override fun onBindViewHolder(holder: SelectGymViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: SelectGymViewHolder,
+        position: Int,
+    ) {
         holder.bind(getItem(position))
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectGymViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): SelectGymViewHolder =
         SelectGymViewHolder(
             ItemStatsGymBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
-                false
-            )
+                false,
+            ),
         )
 
-    inner class SelectGymViewHolder(private val binding: ItemStatsGymBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    inner class SelectGymViewHolder(
+        private val binding: ItemStatsGymBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: SelectGymData) {
             if (item.id == selectedItemId) {
                 binding.tvGymName.setBackgroundResource(R.drawable.rect_mainfill_nostroke_999radius_8elevation)
@@ -65,5 +66,4 @@ class SelectGymAdapter(
             }
         }
     }
-
 }

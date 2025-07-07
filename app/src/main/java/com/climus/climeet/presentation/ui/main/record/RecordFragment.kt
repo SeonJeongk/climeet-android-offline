@@ -14,7 +14,10 @@ import com.climus.climeet.presentation.ui.main.record.stats.StatsFragment
 class RecordFragment : BaseFragment<FragmentRecordBinding>(R.layout.fragment_record) {
     private val viewModel: RecordViewModel by viewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
@@ -50,5 +53,4 @@ class RecordFragment : BaseFragment<FragmentRecordBinding>(R.layout.fragment_rec
             .replace(R.id.container_child_fragment, fragment)
             .commit()
     }
-
 }

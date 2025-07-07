@@ -8,21 +8,28 @@ import com.climus.climeet.databinding.ItemAnnouncementBinding
 import com.climus.climeet.presentation.ui.main.mypage.announce.MyPageAnnounceViewModel
 import com.climus.climeet.presentation.ui.main.mypage.announce.model.AnnouncementUiData
 
-class AnnouncementRVAdapter(private val viewModel : MyPageAnnounceViewModel) :
-    RecyclerView.Adapter<AnnouncementViewHolder>() {
-
+class AnnouncementRVAdapter(
+    private val viewModel: MyPageAnnounceViewModel,
+) : RecyclerView.Adapter<AnnouncementViewHolder>() {
     var items: List<AnnouncementUiData> = emptyList()
         set(value) {
             field = value
             notifyDataSetChanged()
         }
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnnouncementViewHolder {
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): AnnouncementViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemAnnouncementBinding.inflate(inflater, parent, false)
         return AnnouncementViewHolder(binding, viewModel)
     }
 
-    override fun onBindViewHolder(holder: AnnouncementViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: AnnouncementViewHolder,
+        position: Int,
+    ) {
         holder.bind(items[position])
     }
 
@@ -31,11 +38,9 @@ class AnnouncementRVAdapter(private val viewModel : MyPageAnnounceViewModel) :
 
 class AnnouncementViewHolder(
     private val binding: ItemAnnouncementBinding,
-    private val viewModel : MyPageAnnounceViewModel
-) :
-    RecyclerView.ViewHolder(binding.root) {
+    private val viewModel: MyPageAnnounceViewModel,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: AnnouncementUiData) {
-
         // 해당 공지로 이동
         binding.root.setOnClickListener {
             viewModel.navigateToAnnounceDetail(item.boardId)
@@ -58,7 +63,4 @@ class AnnouncementViewHolder(
         binding.tvAnnouncementContents.text = item.content
         binding.tvAnnouncementLikeCount.text = item.likeCount.toString()
     }
-
 }
-
-

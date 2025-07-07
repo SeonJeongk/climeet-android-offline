@@ -1,6 +1,5 @@
 package com.climus.climeet.data.model.request
 
-
 data class ShortsDetailRequest(
     val public: String,
     val thumbnailImageUrl: String,
@@ -9,5 +8,5 @@ data class ShortsDetailRequest(
     val climbingGymId: Long? = null,
     val routeId: Long? = null,
     val sectorId: Long? = null,
-    val shortsVisibility: String
+    val shortsVisibility: String,
 )

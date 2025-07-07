@@ -11,13 +11,14 @@ import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MyPageFollowFragment: BaseFragment<FragmentMypageFollowBinding>(R.layout.fragment_mypage_follow) {
-
-
-    private val args :MyPageFollowFragmentArgs by navArgs()
+class MyPageFollowFragment : BaseFragment<FragmentMypageFollowBinding>(R.layout.fragment_mypage_follow) {
+    private val args: MyPageFollowFragmentArgs by navArgs()
     private val userId by lazy { args.userId }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         setupTabLayout()
@@ -32,5 +33,4 @@ class MyPageFollowFragment: BaseFragment<FragmentMypageFollowBinding>(R.layout.f
             tab.text = tabMenu[position]
         }.attach()
     }
-
 }

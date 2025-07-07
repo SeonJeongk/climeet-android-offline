@@ -9,44 +9,44 @@ import com.climus.climeet.R
 import com.climus.climeet.databinding.ItemGymLevelBinding
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.GymLevelUiData
 
-class GymLevelAdapter :
-    ListAdapter<GymLevelUiData, SectorLevelViewHolder>(diffCallback) {
-
+class GymLevelAdapter : ListAdapter<GymLevelUiData, SectorLevelViewHolder>(diffCallback) {
     companion object {
         val diffCallback = object : DiffUtil.ItemCallback<GymLevelUiData>() {
             override fun areItemsTheSame(
                 oldItem: GymLevelUiData,
-                newItem: GymLevelUiData
-            ): Boolean {
-                return oldItem.levelName == newItem.levelName
-            }
+                newItem: GymLevelUiData,
+            ): Boolean = oldItem.levelName == newItem.levelName
 
             override fun areContentsTheSame(
                 oldItem: GymLevelUiData,
-                newItem: GymLevelUiData
-            ): Boolean {
-                return oldItem == newItem
-            }
+                newItem: GymLevelUiData,
+            ): Boolean = oldItem == newItem
         }
     }
 
-    override fun onBindViewHolder(holder: SectorLevelViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: SectorLevelViewHolder,
+        position: Int,
+    ) {
         holder.bind(getItem(position))
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SectorLevelViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): SectorLevelViewHolder =
         SectorLevelViewHolder(
             ItemGymLevelBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
-                false
-            )
+                false,
+            ),
         )
 }
 
-class SectorLevelViewHolder(private val binding: ItemGymLevelBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-
+class SectorLevelViewHolder(
+    private val binding: ItemGymLevelBinding,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: GymLevelUiData) {
         binding.item = item
         binding.root.setOnClickListener {

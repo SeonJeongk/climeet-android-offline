@@ -16,7 +16,6 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
-
     override fun onCreate() {
         super.onCreate()
         PushUtils.acquireWakeLock(this)
@@ -28,20 +27,22 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         PushUtils.acquireWakeLock(App.getContext())
-        //수신한 메시지를 처리
+        // 수신한 메시지를 처리
 
         showNotification(message.data["title"], message.data["body"])
     }
 
-    private fun showNotification(title: String? = "", message: String? = "") {
-
+    private fun showNotification(
+        title: String? = "",
+        message: String? = "",
+    ) {
         val uniId = (System.currentTimeMillis() / 7).toInt()
         val intent = Intent(this, SplashActivity::class.java)
         val pIntent = PendingIntent.getActivity(
             this,
             uniId,
             intent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE,
         )
 
         val channelId = "greengrim"
@@ -71,5 +72,4 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             notify(uniId, notificationBuilder.build())
         }
     }
-
 }

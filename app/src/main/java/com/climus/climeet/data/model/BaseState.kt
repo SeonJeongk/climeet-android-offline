@@ -6,14 +6,18 @@ import com.google.gson.Gson
 import retrofit2.Response
 
 sealed class BaseState<out T> {
-    data class Success<out T>(val body: T) : BaseState<T>()
-    data class Error(val msg: String, val code: String) : BaseState<Nothing>()
+    data class Success<out T>(
+        val body: T,
+    ) : BaseState<T>()
+
+    data class Error(
+        val msg: String,
+        val code: String,
+    ) : BaseState<Nothing>()
 }
 
-
-
-suspend fun <T> runRemote(block: suspend () -> Response<T>): BaseState<T> {
-    return try {
+suspend fun <T> runRemote(block: suspend () -> Response<T>): BaseState<T> =
+    try {
         val response = block()
         if (response.isSuccessful) {
             response.body()?.let {
@@ -29,4 +33,3 @@ suspend fun <T> runRemote(block: suspend () -> Response<T>): BaseState<T> {
         Log.d(TAG, e.message.toString())
         BaseState.Error("네트워크 통신 에러", "EMPTY")
     }
-}

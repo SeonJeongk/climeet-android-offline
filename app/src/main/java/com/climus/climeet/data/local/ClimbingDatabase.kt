@@ -8,23 +8,24 @@ import androidx.room.RoomDatabase
 @Database(entities = [ClimbingRecordData::class, RouteRecordData::class], version = 2, exportSchema = false)
 abstract class ClimbingDatabase : RoomDatabase() {
     abstract fun ClimbingRecordDao(): ClimbingRecordDao
+
     abstract fun RouteRecordDao(): RouteRecordDao
 
     companion object {
-        private var INSTANCE: ClimbingDatabase? = null
+        private var instance: ClimbingDatabase? = null
 
         fun getInstance(context: Context): ClimbingDatabase? {
-            if (INSTANCE == null) {
+            if (instance == null) {
                 synchronized(ClimbingDatabase::class) {
-                    INSTANCE = Room.databaseBuilder(
+                    instance = Room.databaseBuilder(
                         context.applicationContext,
-                        ClimbingDatabase::class.java, "climbing_db"
-                    )
-                        .fallbackToDestructiveMigration()
+                        ClimbingDatabase::class.java,
+                        "climbing_db",
+                    ).fallbackToDestructiveMigration()
                         .build()
                 }
             }
-            return INSTANCE
+            return instance
         }
     }
 }

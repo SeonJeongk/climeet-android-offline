@@ -6,5 +6,5 @@ data class GetUserInfoResponse(
     val isFollower: Boolean,
     val userId: Int,
     val userName: String,
-    val userProfileUrl: String
+    val userProfileUrl: String,
 )

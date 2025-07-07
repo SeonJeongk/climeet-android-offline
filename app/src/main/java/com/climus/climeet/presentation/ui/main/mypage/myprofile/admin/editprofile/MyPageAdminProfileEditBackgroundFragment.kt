@@ -19,8 +19,9 @@ import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.MyPageAdmi
 import com.climus.climeet.presentation.ui.toMultiPart
 
 class MyPageAdminProfileEditBackgroundFragment :
-    BaseFragment<FragmentMypageAdminProfileBackgroundEditBinding>(R.layout.fragment_mypage_admin_profile_background_edit) {
-
+    BaseFragment<FragmentMypageAdminProfileBackgroundEditBinding>(
+        R.layout.fragment_mypage_admin_profile_background_edit,
+    ) {
     private val parentViewModel: MyPageAdminMyProfileViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val viewModel: MyPageAdminProfileEditBackgroundViewModel by viewModels()
@@ -32,7 +33,10 @@ class MyPageAdminProfileEditBackgroundFragment :
 
     private var gymId: Long = 0
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.svm = mainViewModel
@@ -80,7 +84,7 @@ class MyPageAdminProfileEditBackgroundFragment :
         } else {
             // 갤러리 이미지
             uri.toMultiPart(requireContext())?.let { image ->
-               mainViewModel.fileToUrl(image, DataType.ADMIN_BACKGROUND_IMAGE)
+                mainViewModel.fileToUrl(image, DataType.ADMIN_BACKGROUND_IMAGE)
             } ?: run {
                 showToastMessage("이미지 파일 변환 실패")
             }
@@ -94,17 +98,18 @@ class MyPageAdminProfileEditBackgroundFragment :
     }
 
     private fun NavController.toMyPageAdminProfile() {
-        val action = MyPageAdminProfileEditBackgroundFragmentDirections.actionMyPageAdminProfileEditBackgroundFragmentToMyPageAdminMyProfileFragment(gymId)
+        val action = MyPageAdminProfileEditBackgroundFragmentDirections
+            .actionMyPageAdminProfileEditBackgroundFragmentToMyPageAdminMyProfileFragment(gymId)
         navigate(action)
     }
 
     private fun NavController.toEditProfileNext() {
-        val action =
-            MyPageAdminProfileEditBackgroundFragmentDirections.actionMyPageAdminProfileEditBackgroundFragmentToMyPageAdminProfileEditFragment(
+        val action = MyPageAdminProfileEditBackgroundFragmentDirections
+            .actionMyPageAdminProfileEditBackgroundFragmentToMyPageAdminProfileEditFragment(
                 viewModel.imageUpdated.value,
                 gymName,
                 gymProfile,
-                background
+                background,
             )
         navigate(action)
     }

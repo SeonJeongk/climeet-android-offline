@@ -44,26 +44,22 @@ import kotlin.math.sqrt
 @AndroidEntryPoint
 class MyPageAdminCreateRouteFragment :
     BaseFragment<FragmentMypageAdminCreateRouteBinding>(R.layout.fragment_mypage_admin_create_route) {
-
     private val viewModel: MyPageAdminRouteFindingViewModel by activityViewModels()
 
     private lateinit var neededPermissionList: ArrayList<String>
-    private val requiredPermissionList =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arrayOf(
-                Manifest.permission.READ_MEDIA_IMAGES,
-            )
-        } else {
-            arrayOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            )
-        }
+    private val requiredPermissionList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
+    } else {
+        arrayOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        )
+    }
 
     internal enum class TouchMode {
         NONE,
         ONE_FINGER,
-        TWO_FINGER
+        TWO_FINGER,
     }
 
     private var touchMode: TouchMode? = null
@@ -75,7 +71,10 @@ class MyPageAdminCreateRouteFragment :
     private var cropBitMap: Bitmap? = null
 
     @SuppressLint("ClickableViewAccessibility")
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
@@ -124,9 +123,11 @@ class MyPageAdminCreateRouteFragment :
         requiredPermissionList.forEach { permission ->
             if (ContextCompat.checkSelfPermission(
                     requireContext(),
-                    permission
+                    permission,
                 ) != PackageManager.PERMISSION_GRANTED
-            ) neededPermissionList.add(permission)
+            ) {
+                neededPermissionList.add(permission)
+            }
         }
 
         neededPermissionList.forEach {
@@ -156,21 +157,20 @@ class MyPageAdminCreateRouteFragment :
     private fun bitMapChangeProcess() {
         cropBitMap?.let { bitmap ->
             bitmapToFile(bitmap)?.let { file ->
-                val requestFile =
-                    file.asRequestBody("image/jpg".toMediaTypeOrNull())
+                val requestFile = file.asRequestBody("image/jpg".toMediaTypeOrNull())
                 viewModel.chipImageToUrl(
                     MultipartBody.Part.createFormData(
                         "file",
                         file.name,
-                        requestFile
-                    )
+                        requestFile,
+                    ),
                 )
             }
         }
     }
 
     private fun bitmapToFile(bitmap: Bitmap): File? {
-        val directory = requireContext().filesDir  // 내부 저장소의 파일 디렉토리
+        val directory = requireContext().filesDir // 내부 저장소의 파일 디렉토리
         val file = File(directory, generateFileName())
 
         var outputStream: OutputStream? = null
@@ -213,16 +213,18 @@ class MyPageAdminCreateRouteFragment :
                     downSingleEvent(event)
                 }
 
-                MotionEvent.ACTION_POINTER_DOWN -> if (event.pointerCount == 2) {
-                    touchMode = TouchMode.TWO_FINGER
-                    downMultiEvent(event)
-                }
+                MotionEvent.ACTION_POINTER_DOWN ->
+                    if (event.pointerCount == 2) {
+                        touchMode = TouchMode.TWO_FINGER
+                        downMultiEvent(event)
+                    }
 
-                MotionEvent.ACTION_MOVE -> if (touchMode === TouchMode.ONE_FINGER) {
-                    moveSingleEvent(event)
-                } else if (touchMode === TouchMode.TWO_FINGER) {
-                    moveMultiEvent(event)
-                }
+                MotionEvent.ACTION_MOVE ->
+                    if (touchMode === TouchMode.ONE_FINGER) {
+                        moveSingleEvent(event)
+                    } else if (touchMode === TouchMode.TWO_FINGER) {
+                        moveMultiEvent(event)
+                    }
 
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP -> touchMode = TouchMode.NONE
             }
@@ -272,9 +274,7 @@ class MyPageAdminCreateRouteFragment :
         return sqrt((x * x + y * y).toDouble()).toFloat()
     }
 
-
     private fun getCroppedBitmapFromImageView(): Bitmap? {
-
         val imageView = binding.ivRoute
         val drawable = binding.ivRoute.drawable ?: return null
         val bitmap = (drawable as BitmapDrawable).bitmap
@@ -305,8 +305,7 @@ class MyPageAdminCreateRouteFragment :
             imageViewLeft.toInt(),
             imageViewTop.toInt(),
             (imageViewRight - imageViewLeft).toInt(),
-            (imageViewBottom - imageViewTop).toInt()
+            (imageViewBottom - imageViewTop).toInt(),
         )
     }
-
 }

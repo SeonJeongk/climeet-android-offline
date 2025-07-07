@@ -10,7 +10,6 @@ import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -24,7 +23,6 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class GymProfileLevelDetailFragment : Fragment() {
-
     private lateinit var binding: FragmentLevelDetailBinding
     private val viewModel: GymProfileLevelDetailViewModel by activityViewModels()
 
@@ -73,23 +71,25 @@ class GymProfileLevelDetailFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
-        binding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_level_detail, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_level_detail, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) { // api
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) { // api
         super.onViewCreated(view, savedInstanceState)
         initView()
         viewModel.getClimberRankingOrderLevel()
         initStateObserve()
-
     }
 
-    private fun initView() {
+    private fun initProfileImages() {
         profileImg1 = binding.ivLevelRanking1
         profileImg2 = binding.ivLevelRanking2
         profileImg3 = binding.ivLevelRanking3
@@ -108,8 +108,12 @@ class GymProfileLevelDetailFragment : Fragment() {
             profileImg6,
             profileImg7,
             profileImg8,
-            profileImg9
+            profileImg9,
         )
+    }
+
+    private fun initView() {
+        initProfileImages()
 
         nickname1 = binding.tvLevelRanking1Nickname
         nickname2 = binding.tvLevelRanking2Nickname
@@ -129,7 +133,7 @@ class GymProfileLevelDetailFragment : Fragment() {
             nickname6,
             nickname7,
             nickname8,
-            nickname9
+            nickname9,
         )
 
         level1 = binding.tvLevelRanking1
@@ -142,7 +146,15 @@ class GymProfileLevelDetailFragment : Fragment() {
         level8 = binding.tvLevelRanking8
         level9 = binding.tvLevelRanking9
         levelList = listOf(
-            level1, level2, level3, level4, level5, level6, level7, level8, level9
+            level1,
+            level2,
+            level3,
+            level4,
+            level5,
+            level6,
+            level7,
+            level8,
+            level9,
         )
 
         rank1 = binding.tvLevelRankingNumber1
@@ -153,9 +165,9 @@ class GymProfileLevelDetailFragment : Fragment() {
 
     private fun initStateObserve() {
         repeatOnStarted {
-            viewModel?.let { vm ->
+            viewModel.let { vm ->
                 vm.uiState.collect { uiState ->
-                    uiState.rankingList?.let { rankingList ->
+                    uiState.rankingList.let { rankingList ->
                         Log.d("LevelDetail", rankingList.toString())
                         val iterationCount = minOf(rankingList.size, 9)
 
@@ -171,7 +183,8 @@ class GymProfileLevelDetailFragment : Fragment() {
                                     rankList[i].visibility = View.VISIBLE
                                 }
                                 nicknameList[i].text = bestLevelClimberResponse.profileName
-                                levelList[i].text = bestLevelClimberResponse.gymDifficultyName + " - " + bestLevelClimberResponse.highDifficultyCount
+                                levelList[i].text = bestLevelClimberResponse.gymDifficultyName + " - " +
+                                    bestLevelClimberResponse.highDifficultyCount
 
                                 profileImgList[i].visibility = View.VISIBLE
                                 nicknameList[i].visibility = View.VISIBLE

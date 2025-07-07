@@ -4,22 +4,30 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.climus.climeet.data.model.response.BestFollowGymSimpleResponse
 import com.climus.climeet.data.model.response.BestRecordGymDetailInfoResponse
 import com.climus.climeet.databinding.ItemPopularCragsBinding
 import kotlin.math.min
 
-class RecordOrderPopularCragRVAdapter (private val cragList: List<BestRecordGymDetailInfoResponse>,
-    private val onClickListener: (Long) -> Unit) : RecyclerView.Adapter<RecordOrderPopularCragRVAdapter.ViewHolder>(){
+class RecordOrderPopularCragRVAdapter(
+    private val cragList: List<BestRecordGymDetailInfoResponse>,
+    private val onClickListener: (Long) -> Unit,
+) : RecyclerView.Adapter<RecordOrderPopularCragRVAdapter.ViewHolder>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): RecordOrderPopularCragRVAdapter.ViewHolder {
-        val binding: ItemPopularCragsBinding = ItemPopularCragsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding: ItemPopularCragsBinding = ItemPopularCragsBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false,
+        )
         return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: RecordOrderPopularCragRVAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecordOrderPopularCragRVAdapter.ViewHolder,
+        position: Int,
+    ) {
         holder.bind(cragList[position])
     }
 
@@ -28,13 +36,14 @@ class RecordOrderPopularCragRVAdapter (private val cragList: List<BestRecordGymD
         return min(cragList.size, 10)
     }
 
-    inner class ViewHolder(val binding: ItemPopularCragsBinding): RecyclerView.ViewHolder(binding.root){
+    inner class ViewHolder(
+        val binding: ItemPopularCragsBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(crag: BestRecordGymDetailInfoResponse) {
-
             binding.root.setOnClickListener {
                 onClickListener(crag.gymId)
             }
-            if(crag.profileImageUrl != null) {
+            if (crag.profileImageUrl != null) {
                 Glide.with(binding.root.context)
                     .load(crag.profileImageUrl)
                     .into(binding.ivPopularCragProfile)

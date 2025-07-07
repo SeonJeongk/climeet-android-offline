@@ -20,10 +20,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class UploadBottomSheetFragment : BottomSheetDialogFragment(){
-
-    private var _binding: FragmentUploadBottomSheetBinding? = null
-    private val binding get() = _binding!!
+class UploadBottomSheetFragment : BottomSheetDialogFragment() {
+    private var viewBinding: FragmentUploadBottomSheetBinding? = null
+    private val binding get() = checkNotNull(viewBinding) { "Binding is only available while the view exists" }
 
     private val viewModel: UploadBottomSheetViewModel by activityViewModels()
     private val parentViewModel: UploadViewModel by activityViewModels()
@@ -37,13 +36,13 @@ class UploadBottomSheetFragment : BottomSheetDialogFragment(){
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
-        _binding = DataBindingUtil.inflate(
+        viewBinding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_upload_bottom_sheet,
             container,
-            false
+            false,
         )
         return binding.root
     }
@@ -57,13 +56,16 @@ class UploadBottomSheetFragment : BottomSheetDialogFragment(){
         return dialog
     }
 
-    private fun setupRatio(bottomSheetDialog: BottomSheetDialog){
-        val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as View
+    private fun setupRatio(bottomSheetDialog: BottomSheetDialog) {
+        val bottomSheet =
+            bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as View
         BottomSheetBehavior.from(bottomSheet).state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         initEventObserve()
@@ -72,7 +74,7 @@ class UploadBottomSheetFragment : BottomSheetDialogFragment(){
     private fun initEventObserve() {
         repeatOnStarted {
             viewModel.event.collect {
-                when(it){
+                when (it) {
                     is UploadBottomSheetEvent.DismissDialog -> dismiss()
                     is UploadBottomSheetEvent.ApplyFilter -> {
                         parentViewModel.applyFilter(it.selectedFilter)

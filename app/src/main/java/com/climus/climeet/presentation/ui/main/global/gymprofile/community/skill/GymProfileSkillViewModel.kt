@@ -1,6 +1,5 @@
 package com.climus.climeet.presentation.ui.main.global.gymprofile.community.skill
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.climus.climeet.app.App.Companion.sharedPreferences
@@ -17,14 +16,13 @@ import javax.inject.Inject
 
 data class GymSkillUiState(
     val mySkill: String? = "",
-    val chartUiList: List<StickChartUiData> = emptyList()
+    val chartUiList: List<StickChartUiData> = emptyList(),
 )
 
 @HiltViewModel
 class GymProfileSkillViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(GymSkillUiState())
     val uiState: StateFlow<GymSkillUiState> = _uiState.asStateFlow()
 
@@ -48,8 +46,9 @@ class GymProfileSkillViewModel @Inject constructor(
                     mySkillResult.msg
                 }
             }
-            when (val gymSkillDistributionResult =
-                repository.getGymSkillDistribution(gymId)) {
+            when (
+                val gymSkillDistributionResult = repository.getGymSkillDistribution(gymId)
+            ) {
                 is BaseState.Success -> {
                     val list = mutableListOf<StickChartUiData>()
                     gymSkillDistributionResult.body.forEach {
@@ -70,8 +69,8 @@ class GymProfileSkillViewModel @Inject constructor(
                                 percent = maxOf((percent.toFloat() / 100) * 0.8f, 0.01f),
                                 levelName = it.gymDifficultyName,
                                 levelHex = it.gymDifficultyColor,
-                                levelStringColor = color
-                            )
+                                levelStringColor = color,
+                            ),
                         )
                     }
                     _uiState.update { state ->
@@ -81,9 +80,7 @@ class GymProfileSkillViewModel @Inject constructor(
 
                 is BaseState.Error -> {
                     _uiState.update { state ->
-                        state.copy(
-                            chartUiList = emptyList()
-                        )
+                        state.copy(chartUiList = emptyList())
                     }
                 }
             }

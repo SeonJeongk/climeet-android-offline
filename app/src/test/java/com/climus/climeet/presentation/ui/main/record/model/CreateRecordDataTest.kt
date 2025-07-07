@@ -5,7 +5,6 @@ import org.junit.Test
 import java.time.LocalDate
 
 class CreateRecordDataTest {
-
     @Test
     fun `31일보다 짧은 이전 달은 마지막 날짜로 보정한다`() {
         val result = initialRecordDate(LocalDate.of(2026, 7, 31))

@@ -11,38 +11,46 @@ import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.routefindi
 import kotlinx.coroutines.flow.update
 
 class RouteFindingSectorAdapter(
-    private val viewModel: MyPageAdminRouteFindingViewModel
+    private val viewModel: MyPageAdminRouteFindingViewModel,
 ) : ListAdapter<UiSectorItem, RouteFindingSectorAdapter.RouteFindingSectorViewHolder>(
-    diffCallback
-) {
+        diffCallback,
+    ) {
     companion object {
-
         val diffCallback = object : DiffUtil.ItemCallback<UiSectorItem>() {
-            override fun areItemsTheSame(oldItem: UiSectorItem, newItem: UiSectorItem): Boolean {
-                return oldItem.sectorName == newItem.sectorName
-            }
+            override fun areItemsTheSame(
+                oldItem: UiSectorItem,
+                newItem: UiSectorItem,
+            ): Boolean = oldItem.sectorName == newItem.sectorName
 
-            override fun areContentsTheSame(oldItem: UiSectorItem, newItem: UiSectorItem): Boolean {
-                return oldItem == newItem
-            }
+            override fun areContentsTheSame(
+                oldItem: UiSectorItem,
+                newItem: UiSectorItem,
+            ): Boolean = oldItem == newItem
         }
     }
 
-    override fun onBindViewHolder(holder: RouteFindingSectorViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RouteFindingSectorViewHolder,
+        position: Int,
+    ) {
         holder.bind(getItem(position))
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RouteFindingSectorViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RouteFindingSectorViewHolder =
         RouteFindingSectorViewHolder(
             ItemRouteFindingSectorBinding.inflate(
                 LayoutInflater.from(parent.context),
-                parent, false
-            )
+                parent,
+                false,
+            ),
         )
 
-    inner class RouteFindingSectorViewHolder(private val binding: ItemRouteFindingSectorBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
+    inner class RouteFindingSectorViewHolder(
+        private val binding: ItemRouteFindingSectorBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: UiSectorItem) {
             binding.item = item
             binding.root.setOnClickListener {
@@ -55,4 +63,3 @@ class RouteFindingSectorAdapter(
         }
     }
 }
-

@@ -3,7 +3,7 @@ package com.climus.climeet.data.model.response
 data class ShortsMainCommentResponse(
     val page: Int,
     val hasNext: Boolean,
-    val result: List<ShortsMainCommentItem>
+    val result: List<ShortsMainCommentItem>,
 )
 
 data class ShortsMainCommentItem(
@@ -17,5 +17,5 @@ data class ShortsMainCommentItem(
     val isParent: Boolean,
     val parentCommentId: Long,
     val childCommentCount: Int,
-    val createdDate: String
+    val createdDate: String,
 )

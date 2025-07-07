@@ -23,21 +23,24 @@ import javax.inject.Inject
 data class SearchCragBottomSheetUiState(
     val searchList: List<SearchCragUiData> = emptyList(),
     val progressState: Boolean = false,
-    val emptyResultState: Boolean = false
+    val emptyResultState: Boolean = false,
 )
 
 sealed class SearchCragBottomSheetEvent {
-    data class NavigateToSelectSectorBottomSheet(val id: Long, val name: String) :
-        SearchCragBottomSheetEvent()
+    data class NavigateToSelectSectorBottomSheet(
+        val id: Long,
+        val name: String,
+    ) : SearchCragBottomSheetEvent()
 
-    data class ShowToastMessage(val msg: String) : SearchCragBottomSheetEvent()
+    data class ShowToastMessage(
+        val msg: String,
+    ) : SearchCragBottomSheetEvent()
 }
 
 @HiltViewModel
 class SearchCragBottomSheetViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(SearchCragBottomSheetUiState())
     val uiState: StateFlow<SearchCragBottomSheetUiState> = _uiState.asStateFlow()
 
@@ -51,9 +54,9 @@ class SearchCragBottomSheetViewModel @Inject constructor(
     init {
         observeKeyword()
     }
-    
-    fun getHomeGym(){
-        viewModelScope.launch { 
+
+    fun getHomeGym() {
+        viewModelScope.launch {
             // todo 최초 키워드 입력 전 홈짐 불러오기
         }
     }
@@ -64,18 +67,13 @@ class SearchCragBottomSheetViewModel @Inject constructor(
                 _uiState.update { state ->
                     state.copy(
                         searchList = emptyList(),
-                        emptyResultState = false
+                        emptyResultState = false,
                     )
                 }
             } else {
                 curJob?.cancel()
 
-                _uiState.update { state ->
-                    state.copy(
-                        progressState = true,
-                        emptyResultState = false
-                    )
-                }
+                showSearchProgress()
 
                 curJob = viewModelScope.launch {
                     delay(500)
@@ -87,10 +85,11 @@ class SearchCragBottomSheetViewModel @Inject constructor(
                                         state.copy(
                                             searchList = result.body.result.map { item ->
                                                 item.toSearchCragUiData(
-                                                    it, ::navigateToSelectSectorBottomSheet
+                                                    it,
+                                                    ::navigateToSelectSectorBottomSheet,
                                                 )
                                             },
-                                            progressState = false
+                                            progressState = false,
                                         )
                                     }
                                 } else {
@@ -98,7 +97,7 @@ class SearchCragBottomSheetViewModel @Inject constructor(
                                         state.copy(
                                             searchList = emptyList(),
                                             progressState = false,
-                                            emptyResultState = true
+                                            emptyResultState = true,
                                         )
                                     }
                                 }
@@ -108,7 +107,7 @@ class SearchCragBottomSheetViewModel @Inject constructor(
                                 _uiState.update { state ->
                                     state.copy(
                                         progressState = false,
-                                        emptyResultState = true
+                                        emptyResultState = true,
                                     )
                                 }
                                 _event.emit(SearchCragBottomSheetEvent.ShowToastMessage(result.msg))
@@ -120,23 +119,30 @@ class SearchCragBottomSheetViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun deleteKeyword() {
-        keyword.value = ""
+    private fun showSearchProgress() {
         _uiState.update { state ->
-            state.copy(
-                searchList = emptyList()
-            )
+            state.copy(progressState = true, emptyResultState = false)
         }
     }
 
-    fun navigateToSelectSectorBottomSheet(cragId: Long, cragName: String, cragImgUrl: String) {
+    fun deleteKeyword() {
+        keyword.value = ""
+        _uiState.update { state ->
+            state.copy(searchList = emptyList())
+        }
+    }
 
+    fun navigateToSelectSectorBottomSheet(
+        cragId: Long,
+        cragName: String,
+        cragImgUrl: String,
+    ) {
         viewModelScope.launch {
             _event.emit(
                 SearchCragBottomSheetEvent.NavigateToSelectSectorBottomSheet(
                     cragId,
-                    cragName
-                )
+                    cragName,
+                ),
             )
         }
     }

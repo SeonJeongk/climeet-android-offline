@@ -1,6 +1,5 @@
 package com.climus.climeet.presentation.ui.main.mypage.follow.viewpager.adapter
 
-import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,24 +7,28 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.climus.climeet.R
 import com.climus.climeet.databinding.ItemMypageFollowingUserBinding
-import com.climus.climeet.presentation.ui.main.mypage.follow.model.FollowUiData
 import com.climus.climeet.presentation.ui.main.mypage.follow.model.FollowingUiData
 import com.climus.climeet.presentation.ui.main.mypage.follow.viewpager.FollowingViewModel
 
 class FollowingClimberRVAdapter(
     private val followingClimberList: MutableList<FollowingUiData>,
-    private val viewModel: FollowingViewModel
+    private val viewModel: FollowingViewModel,
 ) : RecyclerView.Adapter<FollowingClimberViewHolder>() {
+    private val followStatus = mutableMapOf<Int, Boolean>()
 
-    private val followStatus =  mutableMapOf<Int, Boolean>()
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FollowingClimberViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): FollowingClimberViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemMypageFollowingUserBinding.inflate(inflater, parent, false)
         return FollowingClimberViewHolder(binding, viewModel)
     }
 
-    override fun onBindViewHolder(holder: FollowingClimberViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: FollowingClimberViewHolder,
+        position: Int,
+    ) {
         val data = followingClimberList[position]
         holder.bind(data)
 
@@ -61,11 +64,9 @@ class FollowingClimberRVAdapter(
 
 class FollowingClimberViewHolder(
     val binding: ItemMypageFollowingUserBinding,
-    val viewModel: FollowingViewModel
-) :
-    RecyclerView.ViewHolder(binding.root) {
+    val viewModel: FollowingViewModel,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(data: FollowingUiData) {
-
         if (data.profileImageUrl != null) {
             Glide.with(binding.root.context)
                 .load(data.profileImageUrl)
@@ -77,7 +78,7 @@ class FollowingClimberViewHolder(
         binding.tvFollower.text = data.followerCount.toString()
         binding.tvFollowing.text = data.followingCount.toString()
 
-        binding.root.setOnClickListener{
+        binding.root.setOnClickListener {
             viewModel.navigateToProfile(data.userId)
         }
     }

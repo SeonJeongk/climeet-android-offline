@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class TimerCragSelectBottomSheetFragment : BottomSheetDialogFragment() {
-
     private val viewModel: TimerCragSelectBottomSheetViewModel by activityViewModels()
     private val routeVM: SetTimerClimbingRecordViewModel by activityViewModels()
     private lateinit var binding: FragmentTimerSelectCragBottomSheetBinding
@@ -31,8 +30,9 @@ class TimerCragSelectBottomSheetFragment : BottomSheetDialogFragment() {
     private var cragSearchAdapter: TimerCragSelectRVAdapter? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         binding = FragmentTimerSelectCragBottomSheetBinding.inflate(inflater, container, false)
         binding.vm = viewModel
@@ -41,7 +41,7 @@ class TimerCragSelectBottomSheetFragment : BottomSheetDialogFragment() {
         binding.layoutBottom.background = context?.let {
             ContextCompat.getDrawable(
                 it,
-                R.drawable.rect_grey9fill_nostroke_top20radius
+                R.drawable.rect_grey9fill_nostroke_top20radius,
             )
         }
 
@@ -57,12 +57,16 @@ class TimerCragSelectBottomSheetFragment : BottomSheetDialogFragment() {
         return dialog
     }
 
-    private fun setupRatio(bottomSheetDialog: BottomSheetDialog){
-        val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as View
+    private fun setupRatio(bottomSheetDialog: BottomSheetDialog) {
+        val bottomSheet =
+            bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as View
         BottomSheetBehavior.from(bottomSheet).state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         initRecyclerview()
@@ -82,11 +86,10 @@ class TimerCragSelectBottomSheetFragment : BottomSheetDialogFragment() {
             viewModel.uiState.collect { uiState ->
                 cragSearchAdapter?.setList(uiState.searchList, viewModel.keyword.value)
 
-                //XML에서 visibility를 설정하면 적용이 안 됨 -> fragment에서 설정
+                // XML에서 visibility를 설정하면 적용이 안 됨 -> fragment에서 설정
                 if (uiState.progressState) {
                     // progress 상태일 때의 UI 처리
                     binding.pbLoading.visibility = View.VISIBLE
-
                 } else {
                     // non-progress 상태일 때의 UI 처리
                     binding.pbLoading.visibility = View.INVISIBLE
@@ -119,12 +122,15 @@ class TimerCragSelectBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun closeBottomSheet() {
-        viewModel.selectedCrag.observe(viewLifecycleOwner, Observer { cragName ->
-            if (cragName != null) {
-                // 암장 검색 바텀 시트 닫기
-                dismiss()
-            }
-        })
+        viewModel.selectedCrag.observe(
+            viewLifecycleOwner,
+            Observer { cragName ->
+                if (cragName != null) {
+                    // 암장 검색 바텀 시트 닫기
+                    dismiss()
+                }
+            },
+        )
     }
 
     fun showToastMessage(message: String) {

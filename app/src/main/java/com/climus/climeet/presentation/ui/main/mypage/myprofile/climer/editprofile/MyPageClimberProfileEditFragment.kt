@@ -21,7 +21,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MyPageClimberProfileEditFragment :
     BaseFragment<FragmentMypageClimberProfileEditBinding>(R.layout.fragment_mypage_climber_profile_edit) {
-
     private val mainViewModel: MainViewModel by activityViewModels()
     private val idViewModel: MyPageClimberProfileViewModel by activityViewModels()
     private val viewModel: MyPageClimberProfileEditViewModel by viewModels()
@@ -32,7 +31,10 @@ class MyPageClimberProfileEditFragment :
     private val userName by lazy { args.userName }
     private val userImage by lazy { args.userImage }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.svm = mainViewModel
@@ -72,7 +74,6 @@ class MyPageClimberProfileEditFragment :
         }
     }
 
-
     private fun setImage(uri: Uri) {
         Glide.with(this)
             .load(uri)
@@ -100,11 +101,8 @@ class MyPageClimberProfileEditFragment :
     }
 
     private fun NavController.toMyPageClimberProfile() {
-        val action =
-            MyPageClimberProfileEditFragmentDirections.actionMyPageClimberProfileEditFragmetnToMyPageClimberProfileFragment(
-                climberId
-            )
+        val action = MyPageClimberProfileEditFragmentDirections
+            .actionMyPageClimberProfileEditFragmetnToMyPageClimberProfileFragment(climberId)
         navigate(action)
     }
-
 }

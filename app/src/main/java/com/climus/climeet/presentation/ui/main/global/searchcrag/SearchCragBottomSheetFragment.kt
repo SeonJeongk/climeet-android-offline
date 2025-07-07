@@ -12,12 +12,15 @@ import com.climus.climeet.presentation.ui.main.shorts.adapter.ShortsSearchCragAd
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class SearchCragBottomSheetFragment : BaseFragment<FragmentSearchCragBottomSheetBinding>(R.layout.fragment_search_crag_bottom_sheet) {
-
+class SearchCragBottomSheetFragment :
+    BaseFragment<FragmentSearchCragBottomSheetBinding>(R.layout.fragment_search_crag_bottom_sheet) {
     private val viewModel: SearchCragBottomSheetViewModel by viewModels()
     private var adapter: ShortsSearchCragAdapter? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
@@ -27,12 +30,12 @@ class SearchCragBottomSheetFragment : BaseFragment<FragmentSearchCragBottomSheet
         initEventObserve()
     }
 
-    private fun setRecycler(){
+    private fun setRecycler() {
         adapter = ShortsSearchCragAdapter()
         binding.rvSearch.adapter = adapter
     }
 
-    private fun initStateObserve(){
+    private fun initStateObserve() {
         repeatOnStarted {
             viewModel.uiState.collect {
                 adapter?.setList(it.searchList, viewModel.keyword.value)
@@ -40,20 +43,31 @@ class SearchCragBottomSheetFragment : BaseFragment<FragmentSearchCragBottomSheet
         }
     }
 
-    private fun initEventObserve(){
+    private fun initEventObserve() {
         repeatOnStarted {
-            viewModel.event.collect{
-                when(it){
-                    is SearchCragBottomSheetEvent.NavigateToSelectSectorBottomSheet -> findNavController().toSelectSectorBottomSheet(it.id, it.name)
+            viewModel.event.collect {
+                when (it) {
+                    is SearchCragBottomSheetEvent.NavigateToSelectSectorBottomSheet ->
+                        findNavController()
+                            .toSelectSectorBottomSheet(
+                                it.id,
+                                it.name,
+                            )
                     is SearchCragBottomSheetEvent.ShowToastMessage -> showToastMessage(it.msg)
                 }
             }
         }
     }
 
-    private fun NavController.toSelectSectorBottomSheet(cragId: Long, cragName: String){
-        val action = SearchCragBottomSheetFragmentDirections.actionSearchCragBottomSheetFragmentToSelectSectorBottomSheetFragment(cragId, cragName)
+    private fun NavController.toSelectSectorBottomSheet(
+        cragId: Long,
+        cragName: String,
+    ) {
+        val action = SearchCragBottomSheetFragmentDirections
+            .actionSearchCragBottomSheetFragmentToSelectSectorBottomSheetFragment(
+                cragId,
+                cragName,
+            )
         navigate(action)
     }
-
 }

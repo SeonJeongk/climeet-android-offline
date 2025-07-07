@@ -3,16 +3,15 @@ package com.climus.climeet.presentation.ui.main.mypage.follow.viewpager
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
-class FollowVPAdapter(fragment: Fragment, val userId: Long) : FragmentStateAdapter(fragment) {
-
+class FollowVPAdapter(
+    fragment: Fragment,
+    val userId: Long,
+) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int = 2
 
-    override fun createFragment(position: Int): Fragment {
-        return when (position) {
-
+    override fun createFragment(position: Int): Fragment =
+        when (position) {
             0 -> FollowerFragment(userId)
             else -> FollowingFragment(userId)
-
         }
-    }
 }

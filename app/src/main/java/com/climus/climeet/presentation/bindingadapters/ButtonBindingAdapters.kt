@@ -10,7 +10,10 @@ import com.climus.climeet.presentation.ui.main.global.selectsector.FloorBtnState
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.routefinding.MyPageAdminRouteFindingUiState
 
 @BindingAdapter("floorBtnState")
-fun bindFloorBtnState(btn: Button, state: FloorBtnState) {
+fun bindFloorBtnState(
+    btn: Button,
+    state: FloorBtnState,
+) {
     when (state) {
         is FloorBtnState.FloorSelected -> {
             btn.setBackgroundResource(R.drawable.rect_mainfill_nostroke_20radius)
@@ -25,7 +28,10 @@ fun bindFloorBtnState(btn: Button, state: FloorBtnState) {
 }
 
 @BindingAdapter("clearBtnState")
-fun bindClearBtn(btn: Button, state: Boolean) {
+fun bindClearBtn(
+    btn: Button,
+    state: Boolean,
+) {
     if (state) {
         btn.setBackgroundResource(R.drawable.rect_mainfill_nostroke_10radius)
     } else {
@@ -33,10 +39,12 @@ fun bindClearBtn(btn: Button, state: Boolean) {
     }
 }
 
-
 @BindingAdapter("favoriteBtnState")
-fun bindFavoriteBtnState(btn: ImageButton, state: Boolean) {
-    if(state){
+fun bindFavoriteBtnState(
+    btn: ImageButton,
+    state: Boolean,
+) {
+    if (state) {
         btn.setImageResource(R.drawable.ic_favorite_on)
     } else {
         btn.setImageResource(R.drawable.ic_favorite_off)
@@ -44,8 +52,11 @@ fun bindFavoriteBtnState(btn: ImageButton, state: Boolean) {
 }
 
 @BindingAdapter("bookMarkBtnState")
-fun bindBookMarkBtnState(btn: ImageButton, state: Boolean) {
-    if(state){
+fun bindBookMarkBtnState(
+    btn: ImageButton,
+    state: Boolean,
+) {
+    if (state) {
         btn.setImageResource(R.drawable.ic_bookmark_on)
     } else {
         btn.setImageResource(R.drawable.ic_bookmark_off)
@@ -53,7 +64,10 @@ fun bindBookMarkBtnState(btn: ImageButton, state: Boolean) {
 }
 
 @BindingAdapter("isEnabledBasedOnLists")
-fun setEnabledBasedOnLists(button: AppCompatButton, uiState: MyPageAdminRouteFindingUiState?) {
+fun setEnabledBasedOnLists(
+    button: AppCompatButton,
+    uiState: MyPageAdminRouteFindingUiState?,
+) {
     uiState?.let {
         val isEnabled = it.levelList.isNotEmpty() && it.sectorList.isNotEmpty() && it.chipList.isNotEmpty()
         button.isEnabled = isEnabled
@@ -61,12 +75,16 @@ fun setEnabledBasedOnLists(button: AppCompatButton, uiState: MyPageAdminRouteFin
         button.setTextColor(
             ContextCompat.getColor(
                 context,
-                if (isEnabled) R.color.black else R.color.white
-            )
+                if (isEnabled) R.color.black else R.color.white,
+            ),
         )
         button.background = ContextCompat.getDrawable(
             context,
-            if (isEnabled) R.drawable.rect_mainfill_nostroke_8radius else R.drawable.rect_grey8fill_nostroke_8radius
+            if (isEnabled) {
+                R.drawable.rect_mainfill_nostroke_8radius
+            } else {
+                R.drawable.rect_grey8fill_nostroke_8radius
+            },
         )
     }
 }

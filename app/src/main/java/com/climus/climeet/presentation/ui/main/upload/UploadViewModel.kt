@@ -1,6 +1,5 @@
 package com.climus.climeet.presentation.ui.main.upload
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.climus.climeet.data.model.BaseState
@@ -8,7 +7,6 @@ import com.climus.climeet.data.model.request.ShortsDetailRequest
 import com.climus.climeet.data.repository.MainRepository
 import com.climus.climeet.presentation.customview.PublicType
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.SelectedFilter
-import com.climus.climeet.presentation.util.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -31,17 +29,23 @@ data class UploadUiState(
 )
 
 sealed class UploadEvent {
-    data class ShowPublicBottomSheet(val type: PublicType) : UploadEvent()
+    data class ShowPublicBottomSheet(
+        val type: PublicType,
+    ) : UploadEvent()
+
     data object NavigateToSearchCragBottomSheet : UploadEvent()
-    data class ShowToastMessage(val msg: String) : UploadEvent()
+
+    data class ShowToastMessage(
+        val msg: String,
+    ) : UploadEvent()
+
     data object NavigateToUploadComplete : UploadEvent()
 }
 
 @HiltViewModel
 class UploadViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _event = MutableSharedFlow<UploadEvent>()
     val event: SharedFlow<UploadEvent> = _event.asSharedFlow()
 
@@ -69,7 +73,7 @@ class UploadViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
-        false
+        false,
     )
 
     fun initViewModel() {
@@ -88,7 +92,10 @@ class UploadViewModel @Inject constructor(
         compressProgress.value = progress
     }
 
-    fun finishCompress(file: MultipartBody.Part, size: Long) {
+    fun finishCompress(
+        file: MultipartBody.Part,
+        size: Long,
+    ) {
         // Compress 끝
         isCompressDone.value = true
         videoFile = file
@@ -113,18 +120,14 @@ class UploadViewModel @Inject constructor(
 
     fun setPublicState(type: PublicType) {
         _uiState.update { state ->
-            state.copy(
-                publicState = type
-            )
+            state.copy(publicState = type)
         }
     }
 
     fun applyFilter(data: SelectedFilter) {
         viewModelScope.launch {
             _uiState.update { state ->
-                state.copy(
-                    selectedFilter = data
-                )
+                state.copy(selectedFilter = data)
             }
         }
     }
@@ -136,15 +139,33 @@ class UploadViewModel @Inject constructor(
             repository.uploadShorts(
                 video = videoFile,
                 body = ShortsDetailRequest(
-                    climbingGymId = if (uiState.value.selectedFilter.cragId == -1L) null else uiState.value.selectedFilter.cragId,
-                    routeId = if (uiState.value.selectedFilter.routeId == -1L) null else uiState.value.selectedFilter.routeId,
-                    sectorId = if (uiState.value.selectedFilter.sectorId == -1L) null else uiState.value.selectedFilter.sectorId,
+                    climbingGymId = if (uiState.value.selectedFilter.cragId ==
+                        -1L
+                    ) {
+                        null
+                    } else {
+                        uiState.value.selectedFilter.cragId
+                    },
+                    routeId = if (uiState.value.selectedFilter.routeId ==
+                        -1L
+                    ) {
+                        null
+                    } else {
+                        uiState.value.selectedFilter.routeId
+                    },
+                    sectorId = if (uiState.value.selectedFilter.sectorId ==
+                        -1L
+                    ) {
+                        null
+                    } else {
+                        uiState.value.selectedFilter.sectorId
+                    },
                     description = description.value,
                     public = uiState.value.publicState.value,
                     soundEnabled = soundEnabled.value,
                     thumbnailImageUrl = thumbnailImg.value,
-                    shortsVisibility = uiState.value.publicState.value
-                )
+                    shortsVisibility = uiState.value.publicState.value,
+                ),
             ).let {
                 when (it) {
                     is BaseState.Success -> {

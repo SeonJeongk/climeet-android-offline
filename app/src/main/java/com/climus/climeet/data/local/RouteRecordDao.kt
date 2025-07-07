@@ -31,7 +31,10 @@ interface RouteRecordDao {
     fun getRouteById(id: Int): RouteRecordData
 
     @Query("SELECT * FROM route_record WHERE sectorId = :sectorId AND routeId = :routeId LIMIT 1")
-    fun findExistRoute(sectorId: Long, routeId: Long): RouteRecordData?
+    fun findExistRoute(
+        sectorId: Long,
+        routeId: Long,
+    ): RouteRecordData?
 
     @Query("SELECT AVG(difficulty) FROM route_record WHERE isCompleted = 1 AND difficulty != 10")
     fun getAverageDifficultyOfCompleted(): Double?

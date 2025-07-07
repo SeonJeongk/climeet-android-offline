@@ -7,8 +7,5 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GymProfileCommunityViewModel @Inject constructor(
-    private val repository: MainRepository
-) : ViewModel() {
-
-
-}
+    private val repository: MainRepository,
+) : ViewModel()

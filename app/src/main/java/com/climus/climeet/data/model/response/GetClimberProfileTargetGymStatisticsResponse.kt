@@ -4,7 +4,7 @@ data class GetClimberProfileTargetGymStatisticsResponse(
     val userId: Long,
     val totalCompletedCount: Int,
     val attemptRouteCount: Int,
-    val difficulty: List<StatisticsDifficultyItem>
+    val difficulty: List<StatisticsDifficultyItem>,
 )
 
 data class StatisticsDifficultyItem(
@@ -12,5 +12,5 @@ data class StatisticsDifficultyItem(
     val gymDifficultyName: String,
     val gymDifficultyColor: String,
     val count: Int,
-    val difficulty: Int
+    val difficulty: Int,
 )

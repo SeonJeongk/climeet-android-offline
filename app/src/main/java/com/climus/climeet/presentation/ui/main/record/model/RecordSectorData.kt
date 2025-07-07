@@ -7,5 +7,5 @@ data class RecordSectorData(
     val levelColor: String = "",
     val sectorImg: String = "",
     var isSelected: Boolean = false,
-    val onClickListener: (Long) -> Unit
+    val onClickListener: (Long) -> Unit,
 )

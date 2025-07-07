@@ -9,13 +9,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed class ShortsEvent{
+sealed class ShortsEvent {
     data object NavigateToSearchCragBottomSheet : ShortsEvent()
 }
 
 @HiltViewModel
-class ShortsViewModel @Inject constructor(): ViewModel() {
-
+class ShortsViewModel @Inject constructor() : ViewModel() {
     private val _event = MutableSharedFlow<ShortsEvent>()
     val event: SharedFlow<ShortsEvent> = _event.asSharedFlow()
 
@@ -24,5 +23,4 @@ class ShortsViewModel @Inject constructor(): ViewModel() {
             _event.emit(ShortsEvent.NavigateToSearchCragBottomSheet)
         }
     }
-
 }

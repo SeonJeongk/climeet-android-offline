@@ -11,16 +11,18 @@ import com.climus.climeet.presentation.base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MyPageFragment: BaseFragment<FragmentMypageBinding>(R.layout.fragment_mypage) {
-
+class MyPageFragment : BaseFragment<FragmentMypageBinding>(R.layout.fragment_mypage) {
     private val viewModel: MyPageViewModel by activityViewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
         initEventObserve()
-        //modeSwitchListener()
+        // modeSwitchListener()
 
         viewModel.getProfileInfo()
     }
@@ -65,46 +67,45 @@ class MyPageFragment: BaseFragment<FragmentMypageBinding>(R.layout.fragment_mypa
 //        }
 //    }
 
-
-    private fun NavController.toAlarm(){
+    private fun NavController.toAlarm() {
         val action = MyPageFragmentDirections.actionMyPageFragmentToMyPageAlarmFragment()
         navigate(action)
     }
 
-    private fun NavController.toAnnounce(){
+    private fun NavController.toAnnounce() {
         val action = MyPageFragmentDirections.actionMyPageFragmentToMyPageAnnounceFragment()
         navigate(action)
     }
 
-    private fun NavController.toFollow(){
+    private fun NavController.toFollow() {
         val action = MyPageFragmentDirections.actionMyPageFragmentToMyPageFollowFragment(viewModel.uiState.value.userId)
         navigate(action)
     }
 
-    private fun NavController.toClimerMyProfile(){
-        val action = MyPageFragmentDirections.actionMyPageFragmentToMyPageClimerMyProfileFragment(viewModel.uiState.value.userId)
+    private fun NavController.toClimerMyProfile() {
+        val action = MyPageFragmentDirections.actionMyPageFragmentToMyPageClimerMyProfileFragment(
+            viewModel.uiState.value.userId,
+        )
         navigate(action)
     }
 
-    private fun NavController.toMyShorts(){
+    private fun NavController.toMyShorts() {
         val action = MyPageFragmentDirections.actionMyPageFragmentToMyPageMyShortsFragment()
         navigate(action)
     }
 
-    private fun NavController.toPolicy(){
+    private fun NavController.toPolicy() {
         val action = MyPageFragmentDirections.actionMyPageFragmentToMyPagePolicyFragment()
         navigate(action)
     }
 
-    private fun NavController.toSendOpinion(){
+    private fun NavController.toSendOpinion() {
         val action = MyPageFragmentDirections.actionMyPageFragmentToMyPageSendOpinionFragment()
         navigate(action)
     }
 
-    private fun NavController.toReview(){
+    private fun NavController.toReview() {
         val action = MyPageFragmentDirections.actionMyPageFragmentToMyPageReviewFragment()
         navigate(action)
     }
-
-
 }

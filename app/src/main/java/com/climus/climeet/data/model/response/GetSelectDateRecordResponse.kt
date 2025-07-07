@@ -9,7 +9,7 @@ data class GetSelectDateRecordResponse(
     val totalCompletedCount: Int,
     val totalAttemptCount: Int,
     val avgDifficulty: Int,
-    val gymId: Long
+    val gymId: Long,
 ) {
     fun getFormattedTime(): String {
         val localTime = LocalTime.parse(time)

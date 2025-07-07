@@ -24,7 +24,6 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class MyPageAdminMyProfileFragment :
     BaseFragment<FragmentMypageAdminMyprofileBinding>(R.layout.fragment_mypage_admin_myprofile) {
-
     private val sharedViewModel: GymProfileViewModel by activityViewModels()
     private val viewModel: MyPageAdminMyProfileViewModel by activityViewModels()
     private var adapter: MyPageAdminProfileVPAdapter? = null
@@ -32,7 +31,10 @@ class MyPageAdminMyProfileFragment :
     private val args: MyPageAdminMyProfileFragmentArgs by navArgs()
     private val gymId by lazy { args.gymId }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.svm = sharedViewModel
@@ -60,7 +62,9 @@ class MyPageAdminMyProfileFragment :
                     MyPageAdminProfileEvent.NavigateToEditAdminProfile -> findNavController().toEditPage()
                     MyPageAdminProfileEvent.NavigateToRouteFinding -> findNavController().toGymRouteFinding()
                     MyPageAdminProfileEvent.NavigateToEditService -> findNavController().toEditServiceFragment()
-                    MyPageAdminProfileEvent.NavigateToGymReviewFromMyPage -> findNavController().toGymReviewBottomSheet()
+                    MyPageAdminProfileEvent.NavigateToGymReviewFromMyPage ->
+                        findNavController()
+                            .toGymReviewBottomSheet()
                 }
             }
         }
@@ -70,10 +74,10 @@ class MyPageAdminMyProfileFragment :
         repeatOnStarted {
             viewModel.showSnackbar.collect { state ->
                 if (state) {
-                    if(AdminEditProfileForm.getNameUpdatedState()){
+                    if (AdminEditProfileForm.getNameUpdatedState()) {
                         showCustomSnackBar(
                             binding.snackGuide,
-                            "클라이밍 암장 이름 변경이 요청되었어요.\n이름이 변경되면 알려드릴게요!"
+                            "클라이밍 암장 이름 변경이 요청되었어요.\n이름이 변경되면 알려드릴게요!",
                         )
                     } else {
                         showCustomSnackBar(binding.snackGuide, "프로필 수정이 완료되었어요!")
@@ -100,63 +104,61 @@ class MyPageAdminMyProfileFragment :
     }
 
     private fun initClickListener() {
-
         // 탭 indicator 색 바꾸기
-        binding.tbMenu.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    val colorFilter = BlendModeColorFilter(
-                        ContextCompat.getColor(requireContext(), R.color.cm_main),
-                        BlendMode.SRC_ATOP
-                    )
-                    tab?.icon?.colorFilter = colorFilter
-                } else {
-                    tab?.icon?.setColorFilter(
-                        ContextCompat.getColor(requireContext(), R.color.cm_main),
-                        PorterDuff.Mode.SRC_IN
-                    )
+        binding.tbMenu.addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab?) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        val colorFilter = BlendModeColorFilter(
+                            ContextCompat.getColor(requireContext(), R.color.cm_main),
+                            BlendMode.SRC_ATOP,
+                        )
+                        tab?.icon?.colorFilter = colorFilter
+                    } else {
+                        tab?.icon?.setColorFilter(
+                            ContextCompat.getColor(requireContext(), R.color.cm_main),
+                            PorterDuff.Mode.SRC_IN,
+                        )
+                    }
                 }
-            }
 
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    val colorFilter = BlendModeColorFilter(
-                        ContextCompat.getColor(requireContext(), R.color.cm_grey5),
-                        BlendMode.SRC_ATOP
-                    )
-                    tab?.icon?.colorFilter = colorFilter
-                } else {
-                    tab?.icon?.setColorFilter(
-                        ContextCompat.getColor(requireContext(), R.color.cm_grey5),
-                        PorterDuff.Mode.SRC_IN
-                    )
+                override fun onTabUnselected(tab: TabLayout.Tab?) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        val colorFilter = BlendModeColorFilter(
+                            ContextCompat.getColor(requireContext(), R.color.cm_grey5),
+                            BlendMode.SRC_ATOP,
+                        )
+                        tab?.icon?.colorFilter = colorFilter
+                    } else {
+                        tab?.icon?.setColorFilter(
+                            ContextCompat.getColor(requireContext(), R.color.cm_grey5),
+                            PorterDuff.Mode.SRC_IN,
+                        )
+                    }
                 }
-            }
 
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-            }
-        })
+                override fun onTabReselected(tab: TabLayout.Tab?) {
+                }
+            },
+        )
     }
 
     private fun NavController.toEditPage() {
         val name = sharedViewModel.uiState.value.gymName
         val profile = sharedViewModel.uiState.value.gymProfileImageUrl
         val background = sharedViewModel.uiState.value.gymBackGroundImageUrl
-        val action =
-            MyPageAdminMyProfileFragmentDirections.actionMyPageAdminMyProfileFragmentToMyPageAdminProfileEditBackgroundFragment(
+        val action = MyPageAdminMyProfileFragmentDirections
+            .actionMyPageAdminMyProfileFragmentToMyPageAdminProfileEditBackgroundFragment(
                 name,
                 profile,
-                background
+                background,
             )
         navigate(action)
     }
 
-
     private fun NavController.toEditServiceFragment() {
-        val action =
-            MyPageAdminMyProfileFragmentDirections.actionMyPageAdminMyProfileFragmentToMyPageAdminProfileEditServiceFragment(
-                gymId
-            )
+        val action = MyPageAdminMyProfileFragmentDirections
+            .actionMyPageAdminMyProfileFragmentToMyPageAdminProfileEditServiceFragment(gymId)
         navigate(action)
     }
 

@@ -3,7 +3,7 @@ package com.climus.climeet.data.model.response
 data class ShortsSubCommentResponse(
     val page: Int,
     val hasNext: Boolean,
-    val result: List<ShortsSubCommentItem>
+    val result: List<ShortsSubCommentItem>,
 )
 
 data class ShortsSubCommentItem(
@@ -15,5 +15,5 @@ data class ShortsSubCommentItem(
     val likeCount: Int,
     val dislikeCount: Int,
     val parentCommentId: Long,
-    val createdDate: String
+    val createdDate: String,
 )

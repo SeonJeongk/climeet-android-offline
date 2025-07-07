@@ -12,8 +12,9 @@ object PushUtils {
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         mWakeLock = pm.newWakeLock(
             PowerManager.FULL_WAKE_LOCK or
-                    PowerManager.ACQUIRE_CAUSES_WAKEUP or
-                    PowerManager.ON_AFTER_RELEASE, "WAKEUP"
+                PowerManager.ACQUIRE_CAUSES_WAKEUP or
+                PowerManager.ON_AFTER_RELEASE,
+            "WAKEUP",
         )
         mWakeLock!!.acquire(3000)
     }

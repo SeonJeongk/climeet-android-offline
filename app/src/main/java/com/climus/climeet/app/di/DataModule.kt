@@ -13,7 +13,7 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object DataModule {
     @Provides
-    fun provideSharedPreferences(@ApplicationContext context: Context) =
-        context.getSharedPreferences("APP", Application.MODE_PRIVATE)
-
+    fun provideSharedPreferences(
+        @ApplicationContext context: Context,
+    ): SharedPreferences = context.getSharedPreferences("APP", Application.MODE_PRIVATE)
 }

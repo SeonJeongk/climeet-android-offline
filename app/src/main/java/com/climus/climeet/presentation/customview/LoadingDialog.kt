@@ -7,9 +7,11 @@ import android.os.Bundle
 import android.view.Window
 import com.climus.climeet.databinding.DialogLoadingBinding
 
-class LoadingDialog(context: Context) : Dialog(context) {
-
+class LoadingDialog(
+    context: Context,
+) : Dialog(context) {
     private lateinit var binding: DialogLoadingBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -24,5 +26,4 @@ class LoadingDialog(context: Context) : Dialog(context) {
     override fun show() {
         if (!this.isShowing) super.show()
     }
-
 }

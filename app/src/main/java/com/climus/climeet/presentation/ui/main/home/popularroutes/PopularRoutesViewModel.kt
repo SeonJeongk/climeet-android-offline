@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.response.BestRouteDetailInfoResponse
 import com.climus.climeet.data.repository.MainRepository
-import com.climus.climeet.presentation.ui.main.home.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,22 +15,23 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class PopularRoutesUiState(
-    val routeList: List<BestRouteDetailInfoResponse> = emptyList()
+    val routeList: List<BestRouteDetailInfoResponse> = emptyList(),
 )
+
 @HiltViewModel
-class PopularRoutesViewModel @Inject constructor(private val repository: MainRepository): ViewModel() {
+class PopularRoutesViewModel @Inject constructor(
+    private val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(PopularRoutesUiState())
     val uiState: StateFlow<PopularRoutesUiState> = _uiState.asStateFlow()
 
     fun getRouteRankingOrderSelectionCount() {
         viewModelScope.launch {
             repository.findRouteRankingOrderSelectionCount().let {
-                when(it) {
+                when (it) {
                     is BaseState.Success -> {
                         _uiState.update { state ->
-                            state.copy(
-                                routeList = it.body
-                            )
+                            state.copy(routeList = it.body)
                         }
                     }
                     is BaseState.Error -> {
@@ -42,5 +42,4 @@ class PopularRoutesViewModel @Inject constructor(private val repository: MainRep
             }
         }
     }
-
 }

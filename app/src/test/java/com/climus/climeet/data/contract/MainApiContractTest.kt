@@ -20,7 +20,6 @@ import retrofit2.http.Query
 import java.util.Base64
 
 class MainApiContractTest {
-
     private val gson = Gson()
 
     @Test
@@ -36,8 +35,19 @@ class MainApiContractTest {
         )
         assertEquals(
             listOf(
-                "#FFFFFF", "#F34040", "#FF9000", "#FDDA16", "#63B75D", "#0094FF", "#393FD6",
-                "#A259FF", "#6E4C41", "#8B8B8B", "#000000", "#000000", "#000000",
+                "#FFFFFF",
+                "#F34040",
+                "#FF9000",
+                "#FDDA16",
+                "#63B75D",
+                "#0094FF",
+                "#393FD6",
+                "#A259FF",
+                "#6E4C41",
+                "#8B8B8B",
+                "#000000",
+                "#000000",
+                "#000000",
             ),
             response.difficultyList.map { it.gymDifficultyColor },
         )
@@ -105,9 +115,9 @@ class MainApiContractTest {
 
     @Test
     fun `record success contract is 200 with an empty body`() {
-        val contract = JsonParser().parse(
-            fixture("create-timer-climbing-record-success.json")
-        ).asJsonObject
+        val contract = JsonParser()
+            .parse(fixture("create-timer-climbing-record-success.json"))
+            .asJsonObject
 
         assertEquals(200, contract["statusCode"].asInt)
         assertEquals(0, Base64.getDecoder().decode(contract["bodyBase64"].asString).size)
@@ -118,7 +128,7 @@ class MainApiContractTest {
         val filteringKey = MainApi::class.java.getDeclaredMethod(
             "getGymFilteringKey",
             Long::class.javaPrimitiveType,
-            kotlin.coroutines.Continuation::class.java
+            kotlin.coroutines.Continuation::class.java,
         )
         assertEquals(
             "/api/gyms/{gymId}/version/key",
@@ -130,7 +140,7 @@ class MainApiContractTest {
             "getGymFilteringKeyTime",
             Long::class.javaPrimitiveType,
             String::class.java,
-            kotlin.coroutines.Continuation::class.java
+            kotlin.coroutines.Continuation::class.java,
         )
         assertEquals(
             "/api/gyms/{gymId}/version/key",
@@ -143,7 +153,7 @@ class MainApiContractTest {
             "getGymRouteInfoList",
             Long::class.javaPrimitiveType,
             GetGymRouteInfoRequest::class.java,
-            kotlin.coroutines.Continuation::class.java
+            kotlin.coroutines.Continuation::class.java,
         )
         assertEquals(
             "/api/gyms/{gymId}/version/route",
@@ -155,7 +165,7 @@ class MainApiContractTest {
         val record = MainApi::class.java.getDeclaredMethod(
             "createTimerClimbingRecord",
             CreateTimerClimbingRecordRequest::class.java,
-            kotlin.coroutines.Continuation::class.java
+            kotlin.coroutines.Continuation::class.java,
         )
         assertEquals(
             "/api/climbing-records",
@@ -165,18 +175,20 @@ class MainApiContractTest {
         assertTrue(record.genericParameterTypes[0].typeName.endsWith("CreateTimerClimbingRecordRequest"))
     }
 
-    private fun fixture(name: String): String =
-        fixtureBytes(name).toString(Charsets.UTF_8)
+    private fun fixture(name: String): String = fixtureBytes(name).toString(Charsets.UTF_8)
 
     private fun fixtureBytes(name: String): ByteArray =
         checkNotNull(javaClass.classLoader?.getResource("contracts/$name")) {
             "Missing contract fixture: $name"
         }.readBytes()
 
-    private fun assertJsonRoundTrip(expectedJson: String, value: Any) {
+    private fun assertJsonRoundTrip(
+        expectedJson: String,
+        value: Any,
+    ) {
         assertEquals(
             JsonParser().parse(expectedJson),
-            JsonParser().parse(gson.toJson(value))
+            JsonParser().parse(gson.toJson(value)),
         )
     }
 
@@ -184,7 +196,7 @@ class MainApiContractTest {
         method: java.lang.reflect.Method,
         parameterIndex: Int,
         annotationType: Class<T>,
-        expectedValue: String
+        expectedValue: String,
     ) {
         val annotation = method.parameterAnnotations[parameterIndex]
             .first { annotationType.isInstance(it) }

@@ -18,17 +18,24 @@ import javax.inject.Inject
 
 sealed class MainEvent {
     data object GoToGalleryForVideo : MainEvent()
-    data class GoToSetProfileImage(val context: Context) : MainEvent()
-    data class ShowToastMessage(val msg: String) : MainEvent()
+
+    data class GoToSetProfileImage(
+        val context: Context,
+    ) : MainEvent()
+
+    data class ShowToastMessage(
+        val msg: String,
+    ) : MainEvent()
+
     data object ChangeStatusBarBlack : MainEvent()
+
     data object ChangeStatusBarBackground : MainEvent()
 }
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _event = MutableSharedFlow<MainEvent>()
     val event: SharedFlow<MainEvent> = _event.asSharedFlow()
 
@@ -67,7 +74,10 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun fileToUrl(file: MultipartBody.Part, type: DataType) {
+    fun fileToUrl(
+        file: MultipartBody.Part,
+        type: DataType,
+    ) {
         viewModelScope.launch {
             repository.uploadFile(file).let {
                 when (it) {
@@ -75,7 +85,8 @@ class MainViewModel @Inject constructor(
                         when (type) {
                             DataType.SHORTS_THUMBNAIL -> _shortsThumbnail.emit(it.body.imgUrl)
                             DataType.ADMIN_PROFILE_IMAGE -> AdminEditProfileForm.setProfileImage(it.body.imgUrl)
-                            DataType.ADMIN_BACKGROUND_IMAGE -> AdminEditProfileForm.setBackgroundImage(it.body.imgUrl)
+                            DataType.ADMIN_BACKGROUND_IMAGE ->
+                                AdminEditProfileForm.setBackgroundImage(it.body.imgUrl)
                         }
                     }
 
@@ -96,9 +107,10 @@ class MainViewModel @Inject constructor(
             _event.emit(MainEvent.ChangeStatusBarBackground)
         }
     }
-
 }
 
 enum class DataType {
-    SHORTS_THUMBNAIL, ADMIN_PROFILE_IMAGE, ADMIN_BACKGROUND_IMAGE
+    SHORTS_THUMBNAIL,
+    ADMIN_PROFILE_IMAGE,
+    ADMIN_BACKGROUND_IMAGE,
 }

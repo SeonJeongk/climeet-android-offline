@@ -19,10 +19,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class GymProfileCommunityFragment :
     BaseFragment<FragmentGymProfileCommunityBinding>(R.layout.fragment_gym_profile_community) {
-
     private val viewModel: GymProfileCommunityViewModel by activityViewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
@@ -42,22 +44,24 @@ class GymProfileCommunityFragment :
         layoutParams.weight = 1.5f
         tab.layoutParams = layoutParams
 
-        binding.tbCommuMenu.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                val fragment: Fragment = when (tab.position) {
-                    0 -> GymProfileSkillFragment()
-                    1 -> GymProfileBestClimberFragment()
-                    else -> GymProfileAvgCompletionFragment()
+        binding.tbCommuMenu.addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab) {
+                    val fragment: Fragment = when (tab.position) {
+                        0 -> GymProfileSkillFragment()
+                        1 -> GymProfileBestClimberFragment()
+                        else -> GymProfileAvgCompletionFragment()
+                    }
+                    replaceFragment(fragment)
                 }
-                replaceFragment(fragment)
-            }
 
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-            }
+                override fun onTabUnselected(tab: TabLayout.Tab?) {
+                }
 
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-            }
-        })
+                override fun onTabReselected(tab: TabLayout.Tab?) {
+                }
+            },
+        )
     }
 
     fun replaceFragment(fragment: Fragment) {

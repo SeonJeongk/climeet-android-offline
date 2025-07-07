@@ -8,16 +8,16 @@ data class SearchCragUiData(
     val imgUrl: String = "",
     val name: String = "",
     val keyword: String = "",
-    val onClickListener: (Long, String, String) -> Unit
+    val onClickListener: (Long, String, String) -> Unit,
 )
 
 fun SearchGymItem.toSearchCragUiData(
     keyword: String,
-    onClickListener: (Long, String, String) -> Unit
+    onClickListener: (Long, String, String) -> Unit,
 ) = SearchCragUiData(
     id = id,
     imgUrl = TEST_IMG,
     name = name,
     keyword = keyword,
-    onClickListener = onClickListener
+    onClickListener = onClickListener,
 )

@@ -13,7 +13,6 @@ class SelectImageMethodDialog(
     context: Context,
     private val itemClickListener: (Int) -> Unit,
 ) : Dialog(context) {
-
     private lateinit var binding: DialogSelectImageMethodBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,23 +22,24 @@ class SelectImageMethodDialog(
         initView()
     }
 
-    private fun initView() = with(binding) {
-        window?.let { window ->
-            val layoutParams = window.attributes
-            layoutParams.gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-            layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT
-            layoutParams.y = 200 // 200 pixels from the bottom
-            window.attributes = layoutParams
-            window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        }
+    private fun initView() =
+        with(binding) {
+            window?.let { window ->
+                val layoutParams = window.attributes
+                layoutParams.gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+                layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT
+                layoutParams.y = 200 // 200 pixels from the bottom
+                window.attributes = layoutParams
+                window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }
 
-        buttonCamera.setOnClickListener {
-            itemClickListener(0)
-            dismiss()
+            buttonCamera.setOnClickListener {
+                itemClickListener(0)
+                dismiss()
+            }
+            buttonGallery.setOnClickListener {
+                itemClickListener(1)
+                dismiss()
+            }
         }
-        buttonGallery.setOnClickListener {
-            itemClickListener(1)
-            dismiss()
-        }
-    }
 }

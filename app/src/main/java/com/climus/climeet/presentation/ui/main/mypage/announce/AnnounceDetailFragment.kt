@@ -11,16 +11,17 @@ import com.climus.climeet.presentation.ui.main.mypage.announce.adapter.AnnounceI
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class AnnounceDetailFragment :
-    BaseFragment<FragmentAnnounceDetailBinding>(R.layout.fragment_announce_detail) {
-
+class AnnounceDetailFragment : BaseFragment<FragmentAnnounceDetailBinding>(R.layout.fragment_announce_detail) {
     private lateinit var itemAdapter: AnnounceImageRVAdapter
     private val viewModel: AnnounceDetailViewModel by viewModels()
 
     private val args: AnnounceDetailFragmentArgs by navArgs()
     private val boardId by lazy { args.boardId }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel

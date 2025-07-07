@@ -16,9 +16,8 @@ import com.climus.climeet.R
 class RouteView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
-
     private var routeImageView: ImageView
     private var routeLevelName: TextView
     private var routeBorderView: ConstraintLayout
@@ -28,10 +27,9 @@ class RouteView @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(R.layout.custom_route_view, this, true)
 
         routeImageView = findViewById(R.id.route_view_iv_image)
-        routeLevelName= findViewById(R.id.route_view_tv_level)
+        routeLevelName = findViewById(R.id.route_view_tv_level)
         routeBorderView = findViewById(R.id.route_view_root)
         routeHoldView = findViewById(R.id.iv_hold)
-
 
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.RouteView)
         val imgUrl = typedArray.getString(R.styleable.RouteView_routeImgUrl)
@@ -44,19 +42,19 @@ class RouteView @JvmOverloads constructor(
         setRouteLevelColor(levelColor)
     }
 
-    fun setRouteImgUrl(url: String?){
+    fun setRouteImgUrl(url: String?) {
         Glide.with(context)
             .load(url)
             .into(routeImageView)
     }
 
-    fun setRouteLevelName(name: String?){
+    fun setRouteLevelName(name: String?) {
         routeLevelName.text = name
     }
 
-    fun setRouteLevelColor(color: String?){
+    fun setRouteLevelColor(color: String?) {
         color?.let {
-            if(it.isNotBlank()){
+            if (it.isNotBlank()) {
                 routeBorderView.backgroundTintList = ColorStateList.valueOf(it.toColorInt())
                 routeLevelName.setTextColor(it.toColorInt())
             } else {
@@ -65,19 +63,20 @@ class RouteView @JvmOverloads constructor(
                 routeLevelName.setTextColor(ContextCompat.getColor(context, R.color.white))
             }
         } ?: run {
-            routeBorderView.backgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
+            routeBorderView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
             routeLevelName.setTextColor(ContextCompat.getColor(context, R.color.white))
         }
     }
 
-    fun setHoldImage(img: Int){
+    fun setHoldImage(img: Int) {
         routeHoldView.setImageResource(img)
     }
-
 }
 
 @BindingAdapter("holdImage")
-fun bindHoldImage(rv: RouteView, img: Int){
+fun bindHoldImage(
+    rv: RouteView,
+    img: Int,
+) {
     rv.setHoldImage(img)
 }

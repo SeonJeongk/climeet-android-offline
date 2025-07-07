@@ -3,7 +3,7 @@ package com.climus.climeet.data.model.response
 data class SearchAvailableGymResponse(
     val page: Int,
     val hasNext: Boolean,
-    val result: List<SearchAvailableGymItem>
+    val result: List<SearchAvailableGymItem>,
 )
 
 data class SearchAvailableGymItem(
@@ -11,5 +11,5 @@ data class SearchAvailableGymItem(
     val name: String,
     val managerId: Long,
     val follower: Int,
-    val profileImageUrl: String
+    val profileImageUrl: String,
 )

@@ -3,7 +3,6 @@ package com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.info
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentMypageAdminProfileInfoBinding
 import com.climus.climeet.presentation.base.BaseFragment
@@ -15,9 +14,9 @@ import com.climus.climeet.presentation.ui.main.global.gymprofile.info.GymProfile
 import com.climus.climeet.presentation.ui.main.global.gymprofile.model.GymReview
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.MyPageAdminMyProfileViewModel
 
-class MyPageAdminProfileInfoFragment(val gymId: Long) :
-    BaseFragment<FragmentMypageAdminProfileInfoBinding>(R.layout.fragment_mypage_admin_profile_info) {
-
+class MyPageAdminProfileInfoFragment(
+    val gymId: Long,
+) : BaseFragment<FragmentMypageAdminProfileInfoBinding>(R.layout.fragment_mypage_admin_profile_info) {
     val sharedViewModel: GymProfileInfoViewModel by activityViewModels()
     val viewModel: MyPageAdminMyProfileViewModel by activityViewModels()
 
@@ -26,7 +25,10 @@ class MyPageAdminProfileInfoFragment(val gymId: Long) :
     private var priceAdapter: GymPriceAdapter? = null
     private var reviewAdapter: GymReviewAdapter? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.svm = sharedViewModel
@@ -54,19 +56,18 @@ class MyPageAdminProfileInfoFragment(val gymId: Long) :
     private fun initStateObserve() {
         repeatOnStarted {
             sharedViewModel.uiState.collect {
-
                 val combinedReviewList = mutableListOf<GymReview>()
 
                 // 내 리뷰가 있을 경우, 리스트의 첫 번째 요소로 추가
-                it.myGymReview?.let {
+                it.myGymReview?.let { review ->
                     combinedReviewList.add(
                         GymReview(
-                            profileImageUrl = it.profileImageUrl,
-                            profileName = it.profileName,
-                            rating = it.rating,
-                            content = it.content,
-                            updatedAt = it.updatedAt
-                        )
+                            profileImageUrl = review.profileImageUrl,
+                            profileName = review.profileName,
+                            rating = review.rating,
+                            content = review.content,
+                            updatedAt = review.updatedAt,
+                        ),
                     )
                 }
 
@@ -78,8 +79,8 @@ class MyPageAdminProfileInfoFragment(val gymId: Long) :
                             profileName = review.profileName,
                             rating = review.rating,
                             content = review.content,
-                            updatedAt = review.updatedAt
-                        )
+                            updatedAt = review.updatedAt,
+                        ),
                     )
                 }
 

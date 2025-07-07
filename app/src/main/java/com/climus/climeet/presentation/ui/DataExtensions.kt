@@ -30,8 +30,11 @@ internal fun generateFileName(): String {
 }
 
 // 절대경로 변환
-private fun getRealPathFromUri(uri: Uri, context: Context): String? {
-    return try {
+private fun getRealPathFromUri(
+    uri: Uri,
+    context: Context,
+): String? =
+    try {
         var filePath: String? = null
         val projection = arrayOf(MediaStore.Images.Media.DATA)
         val cursor = context.contentResolver.query(uri, projection, null, null, null)
@@ -46,7 +49,6 @@ private fun getRealPathFromUri(uri: Uri, context: Context): String? {
     } catch (e: Exception) {
         null
     }
-}
 
 // 프로필 이미지 수정용
 internal fun Uri.toMultiPartImage(context: Context): MultipartBody.Part? {
@@ -60,18 +62,17 @@ internal fun Uri.toMultiPartImage(context: Context): MultipartBody.Part? {
     }
 }
 
-fun Uri.toVideoThumbnail(context: Context): MultipartBody.Part? {
-    return try {
+fun Uri.toVideoThumbnail(context: Context): MultipartBody.Part? =
+    try {
         val mediaMetadataRetriever = MediaMetadataRetriever()
         mediaMetadataRetriever.setDataSource(context, this)
         mediaMetadataRetriever.frameAtTime?.toMultiPart(context)
     } catch (ex: Exception) {
         null
     }
-}
 
-fun Bitmap.toMultiPart(context: Context): MultipartBody.Part? {
-    return try {
+fun Bitmap.toMultiPart(context: Context): MultipartBody.Part? =
+    try {
         val filesDir = context.filesDir
         val imageFile = File(filesDir, "image.jpg")
         val os = FileOutputStream(imageFile)
@@ -81,11 +82,10 @@ fun Bitmap.toMultiPart(context: Context): MultipartBody.Part? {
     } catch (e: Exception) {
         null
     }
-}
 
 // 프로필 이미지 수정용
-fun Bitmap.toMultiPartImage(context: Context): MultipartBody.Part? {
-    return try {
+fun Bitmap.toMultiPartImage(context: Context): MultipartBody.Part? =
+    try {
         val filesDir = context.filesDir
         val imageFile = File(filesDir, "image.jpg")
         val os = FileOutputStream(imageFile)
@@ -95,7 +95,6 @@ fun Bitmap.toMultiPartImage(context: Context): MultipartBody.Part? {
     } catch (e: Exception) {
         null
     }
-}
 
 // 프로필 이미지 수정용
 fun Bitmap.saveCameraImage(context: Context): Uri? {

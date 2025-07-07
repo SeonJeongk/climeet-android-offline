@@ -17,14 +17,16 @@ import javax.inject.Inject
 
 sealed class GymReviewBottomSheetEvent {
     data object CreateReview : GymReviewBottomSheetEvent()
-    data class ShowToastMessage(val msg: String) : GymReviewBottomSheetEvent()
+
+    data class ShowToastMessage(
+        val msg: String,
+    ) : GymReviewBottomSheetEvent()
 }
 
 @HiltViewModel
 class GymReviewBottomSheetFragmentViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _event = MutableSharedFlow<GymReviewBottomSheetEvent>()
     val event: SharedFlow<GymReviewBottomSheetEvent> = _event.asSharedFlow()
 
@@ -39,7 +41,6 @@ class GymReviewBottomSheetFragmentViewModel @Inject constructor(
 
     fun createReview() {
         viewModelScope.launch {
-
             if (reviewText.value.isNullOrBlank()) {
                 _event.emit(GymReviewBottomSheetEvent.ShowToastMessage("리뷰를 입력해주세요."))
                 return@launch
@@ -47,7 +48,7 @@ class GymReviewBottomSheetFragmentViewModel @Inject constructor(
 
             val request = CreateGymProfileReviewRequest(
                 content = reviewText?.value!!,
-                rating = reviewRating.value!!
+                rating = reviewRating.value!!,
             )
 
             repository.createGymReview(gymId, request).let { it ->
@@ -68,7 +69,6 @@ class GymReviewBottomSheetFragmentViewModel @Inject constructor(
 
     fun editReview() {
         viewModelScope.launch {
-
             if (reviewText.value.isNullOrBlank()) {
                 _event.emit(GymReviewBottomSheetEvent.ShowToastMessage("리뷰를 입력해주세요."))
                 return@launch
@@ -76,7 +76,7 @@ class GymReviewBottomSheetFragmentViewModel @Inject constructor(
 
             val request = CreateGymProfileReviewRequest(
                 content = reviewText?.value!!,
-                rating = reviewRating.value!!
+                rating = reviewRating.value!!,
             )
 
             Log.d("gym_profile", "수정된 리뷰 : $request")
@@ -104,5 +104,4 @@ class GymReviewBottomSheetFragmentViewModel @Inject constructor(
             _event.emit(GymReviewBottomSheetEvent.CreateReview)
         }
     }
-
 }

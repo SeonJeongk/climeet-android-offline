@@ -2,25 +2,25 @@ package com.climus.climeet.service
 
 import android.app.Notification
 import android.app.NotificationChannel
+import android.app.NotificationChannelGroup
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.MutableLiveData
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.climus.climeet.R
+import com.climus.climeet.presentation.ui.main.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.Timer
 import java.util.TimerTask
 import java.util.concurrent.TimeUnit
-import android.app.NotificationChannelGroup
-import android.content.SharedPreferences
-import androidx.lifecycle.MutableLiveData
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.climus.climeet.presentation.ui.main.MainActivity
-import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class TimerService : Service() {
@@ -37,19 +37,21 @@ class TimerService : Service() {
     private var isRunning = false
     private var timer: Timer? = null
 
-    override fun onBind(intent: Intent): IBinder? {
-        throw UnsupportedOperationException("Not yet implemented")
-    }
+    override fun onBind(intent: Intent): IBinder? = throw UnsupportedOperationException("Not yet implemented")
 
     // command 를 통해 스톱워치 서비스 상태 변경
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         val command = intent?.getStringExtra("command")
 
         when (command) {
             "START" -> {
                 startTimer()
                 val notification = createNotification(0L)
-                startForeground(1, notification)    // 스톱워치 시작 -> 알림창 띄움
+                startForeground(1, notification) // 스톱워치 시작 -> 알림창 띄움
             }
 
             "PAUSE" -> pauseTimer()
@@ -66,7 +68,6 @@ class TimerService : Service() {
         sharedPreferences = applicationContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         editor = sharedPreferences.edit()
     }
-
 
     override fun onDestroy() {
         super.onDestroy()
@@ -116,8 +117,7 @@ class TimerService : Service() {
             putExtra("showTimerFragment", true)
         }
 
-        val pendingIntent: PendingIntent =
-            PendingIntent.getActivity(this, 0, timerIntent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, timerIntent, PendingIntent.FLAG_IMMUTABLE)
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("$timeFormat")
@@ -125,7 +125,7 @@ class TimerService : Service() {
             .setContentIntent(pendingIntent)
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            notification.setSound(null)  // 알림음을 null로 설정
+            notification.setSound(null) // 알림음을 null로 설정
         }
 
         // 알림창 재시작, 일시중지 버튼
@@ -157,22 +157,25 @@ class TimerService : Service() {
             startTime = System.currentTimeMillis()
         }
         timer = Timer().apply {
-            scheduleAtFixedRate(object : TimerTask() {
-                override fun run() {
-                    elapsedTime += System.currentTimeMillis() - startTime
-                    val notification = createNotification(elapsedTime)
-                    val notificationManager =
-                        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                    notificationManager.notify(1, notification) // 새로운 알림 생성
+            scheduleAtFixedRate(
+                object : TimerTask() {
+                    override fun run() {
+                        elapsedTime += System.currentTimeMillis() - startTime
+                        val notification = createNotification(elapsedTime)
+                        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                        notificationManager.notify(1, notification) // 새로운 알림 생성
 
-                    // 시간 브로드캐스트로 보내기
-                    val intent = Intent("StopwatchUpdate")
-                    intent.putExtra("elapsedTime", elapsedTime)
-                    LocalBroadcastManager.getInstance(this@TimerService).sendBroadcast(intent)
+                        // 시간 브로드캐스트로 보내기
+                        val intent = Intent("StopwatchUpdate")
+                        intent.putExtra("elapsedTime", elapsedTime)
+                        LocalBroadcastManager.getInstance(this@TimerService).sendBroadcast(intent)
 
-                    startTime = System.currentTimeMillis()
-                }
-            }, 0, 1000)
+                        startTime = System.currentTimeMillis()
+                    }
+                },
+                0,
+                1000,
+            )
         }
     }
 
@@ -215,8 +218,7 @@ class TimerService : Service() {
 
         // 알림창 재생성 (재생성하지 않으면 스톱워치 시간이 반영되지 않음)
         val notification = createNotification(elapsedTime)
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(1, notification)
 
         // TimerViewModel에 전달 정지 상태 broadcast로 전달
@@ -241,7 +243,7 @@ class TimerService : Service() {
         isRestart = true
         isStopped = false
         isRunning = true
-        setTimer()   // 타이머 재시작
+        setTimer() // 타이머 재시작
 
         // TimerViewModel에 전달
         val intent = Intent("StopwatchUpdate")

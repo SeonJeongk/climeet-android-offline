@@ -4,5 +4,5 @@ data class GetMyStatsTargetGymMonthResponse(
     val time: String,
     val totalCompletedCount: Int,
     val attemptRouteCount: Int,
-    val difficulty: List<StatisticsDifficultyItem>
+    val difficulty: List<StatisticsDifficultyItem>,
 )

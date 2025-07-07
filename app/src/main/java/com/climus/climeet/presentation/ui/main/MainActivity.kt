@@ -34,25 +34,23 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::inflate) {
-
     private val viewModel: MainViewModel by viewModels()
 
     private lateinit var neededPermissionList: MutableList<String>
     private lateinit var navController: NavController
 
-    private val storagePermissionList =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arrayOf(
-                // 안드로이드 13 이상 필요한 권한들
-                Manifest.permission.READ_MEDIA_IMAGES,
-                // Manifest.permission.POST_NOTIFICATIONS
-            )
-        } else {
-            arrayOf(  // 안드로이드 13 미만 필요한 권한들
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-        }
+    private val storagePermissionList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        arrayOf(
+            // 안드로이드 13 이상 필요한 권한들
+            Manifest.permission.READ_MEDIA_IMAGES,
+            // Manifest.permission.POST_NOTIFICATIONS
+        )
+    } else {
+        arrayOf( // 안드로이드 13 미만 필요한 권한들
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        )
+    }
 
     private val cameraPermissionList = arrayOf(Manifest.permission.CAMERA)
 
@@ -64,11 +62,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     }
 
     private fun setBnv() {
-
         binding.mainBnv.itemIconTintList = null
 
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.main_container) as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.main_container) as NavHostFragment
         navController = navHostFragment.navController
         binding.mainBnv.apply {
             setupWithNavController(navController)
@@ -80,11 +76,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         }
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.home_fragment || destination.id == R.id.shorts_fragment
-                || destination.id == R.id.myPage_fragment || destination.id == R.id.bestClimerFragment || destination.id == R.id.popularShortsFragment
-                || destination.id == R.id.popularCragsFragment || destination.id == R.id.popularRoutesFragment
-                || destination.id == R.id.set_timer_climbing_record_fragment || destination.id == R.id.calendar_fragment
-                || destination.id == R.id.timerMainFragment || destination.id == R.id.timerMainFragment || destination.id == R.id.record_fragment
+            if (destination.id == R.id.home_fragment ||
+                destination.id == R.id.shorts_fragment ||
+                destination.id == R.id.myPage_fragment ||
+                destination.id == R.id.bestClimerFragment ||
+                destination.id == R.id.popularShortsFragment ||
+                destination.id == R.id.popularCragsFragment ||
+                destination.id == R.id.popularRoutesFragment ||
+                destination.id == R.id.set_timer_climbing_record_fragment ||
+                destination.id == R.id.calendar_fragment ||
+                destination.id == R.id.timerMainFragment ||
+                destination.id == R.id.timerMainFragment ||
+                destination.id == R.id.record_fragment
             ) {
                 // todo bnv show 해야되는 frag
                 binding.mainBnv.visibility = View.VISIBLE
@@ -111,13 +114,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                     is MainEvent.GoToSetProfileImage -> showMethodSelectionDialog(it.context)
                     is MainEvent.ShowToastMessage -> showToastMessage(it.msg)
                     is MainEvent.ChangeStatusBarBlack -> {
-                        window.statusBarColor =
-                            ContextCompat.getColor(this@MainActivity, R.color.black)
+                        window.statusBarColor = ContextCompat.getColor(this@MainActivity, R.color.black)
                     }
 
                     is MainEvent.ChangeStatusBarBackground -> {
-                        window.statusBarColor =
-                            ContextCompat.getColor(this@MainActivity, R.color.cm_background)
+                        window.statusBarColor = ContextCompat.getColor(this@MainActivity, R.color.cm_background)
                     }
                 }
             }
@@ -131,16 +132,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         storagePermissionList.forEach { permission ->
             if (ContextCompat.checkSelfPermission(
                     this,
-                    permission
+                    permission,
                 ) != PackageManager.PERMISSION_GRANTED
-            ) neededPermissionList.add(permission)
+            ) {
+                neededPermissionList.add(permission)
+            }
         }
 
         if (neededPermissionList.isNotEmpty()) {
             ActivityCompat.requestPermissions(
                 this,
                 neededPermissionList.toTypedArray(),
-                STORAGE_PERMISSION_VIDEO
+                STORAGE_PERMISSION_VIDEO,
             )
         } else {
             openGalleryForVideo()
@@ -154,16 +157,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         storagePermissionList.forEach { permission ->
             if (ContextCompat.checkSelfPermission(
                     this,
-                    permission
+                    permission,
                 ) != PackageManager.PERMISSION_GRANTED
-            ) neededPermissionList.add(permission)
+            ) {
+                neededPermissionList.add(permission)
+            }
         }
 
         if (neededPermissionList.isNotEmpty()) {
             ActivityCompat.requestPermissions(
                 this,
                 neededPermissionList.toTypedArray(),
-                STORAGE_PERMISSION_IMAGE
+                STORAGE_PERMISSION_IMAGE,
             )
         } else {
             openGalleryForImage()
@@ -177,16 +182,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         cameraPermissionList.forEach { permission ->
             if (ContextCompat.checkSelfPermission(
                     this,
-                    permission
+                    permission,
                 ) != PackageManager.PERMISSION_GRANTED
-            ) neededPermissionList.add(permission)
+            ) {
+                neededPermissionList.add(permission)
+            }
         }
 
         if (neededPermissionList.isNotEmpty()) {
             ActivityCompat.requestPermissions(
                 this,
                 neededPermissionList.toTypedArray(),
-                CAMERA_PERMISSION
+                CAMERA_PERMISSION,
             )
         } else {
             openCamera()
@@ -204,9 +211,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                 neededPermissionList.forEach {
                     if (ContextCompat.checkSelfPermission(
                             this,
-                            it
+                            it,
                         ) != PackageManager.PERMISSION_GRANTED
-                    ) return
+                    ) {
+                        return
+                    }
                 }
                 openGalleryForVideo()
             }
@@ -214,9 +223,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                 neededPermissionList.forEach {
                     if (ContextCompat.checkSelfPermission(
                             this,
-                            it
+                            it,
                         ) != PackageManager.PERMISSION_GRANTED
-                    ) return
+                    ) {
+                        return
+                    }
                 }
                 openGalleryForImage()
             }
@@ -224,9 +235,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                 neededPermissionList.forEach {
                     if (ContextCompat.checkSelfPermission(
                             this,
-                            it
+                            it,
                         ) != PackageManager.PERMISSION_GRANTED
-                    ) return
+                    ) {
+                        return
+                    }
                 }
                 openCamera()
             }
@@ -283,36 +296,34 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
             }
         }
 
-    private val imageLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                viewModel.cameraImage.value = false
+    private val imageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.cameraImage.value = false
 
-                val uri = result.data?.data
+            val uri = result.data?.data
+            uri?.let {
+                viewModel.setImageUri(it)
+            }
+        }
+    }
+
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+
+            viewModel.cameraImage.value = true
+            val bitmap = result.data?.extras?.get("data") as Bitmap
+
+            bitmap.toMultiPartImage(this)?.let { image ->
+                CameraImageForm.setImage(image)
+            } ?: run {
+                showToastMessage("카메라 이미지 파일 변환 실패")
+            }
+
+            bitmap.saveCameraImage(this).let { uri ->
                 uri?.let {
                     viewModel.setImageUri(it)
                 }
             }
         }
-
-    private val cameraLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-
-                viewModel.cameraImage.value = true
-                val bitmap = result.data?.extras?.get("data") as Bitmap
-
-                bitmap.toMultiPartImage(this)?.let { image ->
-                    CameraImageForm.setImage(image)
-                } ?: run {
-                    showToastMessage("카메라 이미지 파일 변환 실패")
-                }
-
-                bitmap.saveCameraImage(this).let { uri ->
-                    uri?.let {
-                        viewModel.setImageUri(it)
-                    }
-                }
-            }
-        }
+    }
 }

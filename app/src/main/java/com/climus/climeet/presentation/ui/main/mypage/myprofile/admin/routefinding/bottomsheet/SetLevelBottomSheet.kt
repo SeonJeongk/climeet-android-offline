@@ -7,15 +7,14 @@ import androidx.core.content.ContextCompat
 import com.climus.climeet.R
 import com.climus.climeet.databinding.DialogSetLevelBottomSheetBinding
 import com.climus.climeet.presentation.customview.WarningSnackBar
-import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.routefinding.MyPageAdminRouteFindingViewModel
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.model.LevelColorData
+import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.routefinding.MyPageAdminRouteFindingViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class SetLevelBottomSheet(
     context: Context,
-    private val viewModel: MyPageAdminRouteFindingViewModel
+    private val viewModel: MyPageAdminRouteFindingViewModel,
 ) : BottomSheetDialog(context) {
-
     private lateinit var binding: DialogSetLevelBottomSheetBinding
     private var selectedLevel = ""
     private val handler = Handler(Looper.getMainLooper())
@@ -42,7 +41,8 @@ class SetLevelBottomSheet(
         levelPicker.maxValue = levelsArray.size - 1
         levelPicker.displayedValues = levelsArray
 
-        val currentIndex = LevelColorData.LEVELS.indexOf(viewModel.selectedLevel.value.climeetLevel).takeIf { it != -1 } ?: 0
+        val currentIndex =
+            LevelColorData.LEVELS.indexOf(viewModel.selectedLevel.value.climeetLevel).takeIf { it != -1 } ?: 0
         levelPicker.value = currentIndex
 
         selectedLevel = levelsArray[currentIndex]
@@ -69,15 +69,13 @@ class SetLevelBottomSheet(
         binding.tvCancel.setOnClickListener {
             dismiss()
         }
-
     }
 
     private fun checkIfLevelAlreadySelected() {
-        val isLevelAlreadySelected =
-            viewModel.uiState.value.levelList.any { it.climeetLevel == selectedLevel }
+        val isLevelAlreadySelected = viewModel.uiState.value.levelList.any { it.climeetLevel == selectedLevel }
         val isLevelIsNotMine = viewModel.modifyingLevel.value.climeetLevel != selectedLevel
         if (isLevelAlreadySelected) {
-            if(isLevelIsNotMine) {
+            if (isLevelIsNotMine) {
                 binding.tvOk.isEnabled = false
                 binding.tvOk.setBackgroundResource(R.drawable.rect_silverfill_nostroke_5radius)
                 binding.tvOk.setTextColor(ContextCompat.getColor(context, R.color.white))
@@ -100,5 +98,4 @@ class SetLevelBottomSheet(
             show()
         }
     }
-
 }

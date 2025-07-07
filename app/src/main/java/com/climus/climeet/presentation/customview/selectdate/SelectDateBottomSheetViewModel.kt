@@ -11,13 +11,13 @@ import kotlinx.coroutines.launch
 
 sealed class SelectDateBottomEvent {
     data object CloseFragment : SelectDateBottomEvent()
+
     data object UpdateIsToday : SelectDateBottomEvent()
 }
 
 class SelectDateBottomSheetViewModel : ViewModel() {
     private val _event = MutableSharedFlow<SelectDateBottomEvent>()
     val event: SharedFlow<SelectDateBottomEvent> = _event.asSharedFlow()
-
 
     val isToday = MutableStateFlow(false)
 
@@ -27,7 +27,7 @@ class SelectDateBottomSheetViewModel : ViewModel() {
         }
     }
 
-    fun setIsTodayToFalse(){
+    fun setIsTodayToFalse() {
         isToday.update { false }
     }
 
@@ -40,5 +40,4 @@ class SelectDateBottomSheetViewModel : ViewModel() {
 
         isToday.update { !isToday.value }
     }
-
 }

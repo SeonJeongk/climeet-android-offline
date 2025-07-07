@@ -5,16 +5,13 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class ClimberProfileVPAdapter(
     fragment: Fragment,
-    private val userId: Long
+    private val userId: Long,
 ) : FragmentStateAdapter(fragment) {
-
     override fun getItemCount(): Int = 2
 
-    override fun createFragment(position: Int): Fragment {
-        return when (position) {
+    override fun createFragment(position: Int): Fragment =
+        when (position) {
             0 -> ClimberProfileShortsFragment(userId)
             else -> ClimberProfileInfoFragment(userId)
         }
-    }
-
 }

@@ -6,10 +6,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.climus.climeet.databinding.ItemAnnouncementImageBinding
 
-class AnnounceImageRVAdapter(private val items: List<String>) :
-    RecyclerView.Adapter<ImageViewHolder>() {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
+class AnnounceImageRVAdapter(
+    private val items: List<String>,
+) : RecyclerView.Adapter<ImageViewHolder>() {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ImageViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemAnnouncementImageBinding.inflate(inflater, parent, false)
         return ImageViewHolder(binding)
@@ -17,7 +20,10 @@ class AnnounceImageRVAdapter(private val items: List<String>) :
 
     override fun getItemCount(): Int = items.size
 
-    override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ImageViewHolder,
+        position: Int,
+    ) {
         val uri = items[position]
         Glide.with(holder.itemView.context)
             .load(uri)
@@ -25,5 +31,6 @@ class AnnounceImageRVAdapter(private val items: List<String>) :
     }
 }
 
-class ImageViewHolder(val binding: ItemAnnouncementImageBinding) :
-    RecyclerView.ViewHolder(binding.root)
+class ImageViewHolder(
+    val binding: ItemAnnouncementImageBinding,
+) : RecyclerView.ViewHolder(binding.root)

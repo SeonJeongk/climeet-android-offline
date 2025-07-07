@@ -14,7 +14,6 @@ class DeleteDialog(
     private val leftText: String,
     private val itemClickListener: (Boolean) -> Unit,
 ) : Dialog(context) {
-
     private lateinit var binding: DialogDeleteBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,19 +23,20 @@ class DeleteDialog(
         initView()
     }
 
-    private fun initView() = with(binding) {
-        window?.attributes?.y = 200
-        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        tvDescription.text = explainText
-        btnDelete.text = rightText
-        btnRefuse.text = leftText
-        btnDelete.setOnClickListener {
-            itemClickListener(true)
-            dismiss()
+    private fun initView() =
+        with(binding) {
+            window?.attributes?.y = 200
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            tvDescription.text = explainText
+            btnDelete.text = rightText
+            btnRefuse.text = leftText
+            btnDelete.setOnClickListener {
+                itemClickListener(true)
+                dismiss()
+            }
+            btnRefuse.setOnClickListener {
+                itemClickListener(false)
+                dismiss()
+            }
         }
-        btnRefuse.setOnClickListener {
-            itemClickListener(false)
-            dismiss()
-        }
-    }
 }

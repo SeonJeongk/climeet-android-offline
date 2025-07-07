@@ -10,21 +10,27 @@ import com.climus.climeet.presentation.ui.main.record.model.CreateRecordData
 
 class CreateSelectCragRVAdapter(
     private val viewModel: CreateSelectCragViewModel,
-    private val parentViewModel: CreateClimbingRecordViewModel
+    private val parentViewModel: CreateClimbingRecordViewModel,
 ) : RecyclerView.Adapter<CreateSelectCragRVAdapter.CragSelectViewHolder>() {
-
     private var searchList: List<FollowCrag> = emptyList()
     private var keyword: String = ""
 
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CragSelectViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): CragSelectViewHolder =
         CragSelectViewHolder(
             ItemCragSearchCalendarBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
+                LayoutInflater.from(parent.context),
+                parent,
+                false,
+            ),
         )
 
-    override fun onBindViewHolder(holder: CragSelectViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: CragSelectViewHolder,
+        position: Int,
+    ) {
         val cragData = searchList[position]
         holder.bind(searchList[position], keyword)
 
@@ -40,16 +46,22 @@ class CreateSelectCragRVAdapter(
     override fun getItemCount(): Int = searchList.size
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setList(list: List<FollowCrag>, keyword: String) {
+    fun setList(
+        list: List<FollowCrag>,
+        keyword: String,
+    ) {
         searchList = list
         this.keyword = keyword
         notifyDataSetChanged()
     }
 
-    class CragSelectViewHolder(val binding: ItemCragSearchCalendarBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(data: FollowCrag, keyword: String) {
+    class CragSelectViewHolder(
+        val binding: ItemCragSearchCalendarBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(
+            data: FollowCrag,
+            keyword: String,
+        ) {
             binding.keyword = keyword
             binding.crag = data
         }

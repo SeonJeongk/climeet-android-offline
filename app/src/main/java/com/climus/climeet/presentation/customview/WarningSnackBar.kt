@@ -9,11 +9,9 @@ import com.climus.climeet.databinding.DialogWarningSnackbarBinding
 import com.google.android.material.snackbar.Snackbar
 
 class WarningSnackBar(
-    view: View
+    view: View,
 ) {
-
     companion object {
-
         fun make(view: View) = WarningSnackBar(view)
     }
 
@@ -28,7 +26,7 @@ class WarningSnackBar(
         LayoutInflater.from(context),
         R.layout.dialog_warning_snackbar,
         null,
-        false
+        false,
     )
 
     init {

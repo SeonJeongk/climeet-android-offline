@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.climus.climeet.app.App.Companion.sharedPreferences
 import com.climus.climeet.data.model.BaseState
-import com.climus.climeet.data.model.response.BestTimeClimberSimpleResponse
 import com.climus.climeet.data.model.response.GymTimeBestClimberResponse
 import com.climus.climeet.data.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,13 +16,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class GymProfileTimeDetailUiState(
-    val rankingList: List<GymTimeBestClimberResponse> = emptyList()
+    val rankingList: List<GymTimeBestClimberResponse> = emptyList(),
 )
 
 @HiltViewModel
-class GymProfileTimeDetailViewModel @Inject constructor(private val repository: MainRepository) :
-    ViewModel() {
-
+class GymProfileTimeDetailViewModel @Inject constructor(
+    private val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(GymProfileTimeDetailUiState())
     val uiState: StateFlow<GymProfileTimeDetailUiState> = _uiState.asStateFlow()
 
@@ -35,9 +34,7 @@ class GymProfileTimeDetailViewModel @Inject constructor(private val repository: 
                 when (it) {
                     is BaseState.Success -> {
                         _uiState.update { state ->
-                            state.copy(
-                                rankingList = it.body
-                            )
+                            state.copy(rankingList = it.body)
                         }
                     }
 

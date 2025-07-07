@@ -7,36 +7,46 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.climus.climeet.databinding.ItemRouteFindingLevelColorBinding
-import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.routefinding.MyPageAdminRouteFindingViewModel
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.model.RouteColor
+import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.routefinding.MyPageAdminRouteFindingViewModel
 
 class LevelColorAdapter(
-    private val viewModel: MyPageAdminRouteFindingViewModel
+    private val viewModel: MyPageAdminRouteFindingViewModel,
 ) : ListAdapter<RouteColor, LevelColorAdapter.ViewHolder>(DiffCallback()) {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ViewHolder {
         val binding = ItemRouteFindingLevelColorBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
-            false
+            false,
         )
         return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ViewHolder,
+        position: Int,
+    ) {
         holder.bind(getItem(position))
     }
 
     class DiffCallback : DiffUtil.ItemCallback<RouteColor>() {
-        override fun areItemsTheSame(oldItem: RouteColor, newItem: RouteColor): Boolean =
-            oldItem.name == newItem.name
+        override fun areItemsTheSame(
+            oldItem: RouteColor,
+            newItem: RouteColor,
+        ): Boolean = oldItem.name == newItem.name
 
-        override fun areContentsTheSame(oldItem: RouteColor, newItem: RouteColor): Boolean =
-            oldItem == newItem
+        override fun areContentsTheSame(
+            oldItem: RouteColor,
+            newItem: RouteColor,
+        ): Boolean = oldItem == newItem
     }
 
-    inner class ViewHolder(private val binding: ItemRouteFindingLevelColorBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(
+        private val binding: ItemRouteFindingLevelColorBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(routeColor: RouteColor) {
             binding.rc = routeColor
             binding.executePendingBindings()
@@ -52,14 +62,14 @@ class LevelColorAdapter(
         }
 
         private fun updateSelection(routeColor: RouteColor) {
-            if(routeColor.name == viewModel.selectedLevel.value.colorName) {
+            if (routeColor.name == viewModel.selectedLevel.value.colorName) {
                 binding.circleOutside.visibility = View.VISIBLE
             } else {
                 binding.circleOutside.visibility = View.GONE
             }
-            if(routeColor.name == "컴피") {
+            if (routeColor.name == "컴피") {
                 binding.tvColorName.text = "C"
-            }else{
+            } else {
                 binding.tvColorName.text = ""
             }
         }

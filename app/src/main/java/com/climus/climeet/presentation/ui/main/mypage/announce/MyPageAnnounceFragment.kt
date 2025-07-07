@@ -12,12 +12,14 @@ import com.climus.climeet.presentation.ui.main.mypage.announce.adapter.Announcem
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MyPageAnnounceFragment: BaseFragment<FragmentMypageAnnounceBinding>(R.layout.fragment_mypage_announce) {
-
+class MyPageAnnounceFragment : BaseFragment<FragmentMypageAnnounceBinding>(R.layout.fragment_mypage_announce) {
     lateinit var itemAdapter: AnnouncementRVAdapter
     private val viewModel: MyPageAnnounceViewModel by viewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         itemAdapter = AnnouncementRVAdapter(viewModel)
@@ -53,12 +55,12 @@ class MyPageAnnounceFragment: BaseFragment<FragmentMypageAnnounceBinding>(R.layo
 
     private fun setRecyclerView() {
         binding.rvMypageAnnouncement.adapter = itemAdapter
-        binding.rvMypageAnnouncement.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
+        binding.rvMypageAnnouncement.layoutManager =
+            LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
     }
 
     private fun navigateToAnnounceDetail(boardId: Long) {
         val action = MyPageAnnounceFragmentDirections.actionMyPageAnnounceFragmentToAnnounceDetailFragment(boardId)
         findNavController().navigate(action)
     }
-
 }

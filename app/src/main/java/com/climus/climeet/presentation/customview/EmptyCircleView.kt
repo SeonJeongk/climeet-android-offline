@@ -14,9 +14,8 @@ import java.lang.Float.min
 class EmptyCircleView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
-
     var ecColor: Int = Color.WHITE
     var ecText: String = ""
     var ecTextSize: Float = 0F

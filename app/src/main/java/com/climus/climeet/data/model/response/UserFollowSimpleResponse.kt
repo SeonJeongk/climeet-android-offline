@@ -4,14 +4,11 @@ import com.google.gson.annotations.SerializedName
 
 data class UserFollowSimpleResponse(
     @SerializedName("userId")
-    val userId : Long,
-
+    val userId: Long,
     @SerializedName("userName")
-    val userName : String,
-
+    val userName: String,
     @SerializedName("userProfileUrl")
-    val userProfileUrl : String,
-
+    val userProfileUrl: String,
     @SerializedName("followerCount")
-    var followerCount : Long,
+    var followerCount: Long,
 )

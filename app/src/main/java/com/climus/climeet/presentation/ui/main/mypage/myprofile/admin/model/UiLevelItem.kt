@@ -6,11 +6,11 @@ data class UiLevelItem(
     val colorName: String = "",
     val colorHex: String = "",
     val climeetLevel: String = "",
-    val setLevelListener: (String, String) -> Unit
+    val setLevelListener: (String, String) -> Unit,
 ) {
-    fun toDifficultyRequestItem() = UpdateGymRouteVersionRequest.NewData.DifficultyRequestItem(
-        gymDifficultyName = colorName,
-        climeetDifficultyName = climeetLevel
-    )
+    fun toDifficultyRequestItem() =
+        UpdateGymRouteVersionRequest.NewData.DifficultyRequestItem(
+            gymDifficultyName = colorName,
+            climeetDifficultyName = climeetLevel,
+        )
 }
-

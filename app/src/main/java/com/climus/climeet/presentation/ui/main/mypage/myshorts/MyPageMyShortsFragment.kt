@@ -10,13 +10,14 @@ import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MyPageMyShortsFragment: BaseFragment<FragmentMypageMyshortsBinding>(R.layout.fragment_mypage_myshorts) {
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+class MyPageMyShortsFragment : BaseFragment<FragmentMypageMyshortsBinding>(R.layout.fragment_mypage_myshorts) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         setupTabLayout()
-
     }
 
     private fun setupTabLayout() {
@@ -27,7 +28,5 @@ class MyPageMyShortsFragment: BaseFragment<FragmentMypageMyshortsBinding>(R.layo
         TabLayoutMediator(binding.tbMypageShorts, binding.vpMyapgeShorts) { tab, position ->
             tab.text = tabMenu[position]
         }.attach()
-
     }
-
 }

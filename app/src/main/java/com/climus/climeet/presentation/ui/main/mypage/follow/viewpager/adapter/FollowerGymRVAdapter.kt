@@ -13,12 +13,14 @@ import com.climus.climeet.presentation.ui.main.mypage.follow.viewpager.FollowerV
 
 class FollowerGymRVAdapter(
     private val followerGymList: List<FollowUiData>,
-    private val viewModel: FollowerViewModel
+    private val viewModel: FollowerViewModel,
 ) : RecyclerView.Adapter<FollowerGymViewHolder>() {
-
     private val followStatus = SparseBooleanArray()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FollowerGymViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): FollowerGymViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemMypageFollowerCragBinding.inflate(inflater, parent, false)
         return FollowerGymViewHolder(binding, viewModel)
@@ -62,15 +64,13 @@ class FollowerGymRVAdapter(
     }
 
     override fun getItemCount(): Int = followerGymList.size
-
 }
 
 class FollowerGymViewHolder(
     val binding: ItemMypageFollowerCragBinding,
-    val viewModel: FollowerViewModel
+    val viewModel: FollowerViewModel,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(data: FollowUiData) {
-
         if (data.profileImageUrl != null) {
             Glide.with(binding.root.context)
                 .load(data.profileImageUrl)
@@ -82,7 +82,7 @@ class FollowerGymViewHolder(
         binding.tvFollower.text = data.followerCount.toString()
         binding.tvFollowing.text = data.followingCount.toString()
 
-        binding.root.setOnClickListener{
+        binding.root.setOnClickListener {
             viewModel.navigateToProfile(data.userId)
         }
     }

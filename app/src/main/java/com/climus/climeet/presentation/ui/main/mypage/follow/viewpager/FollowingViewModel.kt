@@ -27,14 +27,19 @@ data class FollowingUiState(
 )
 
 sealed class FollowingEvent {
-    data class NavigateToGymProfile(val id: Long) : FollowingEvent()
-    data class NavigateToClimerProfile(val id: Long) : FollowingEvent()
+    data class NavigateToGymProfile(
+        val id: Long,
+    ) : FollowingEvent()
 
+    data class NavigateToClimerProfile(
+        val id: Long,
+    ) : FollowingEvent()
 }
 
 @HiltViewModel
-class FollowingViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
-
+class FollowingViewModel @Inject constructor(
+    private val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(FollowingUiState())
     val uiState: StateFlow<FollowingUiState> = _uiState.asStateFlow()
 
@@ -46,7 +51,6 @@ class FollowingViewModel @Inject constructor(private val repository: MainReposit
             repository.getUserFollowing(null, userCategory).let {
                 when (it) {
                     is BaseState.Success -> {
-
                         if (userCategory == "Climber") {
                             _uiState.update { state ->
                                 state.copy(
@@ -54,7 +58,7 @@ class FollowingViewModel @Inject constructor(private val repository: MainReposit
                                         item.toUserFollowingUiData(
                                             follow = ::follow,
                                             unFollow = ::unfollow,
-                                            navigateToProfile = ::navigateToProfile
+                                            navigateToProfile = ::navigateToProfile,
                                         )
                                     },
                                 )
@@ -66,7 +70,7 @@ class FollowingViewModel @Inject constructor(private val repository: MainReposit
                                         item.toUserFollowingUiData(
                                             follow = ::follow,
                                             unFollow = ::unfollow,
-                                            navigateToProfile = ::navigateToProfile
+                                            navigateToProfile = ::navigateToProfile,
                                         )
                                     },
                                 )
@@ -85,9 +89,7 @@ class FollowingViewModel @Inject constructor(private val repository: MainReposit
 
     fun changeMode(isGym: Boolean) {
         _uiState.update { state ->
-            state.copy(
-                isGym = isGym,
-            )
+            state.copy(isGym = isGym)
         }
     }
 
@@ -97,26 +99,20 @@ class FollowingViewModel @Inject constructor(private val repository: MainReposit
                 repository.followGym(id).let {
                     when (it) {
                         is BaseState.Success -> {
-
                             val newList = uiState.value.profileList.map { data ->
                                 if (data.id == id) {
-                                    data.copy(
-                                        isFollowing = true
-                                    )
+                                    data.copy(isFollowing = true)
                                 } else {
                                     data.copy()
                                 }
                             }
 
                             _uiState.update { state ->
-                                state.copy(
-                                    profileList = newList
-                                )
+                                state.copy(profileList = newList)
                             }
                         }
 
                         is BaseState.Error -> {
-
                         }
                     }
                 }
@@ -126,18 +122,14 @@ class FollowingViewModel @Inject constructor(private val repository: MainReposit
                         is BaseState.Success -> {
                             val newList = uiState.value.profileList.map { data ->
                                 if (data.id == id) {
-                                    data.copy(
-                                        isFollowing = true
-                                    )
+                                    data.copy(isFollowing = true)
                                 } else {
                                     data.copy()
                                 }
                             }
 
                             _uiState.update { state ->
-                                state.copy(
-                                    profileList = newList
-                                )
+                                state.copy(profileList = newList)
                             }
                         }
 
@@ -148,13 +140,11 @@ class FollowingViewModel @Inject constructor(private val repository: MainReposit
                     }
                 }
             }
-
         }
     }
 
     fun unfollow(id: Long) {
         viewModelScope.launch {
-
             if (uiState.value.isGym) {
                 repository.unFollowGym(id).let {
                     when (it) {
@@ -173,7 +163,6 @@ class FollowingViewModel @Inject constructor(private val repository: MainReposit
                         }
 
                         is BaseState.Error -> {
-
                         }
                     }
                 }
@@ -201,7 +190,6 @@ class FollowingViewModel @Inject constructor(private val repository: MainReposit
                     }
                 }
             }
-
         }
     }
 

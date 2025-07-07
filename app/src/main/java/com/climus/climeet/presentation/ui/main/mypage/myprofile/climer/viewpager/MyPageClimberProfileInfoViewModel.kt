@@ -19,24 +19,32 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class MyPageClimberProfileInfoUiState(
-    val homeGymList: List<ProfileHomeGymUiData> = emptyList()
+    val homeGymList: List<ProfileHomeGymUiData> = emptyList(),
 )
 
 data class ClimberProfileSettingBtnState(
     val homeGym: Boolean = false,
     val avgComplete: Boolean = false,
-    val avgCompleteLevel: Boolean = false
+    val avgCompleteLevel: Boolean = false,
 )
 
 sealed class MyPageClimberProfileEvent {
-    data class NavigateToGymProfile(val id: Long) : MyPageClimberProfileEvent()
-    data class ChangePrivacyState(val target: String, val state: Boolean) : MyPageClimberProfileEvent()
+    data class NavigateToGymProfile(
+        val id: Long,
+    ) : MyPageClimberProfileEvent()
+
+    data class ChangePrivacyState(
+        val target: String,
+        val state: Boolean,
+    ) : MyPageClimberProfileEvent()
+
     data object ShowPopupWindow : MyPageClimberProfileEvent()
 }
 
 @HiltViewModel
-class MyPageClimberProfileInfoViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
-
+class MyPageClimberProfileInfoViewModel @Inject constructor(
+    private val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(MyPageClimberProfileInfoUiState())
     val uiState: StateFlow<MyPageClimberProfileInfoUiState> = _uiState.asStateFlow()
 
@@ -63,13 +71,12 @@ class MyPageClimberProfileInfoViewModel @Inject constructor(private val reposito
                             state.copy(
                                 homeGymList = it.body.map { data ->
                                     data.toProfileHomeGymUiData(::navigateToGymProfile)
-                                }
+                                },
                             )
                         }
                     }
 
                     is BaseState.Error -> {
-
                     }
                 }
             }
@@ -79,25 +86,19 @@ class MyPageClimberProfileInfoViewModel @Inject constructor(private val reposito
     // 버튼 클릭 시, 선택지 버튼 보이게 설정
     fun showHomeGymBtns() {
         _btnState.update { state ->
-            state.copy(
-                homeGym = true
-            )
+            state.copy(homeGym = true)
         }
     }
 
     fun showCompleteBtns() {
         _btnState.update { state ->
-            state.copy(
-                avgComplete = true
-            )
+            state.copy(avgComplete = true)
         }
     }
 
     fun showCompleteLevelBtns() {
         _btnState.update { state ->
-            state.copy(
-                avgCompleteLevel = true
-            )
+            state.copy(avgCompleteLevel = true)
         }
     }
 
@@ -107,9 +108,7 @@ class MyPageClimberProfileInfoViewModel @Inject constructor(private val reposito
      */
     fun setHomeGymState(privacy: Boolean) {
         _btnState.update { state ->
-            state.copy(
-                homeGym = false
-            )
+            state.copy(homeGym = false)
         }
         viewModelScope.launch {
             _event.emit(MyPageClimberProfileEvent.ChangePrivacyState("homeGym", privacy))
@@ -120,9 +119,7 @@ class MyPageClimberProfileInfoViewModel @Inject constructor(private val reposito
 
     fun setAvgCompleteState(privacy: Boolean) {
         _btnState.update { state ->
-            state.copy(
-                avgComplete = false
-            )
+            state.copy(avgComplete = false)
         }
         viewModelScope.launch {
             _event.emit(MyPageClimberProfileEvent.ChangePrivacyState("avgComplete", privacy))
@@ -133,9 +130,7 @@ class MyPageClimberProfileInfoViewModel @Inject constructor(private val reposito
 
     fun setAvgCompleteLevelState(privacy: Boolean) {
         _btnState.update { state ->
-            state.copy(
-                avgCompleteLevel = false
-            )
+            state.copy(avgCompleteLevel = false)
         }
         viewModelScope.launch {
             _event.emit(MyPageClimberProfileEvent.ChangePrivacyState("avgCompleteLevel", privacy))

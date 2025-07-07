@@ -2,13 +2,13 @@ package com.climus.climeet.presentation.ui.main.home.bestclimer.viewpager
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -18,8 +18,6 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.climus.climeet.MainNavDirections
 import com.climus.climeet.R
-import com.climus.climeet.databinding.FragmentCompleteDetailBinding
-import com.climus.climeet.databinding.FragmentTimeBinding
 import com.climus.climeet.databinding.FragmentTimeDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -27,46 +25,45 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class TimeDetailFragment : Fragment() {
-
-    private lateinit var binding : FragmentTimeDetailBinding
+    private lateinit var binding: FragmentTimeDetailBinding
     private val viewModel: TimeDetailViewModel by viewModels()
 
-    private lateinit var profileImg1 : ImageView
-    private lateinit var profileImg2 : ImageView
-    private lateinit var profileImg3 : ImageView
-    private lateinit var profileImg4 : ImageView
-    private lateinit var profileImg5 : ImageView
-    private lateinit var profileImg6 : ImageView
-    private lateinit var profileImg7 : ImageView
-    private lateinit var profileImg8 : ImageView
-    private lateinit var profileImg9 : ImageView
+    private lateinit var profileImg1: ImageView
+    private lateinit var profileImg2: ImageView
+    private lateinit var profileImg3: ImageView
+    private lateinit var profileImg4: ImageView
+    private lateinit var profileImg5: ImageView
+    private lateinit var profileImg6: ImageView
+    private lateinit var profileImg7: ImageView
+    private lateinit var profileImg8: ImageView
+    private lateinit var profileImg9: ImageView
     lateinit var profileImgList: List<ImageView>
 
-    private lateinit var nickname1 : TextView
-    private lateinit var nickname2 : TextView
-    private lateinit var nickname3 : TextView
-    private lateinit var nickname4 : TextView
-    private lateinit var nickname5 : TextView
-    private lateinit var nickname6 : TextView
-    private lateinit var nickname7 : TextView
-    private lateinit var nickname8 : TextView
-    private lateinit var nickname9 : TextView
+    private lateinit var nickname1: TextView
+    private lateinit var nickname2: TextView
+    private lateinit var nickname3: TextView
+    private lateinit var nickname4: TextView
+    private lateinit var nickname5: TextView
+    private lateinit var nickname6: TextView
+    private lateinit var nickname7: TextView
+    private lateinit var nickname8: TextView
+    private lateinit var nickname9: TextView
     lateinit var nicknameList: List<TextView>
 
-    private lateinit var recordTime1 : TextView
-    private lateinit var recordTime2 : TextView
-    private lateinit var recordTime3 : TextView
-    private lateinit var recordTime4 : TextView
-    private lateinit var recordTime5 : TextView
-    private lateinit var recordTime6 : TextView
-    private lateinit var recordTime7 : TextView
-    private lateinit var recordTime8 : TextView
-    private lateinit var recordTime9 : TextView
+    private lateinit var recordTime1: TextView
+    private lateinit var recordTime2: TextView
+    private lateinit var recordTime3: TextView
+    private lateinit var recordTime4: TextView
+    private lateinit var recordTime5: TextView
+    private lateinit var recordTime6: TextView
+    private lateinit var recordTime7: TextView
+    private lateinit var recordTime8: TextView
+    private lateinit var recordTime9: TextView
     lateinit var recordList: List<TextView>
 
-    private lateinit var rank1 : TextView
-    private lateinit var rank2 : TextView
-    private lateinit var rank3 : TextView
+    private lateinit var rank1: TextView
+    private lateinit var rank2: TextView
+    private lateinit var rank3: TextView
     lateinit var rankList: List<TextView>
 
     fun LifecycleOwner.repeatOnStarted(block: suspend CoroutineScope.() -> Unit) {
@@ -76,22 +73,25 @@ class TimeDetailFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_time_detail, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) { // api
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) { // api
         super.onViewCreated(view, savedInstanceState)
         initView()
         viewModel.getClimberRankingOrderTime()
         initStateObserve()
-
     }
 
-    private fun initView() {
+    private fun initProfileImages() {
         profileImg1 = binding.ivTimeRanking1
         profileImg2 = binding.ivTimeRanking2
         profileImg3 = binding.ivTimeRanking3
@@ -102,8 +102,20 @@ class TimeDetailFragment : Fragment() {
         profileImg8 = binding.ivTimeRanking8
         profileImg9 = binding.ivTimeRanking9
         profileImgList = listOf(
-            profileImg1, profileImg2, profileImg3, profileImg4, profileImg5, profileImg6, profileImg7, profileImg8, profileImg9
+            profileImg1,
+            profileImg2,
+            profileImg3,
+            profileImg4,
+            profileImg5,
+            profileImg6,
+            profileImg7,
+            profileImg8,
+            profileImg9,
         )
+    }
+
+    private fun initView() {
+        initProfileImages()
 
         nickname1 = binding.tvTimeRanking1Nickname
         nickname2 = binding.tvTimeRanking2Nickname
@@ -115,7 +127,15 @@ class TimeDetailFragment : Fragment() {
         nickname8 = binding.tvTimeRanking8Nickname
         nickname9 = binding.tvTimeRanking9Nickname
         nicknameList = listOf(
-            nickname1, nickname2, nickname3, nickname4, nickname5, nickname6, nickname7, nickname8, nickname9
+            nickname1,
+            nickname2,
+            nickname3,
+            nickname4,
+            nickname5,
+            nickname6,
+            nickname7,
+            nickname8,
+            nickname9,
         )
 
         recordTime1 = binding.tvTimeRanking1
@@ -128,7 +148,15 @@ class TimeDetailFragment : Fragment() {
         recordTime8 = binding.tvTimeRanking8
         recordTime9 = binding.tvTimeRanking9
         recordList = listOf(
-            recordTime1, recordTime2, recordTime3, recordTime4, recordTime5, recordTime6, recordTime7, recordTime8, recordTime9
+            recordTime1,
+            recordTime2,
+            recordTime3,
+            recordTime4,
+            recordTime5,
+            recordTime6,
+            recordTime7,
+            recordTime8,
+            recordTime9,
         )
 
         rank1 = binding.tvTimeRankingNumber1
@@ -139,14 +167,14 @@ class TimeDetailFragment : Fragment() {
 
     private fun initStateObserve() {
         repeatOnStarted {
-            viewModel?.let { vm ->
+            viewModel.let { vm ->
                 vm.uiState.collect { uiState ->
-                    uiState.rankingList?.let { rankingList ->
+                    uiState.rankingList.let { rankingList ->
                         Log.d("TimeDetail", rankingList.toString())
                         val iterationCount = minOf(rankingList.size, 9)
 
                         rankingList.take(iterationCount).forEachIndexed { i, bestTimeClimberResponse ->
-                            if(bestTimeClimberResponse.profileImageUrl != null) {
+                            if (bestTimeClimberResponse.profileImageUrl != null) {
                                 Glide.with(binding.root)
                                     .load(bestTimeClimberResponse.profileImageUrl)
                                     .into(profileImgList[i])
@@ -154,7 +182,7 @@ class TimeDetailFragment : Fragment() {
                                     navigateToClimberProfile(bestTimeClimberResponse.userId)
                                 }
                             }
-                            if(i < 3) {
+                            if (i < 3) {
                                 rankList[i].text = bestTimeClimberResponse.ranking.toString()
                                 rankList[i].visibility = View.VISIBLE
                             }
@@ -165,16 +193,14 @@ class TimeDetailFragment : Fragment() {
                             nicknameList[i].visibility = View.VISIBLE
                             recordList[i].visibility = View.VISIBLE
                         }
-
                     }
                 }
             }
         }
     }
 
-    private fun navigateToClimberProfile(userId : Long) {
+    private fun navigateToClimberProfile(userId: Long) {
         val action = MainNavDirections.globalActionToClimerProfileFragment(userId)
         findNavController().navigate(action)
     }
-
 }

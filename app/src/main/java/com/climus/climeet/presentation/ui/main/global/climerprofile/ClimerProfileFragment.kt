@@ -1,31 +1,27 @@
 package com.climus.climeet.presentation.ui.main.global.climerprofile
 
-import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentClimerProfileBinding
 import com.climus.climeet.presentation.base.BaseFragment
 import com.climus.climeet.presentation.ui.main.global.climerprofile.viewpager.ClimberProfileVPAdapter
-import com.climus.climeet.presentation.ui.main.mypage.myshorts.viewpager.MyShortsVPAdapter
-import com.climus.climeet.presentation.util.Constants.TAG
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ClimerProfileFragment :
-    BaseFragment<FragmentClimerProfileBinding>(R.layout.fragment_climer_profile) {
-
+class ClimerProfileFragment : BaseFragment<FragmentClimerProfileBinding>(R.layout.fragment_climer_profile) {
     private val args: ClimerProfileFragmentArgs by navArgs()
     private val userId by lazy { args.userId }
 
     private val viewModel: ClimberProfileViewModel by activityViewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
@@ -42,7 +38,6 @@ class ClimerProfileFragment :
         TabLayoutMediator(binding.tbClimberProfile, binding.vpClimberProfile) { tab, position ->
             tab.text = tabMenu[position]
         }.attach()
-
     }
 
     private fun initEventObserve() {

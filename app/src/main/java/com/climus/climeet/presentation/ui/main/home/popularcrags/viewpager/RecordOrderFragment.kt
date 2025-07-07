@@ -1,13 +1,13 @@
 package com.climus.climeet.presentation.ui.main.home.popularcrags.viewpager
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -15,7 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.Glide
 import com.climus.climeet.R
-import com.climus.climeet.databinding.FragmentFollowerOrderBinding
 import com.climus.climeet.databinding.FragmentRecordOrderBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -23,46 +22,45 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class RecordOrderFragment : Fragment() {
-
-    private lateinit var binding : FragmentRecordOrderBinding
+    private lateinit var binding: FragmentRecordOrderBinding
     private val viewModel: RecordOrderViewModel by viewModels()
 
-    private lateinit var profileImg1 : ImageView
-    private lateinit var profileImg2 : ImageView
-    private lateinit var profileImg3 : ImageView
-    private lateinit var profileImg4 : ImageView
-    private lateinit var profileImg5 : ImageView
-    private lateinit var profileImg6 : ImageView
-    private lateinit var profileImg7 : ImageView
-    private lateinit var profileImg8 : ImageView
-    private lateinit var profileImg9 : ImageView
+    private lateinit var profileImg1: ImageView
+    private lateinit var profileImg2: ImageView
+    private lateinit var profileImg3: ImageView
+    private lateinit var profileImg4: ImageView
+    private lateinit var profileImg5: ImageView
+    private lateinit var profileImg6: ImageView
+    private lateinit var profileImg7: ImageView
+    private lateinit var profileImg8: ImageView
+    private lateinit var profileImg9: ImageView
     lateinit var profileImgList: List<ImageView>
 
-    private lateinit var gymName1 : TextView
-    private lateinit var gymName2 : TextView
-    private lateinit var gymName3 : TextView
-    private lateinit var gymName4 : TextView
-    private lateinit var gymName5 : TextView
-    private lateinit var gymName6 : TextView
-    private lateinit var gymName7 : TextView
-    private lateinit var gymName8 : TextView
-    private lateinit var gymName9 : TextView
+    private lateinit var gymName1: TextView
+    private lateinit var gymName2: TextView
+    private lateinit var gymName3: TextView
+    private lateinit var gymName4: TextView
+    private lateinit var gymName5: TextView
+    private lateinit var gymName6: TextView
+    private lateinit var gymName7: TextView
+    private lateinit var gymName8: TextView
+    private lateinit var gymName9: TextView
     lateinit var gymNameList: List<TextView>
 
-    private lateinit var records1 : TextView
-    private lateinit var records2 : TextView
-    private lateinit var records3 : TextView
-    private lateinit var records4 : TextView
-    private lateinit var records5 : TextView
-    private lateinit var records6 : TextView
-    private lateinit var records7 : TextView
-    private lateinit var records8 : TextView
-    private lateinit var records9 : TextView
+    private lateinit var records1: TextView
+    private lateinit var records2: TextView
+    private lateinit var records3: TextView
+    private lateinit var records4: TextView
+    private lateinit var records5: TextView
+    private lateinit var records6: TextView
+    private lateinit var records7: TextView
+    private lateinit var records8: TextView
+    private lateinit var records9: TextView
     lateinit var recordsList: List<TextView>
 
-    private lateinit var rank1 : TextView
-    private lateinit var rank2 : TextView
-    private lateinit var rank3 : TextView
+    private lateinit var rank1: TextView
+    private lateinit var rank2: TextView
+    private lateinit var rank3: TextView
     lateinit var rankList: List<TextView>
 
     fun LifecycleOwner.repeatOnStarted(block: suspend CoroutineScope.() -> Unit) {
@@ -72,22 +70,25 @@ class RecordOrderFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_record_order, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) { // api
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) { // api
         super.onViewCreated(view, savedInstanceState)
         initView()
         viewModel.getGymRankingOrderFollowCount()
         initStateObserve()
-
     }
 
-    private fun initView() {
+    private fun initProfileImages() {
         profileImg1 = binding.ivRecordRanking1
         profileImg2 = binding.ivRecordRanking2
         profileImg3 = binding.ivRecordRanking3
@@ -98,8 +99,20 @@ class RecordOrderFragment : Fragment() {
         profileImg8 = binding.ivRecordRanking8
         profileImg9 = binding.ivRecordRanking9
         profileImgList = listOf(
-            profileImg1, profileImg2, profileImg3, profileImg4, profileImg5, profileImg6, profileImg7, profileImg8, profileImg9
+            profileImg1,
+            profileImg2,
+            profileImg3,
+            profileImg4,
+            profileImg5,
+            profileImg6,
+            profileImg7,
+            profileImg8,
+            profileImg9,
         )
+    }
+
+    private fun initView() {
+        initProfileImages()
 
         gymName1 = binding.tvRecordRanking1GymName
         gymName2 = binding.tvRecordRanking2GymName
@@ -111,7 +124,15 @@ class RecordOrderFragment : Fragment() {
         gymName8 = binding.tvRecordRanking8GymName
         gymName9 = binding.tvRecordRanking9GymName
         gymNameList = listOf(
-            gymName1, gymName2, gymName3, gymName4, gymName5, gymName6, gymName7, gymName8, gymName9
+            gymName1,
+            gymName2,
+            gymName3,
+            gymName4,
+            gymName5,
+            gymName6,
+            gymName7,
+            gymName8,
+            gymName9,
         )
 
         records1 = binding.tvRecordRanking1Records
@@ -124,7 +145,15 @@ class RecordOrderFragment : Fragment() {
         records8 = binding.tvRecordRanking8Records
         records9 = binding.tvRecordRanking9Records
         recordsList = listOf(
-            records1, records2, records3, records4, records5, records6, records7, records8, records9
+            records1,
+            records2,
+            records3,
+            records4,
+            records5,
+            records6,
+            records7,
+            records8,
+            records9,
         )
 
         rank1 = binding.tvRecordRankingNumber1
@@ -135,18 +164,18 @@ class RecordOrderFragment : Fragment() {
 
     private fun initStateObserve() {
         repeatOnStarted {
-            viewModel?.let { vm ->
+            viewModel.let { vm ->
                 vm.uiState.collect { uiState ->
-                    uiState.cragList?.let { cragList ->
+                    uiState.cragList.let { cragList ->
                         val iterationCount = minOf(cragList.size, 9)
 
                         cragList.take(iterationCount).forEachIndexed { i, bestRecordGymResponse ->
-                            if(bestRecordGymResponse.profileImageUrl != null) {
+                            if (bestRecordGymResponse.profileImageUrl != null) {
                                 Glide.with(binding.root)
                                     .load(bestRecordGymResponse.profileImageUrl)
                                     .into(profileImgList[i])
                             }
-                            if(i < 3) {
+                            if (i < 3) {
                                 rankList[i].text = bestRecordGymResponse.ranking.toString()
                                 rankList[i].visibility = View.VISIBLE
                             }

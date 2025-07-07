@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 data class ClimberProfileUiState(
     val userName: String = "",
     val userProfileImg: String = "",
@@ -28,14 +27,15 @@ data class ClimberProfileUiState(
 )
 
 sealed class ClimberProfileEvent {
-    data class ChangeFollowing(val state: Boolean) : ClimberProfileEvent()
+    data class ChangeFollowing(
+        val state: Boolean,
+    ) : ClimberProfileEvent()
 }
 
 @HiltViewModel
 class ClimberProfileViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(ClimberProfileUiState())
     val uiState: StateFlow<ClimberProfileUiState> = _uiState.asStateFlow()
 
@@ -50,11 +50,10 @@ class ClimberProfileViewModel @Inject constructor(
             shortsPublic = false,
             homeGymPublic = false,
             averageCompletionRatePublic = false,
-            averageCompletionLevelPublic = false
-        )
+            averageCompletionLevelPublic = false,
+        ),
     )
-    val climberPrivacySetting: StateFlow<GetClimberPrivacySettingResponse> =
-        _climberPrivacySetting.asStateFlow()
+    val climberPrivacySetting: StateFlow<GetClimberPrivacySettingResponse> = _climberPrivacySetting.asStateFlow()
 
     private var userId: Long = 0
     private var followingCount = 0
@@ -71,22 +70,19 @@ class ClimberProfileViewModel @Inject constructor(
                 when (it) {
                     is BaseState.Success -> {
                         Log.d("follow_test", it.body.toString())
-                        _isFollower.postValue(
-                            it.body.isFollower
-                        )
+                        _isFollower.postValue(it.body.isFollower)
                         _uiState.update { state ->
                             state.copy(
                                 userName = it.body.userName,
                                 userProfileImg = it.body.userProfileUrl,
                                 followingString = "팔로워 ${it.body.followerCount}  |  팔로잉 ${it.body.followingCount}",
-                                followerCount = it.body.followerCount
+                                followerCount = it.body.followerCount,
                             )
                         }
                         followingCount = it.body.followingCount
                     }
 
                     is BaseState.Error -> {
-
                     }
                 }
             }
@@ -103,7 +99,7 @@ class ClimberProfileViewModel @Inject constructor(
                                 shortsPublic = it.body.shortsPublic,
                                 homeGymPublic = it.body.homeGymPublic,
                                 averageCompletionRatePublic = it.body.averageCompletionRatePublic,
-                                averageCompletionLevelPublic = it.body.averageCompletionLevelPublic
+                                averageCompletionLevelPublic = it.body.averageCompletionLevelPublic,
                             )
                         }
                     }
@@ -114,7 +110,7 @@ class ClimberProfileViewModel @Inject constructor(
                                 shortsPublic = false,
                                 homeGymPublic = false,
                                 averageCompletionRatePublic = false,
-                                averageCompletionLevelPublic = false
+                                averageCompletionLevelPublic = false,
                             )
                         }
                     }
@@ -137,16 +133,16 @@ class ClimberProfileViewModel @Inject constructor(
                                 _uiState.update { state ->
                                     state.copy(
                                         followerCount = _uiState.value.followerCount + 1,
-                                        followingString = "팔로워 ${_uiState.value.followerCount + 1}  |  팔로잉 $followingCount",
+                                        followingString =
+                                            "팔로워 ${_uiState.value.followerCount + 1}  |  팔로잉 $followingCount",
                                     )
                                 }
-                                Log.d("follow_test", "${result}")
+                                Log.d("follow_test", "$result")
                             }
 
                             is BaseState.Error -> {
-                                Log.d("follow_test", "${result}")
+                                Log.d("follow_test", "$result")
                             }
-
                         }
                     }
                 } else {
@@ -157,14 +153,15 @@ class ClimberProfileViewModel @Inject constructor(
                                 _uiState.update { state ->
                                     state.copy(
                                         followerCount = _uiState.value.followerCount - 1,
-                                        followingString = "팔로워 ${_uiState.value.followerCount - 1}  |  팔로잉 $followingCount",
+                                        followingString =
+                                            "팔로워 ${_uiState.value.followerCount - 1}  |  팔로잉 $followingCount",
                                     )
                                 }
-                                Log.d("follow_test", "${result}")
+                                Log.d("follow_test", "$result")
                             }
 
                             is BaseState.Error -> {
-                                Log.d("follow_test", "${result.msg}")
+                                Log.d("follow_test", result.msg)
                             }
                         }
                     }

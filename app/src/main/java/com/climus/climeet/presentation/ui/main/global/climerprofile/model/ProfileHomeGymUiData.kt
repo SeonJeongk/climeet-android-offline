@@ -4,6 +4,6 @@ data class ProfileHomeGymUiData(
     val gymId: Long = 0,
     val profileImg: String = "",
     val name: String = "",
-    val followerString : String = "",
-    val onClickListener: (Long) -> Unit
+    val followerString: String = "",
+    val onClickListener: (Long) -> Unit,
 )

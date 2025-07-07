@@ -18,14 +18,16 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MyPageClimberProfileFragment :
     BaseFragment<FragmentMypageClimberProfileBinding>(R.layout.fragment_mypage_climber_profile) {
-
     private val sharedViewModel: MyPageViewModel by activityViewModels()
     private val viewModel: MyPageClimberProfileViewModel by activityViewModels()
 
     private val args: MyPageClimberProfileFragmentArgs by navArgs()
     private val userId by lazy { args.userId }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.svm = sharedViewModel
@@ -56,10 +58,10 @@ class MyPageClimberProfileFragment :
         }.attach()
     }
 
-    private fun initEventObserve(){
+    private fun initEventObserve() {
         repeatOnStarted {
-            viewModel.event.collect{
-                when(it){
+            viewModel.event.collect {
+                when (it) {
                     is MyPageClimberProfileEvent.NavigateToEditClimberProfile -> findNavController().toEditPage()
                 }
             }
@@ -77,10 +79,14 @@ class MyPageClimberProfileFragment :
         }
     }
 
-    private fun NavController.toEditPage(){
+    private fun NavController.toEditPage() {
         val name = sharedViewModel.uiState.value.userName
         val image = sharedViewModel.uiState.value.profileImgUrl
-        val action = MyPageClimberProfileFragmentDirections.actionMyPageClimberProfileFragmentToMyPageClimberProfileEditFragment(name, image)
+        val action = MyPageClimberProfileFragmentDirections
+            .actionMyPageClimberProfileFragmentToMyPageClimberProfileEditFragment(
+                name,
+                image,
+            )
         navigate(action)
     }
 }

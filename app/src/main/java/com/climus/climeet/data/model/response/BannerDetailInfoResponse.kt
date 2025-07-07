@@ -1,30 +1,22 @@
 package com.climus.climeet.data.model.response
 
 import com.google.gson.annotations.SerializedName
-import java.time.LocalDate
 
 data class BannerDetailInfoResponse(
     @SerializedName("id")
-    val id : Long,
-
+    val id: Long,
     @SerializedName("bannerImageUrl")
-    val bannerImageUrl : String,
-
+    val bannerImageUrl: String,
     @SerializedName("title")
-    val title : String,
-
+    val title: String,
     @SerializedName("bannerTargetUrl")
-    val bannerTargetUrl : String,
-
+    val bannerTargetUrl: String,
     @SerializedName("bannerStartDate")
-    val bannerStartDate : String,
-
+    val bannerStartDate: String,
     @SerializedName("bannerEndDate")
-    val bannerEndDate : String,
-
+    val bannerEndDate: String,
     @SerializedName("isPopup")
-    val isPopup : Boolean,
-
+    val isPopup: Boolean,
     @SerializedName("linkUrl")
-    val linkUrl : String
+    val linkUrl: String,
 )

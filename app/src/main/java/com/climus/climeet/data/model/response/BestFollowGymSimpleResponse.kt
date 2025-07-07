@@ -2,26 +2,18 @@ package com.climus.climeet.data.model.response
 
 import com.google.gson.annotations.SerializedName
 
-
 data class BestFollowGymSimpleResponse(
     val gymId: Long,
-
     @SerializedName("ranking")
-    val ranking : Int,
-
+    val ranking: Int,
     @SerializedName("profileImageUrl")
-    val profileImageUrl : String,
-
+    val profileImageUrl: String,
     @SerializedName("gymName")
-    val gymName : String,
-
+    val gymName: String,
     @SerializedName("thisWeekFollowerCount")
-    val thisWeekFollowerCount : Int,
-
+    val thisWeekFollowerCount: Int,
     @SerializedName("rating")
-    val rating : Float,
-
+    val rating: Float,
     @SerializedName("reviewCount")
-    val reviewCount : Int
-
+    val reviewCount: Int,
 )

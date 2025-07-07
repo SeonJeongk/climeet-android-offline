@@ -6,15 +6,15 @@ import com.climus.climeet.presentation.ui.main.global.gymprofile.community.bestc
 import com.climus.climeet.presentation.ui.main.global.gymprofile.community.bestclimber.detail.level.GymProfileLevelDetailFragment
 import com.climus.climeet.presentation.ui.main.global.gymprofile.community.bestclimber.detail.time.GymProfileTimeDetailFragment
 
-class GymProfileBestClimberAdapter(fragment : Fragment) : FragmentStateAdapter(fragment) {
+class GymProfileBestClimberAdapter(
+    fragment: Fragment,
+) : FragmentStateAdapter(fragment) {
+    override fun getItemCount(): Int = 3
 
-        override fun getItemCount(): Int = 3
-
-        override fun createFragment(position: Int): Fragment {
-            return when(position) {
-                0 -> GymProfileCompleteDetailFragment()
-                1 -> GymProfileTimeDetailFragment()
-                else -> GymProfileLevelDetailFragment()
-            }
+    override fun createFragment(position: Int): Fragment =
+        when (position) {
+            0 -> GymProfileCompleteDetailFragment()
+            1 -> GymProfileTimeDetailFragment()
+            else -> GymProfileLevelDetailFragment()
         }
-    }
+}

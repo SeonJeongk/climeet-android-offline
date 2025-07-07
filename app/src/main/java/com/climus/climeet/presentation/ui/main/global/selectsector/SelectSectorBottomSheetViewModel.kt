@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 data class SelectSectorBottomSheetUiState(
     val isSingleFloor: Boolean = false,
     val curFloor: Int = 0,
@@ -37,26 +36,33 @@ data class SelectSectorBottomSheetUiState(
     val selectedSector: SectorNameUiData = SectorNameUiData {},
     val selectedLevel: GymLevelUiData = GymLevelUiData {},
     val selectedRoute: RouteUiData = RouteUiData {},
-    val selectedFilter: SelectedFilter = SelectedFilter()
+    val selectedFilter: SelectedFilter = SelectedFilter(),
 )
 
 sealed class FloorBtnState {
     data object FloorSelected : FloorBtnState()
+
     data object FloorUnSelected : FloorBtnState()
 }
 
 sealed class SelectSectorBottomSheetEvent {
     data object NavigateToBack : SelectSectorBottomSheetEvent()
-    data class ApplyFilter(val filter: SelectedFilter) : SelectSectorBottomSheetEvent()
+
+    data class ApplyFilter(
+        val filter: SelectedFilter,
+    ) : SelectSectorBottomSheetEvent()
+
     data object DismissDialog : SelectSectorBottomSheetEvent()
-    data class ShowToastMessage(val msg: String) : SelectSectorBottomSheetEvent()
+
+    data class ShowToastMessage(
+        val msg: String,
+    ) : SelectSectorBottomSheetEvent()
 }
 
 @HiltViewModel
 class SelectSectorBottomSheetViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(SelectSectorBottomSheetUiState())
     val uiState: StateFlow<SelectSectorBottomSheetUiState> = _uiState.asStateFlow()
 
@@ -69,7 +75,10 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
     var cragId: Long = 0
     var cragName: String = ""
 
-    fun setCragInfo(id: Long, name: String) {
+    fun setCragInfo(
+        id: Long,
+        name: String,
+    ) {
         cragId = id
         cragName = name
         getCragInfo(cragId)
@@ -82,7 +91,6 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
     }
 
     private fun getCragInfo(id: Long) {
-
         viewModelScope.launch {
             repository.getGymFilteringKey(id).let {
                 when (it) {
@@ -99,14 +107,14 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
                             _uiState.update { state ->
                                 state.copy(
                                     isSingleFloor = true,
-                                    layoutImg = it.body.layoutImageUrl
+                                    layoutImg = it.body.layoutImageUrl,
                                 )
                             }
                         } else {
                             _uiState.update { state ->
                                 state.copy(
                                     isSingleFloor = false,
-                                    layoutImg = it.body.layoutImageUrl
+                                    layoutImg = it.body.layoutImageUrl,
                                 )
                             }
                         }
@@ -119,32 +127,35 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
                     }
                 }
             }
-
         }
     }
 
     fun selectFloor(floor: Int) {
         _uiState.update { state ->
             state.copy(
-                secondFloorBtnState = if (floor == 2) FloorBtnState.FloorSelected else FloorBtnState.FloorUnSelected,
+                secondFloorBtnState = if (floor ==
+                    2
+                ) {
+                    FloorBtnState.FloorSelected
+                } else {
+                    FloorBtnState.FloorUnSelected
+                },
                 firstFloorBtnState = if (floor == 1) FloorBtnState.FloorSelected else FloorBtnState.FloorUnSelected,
                 curFloor = floor,
                 sectorNameList = sectorNameList.filter {
                     it.floor == floor
                 },
-                selectedRoute = RouteUiData {}
+                selectedRoute = RouteUiData {},
             )
         }
         setFloorInfo(floor)
     }
 
     private fun setFloorInfo(floor: Int) {
-
         viewModelScope.launch {
             repository.getGymRouteInfoList(cragId, GetGymRouteInfoRequest(0, 10, floor)).let {
                 when (it) {
                     is BaseState.Success -> {
-
                         _uiState.update { state ->
                             state.copy(
                                 sectorNameList = sectorNameList.filter { data -> data.floor == floor },
@@ -152,7 +163,7 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
                                 routeList = it.body.result.map { data ->
                                     data.toRouteUiData(::selectRoute)
                                 },
-                                curFloor = 1
+                                curFloor = 1,
                             )
                         }
                     }
@@ -172,9 +183,14 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             repository.getGymRouteInfoList(
-                cragId, GetGymRouteInfoRequest(
-                    0, 10, floor, sectorId, difficulty
-                )
+                cragId,
+                GetGymRouteInfoRequest(
+                    0,
+                    10,
+                    floor,
+                    sectorId,
+                    difficulty,
+                ),
             ).let {
                 when (it) {
                     is BaseState.Success -> {
@@ -182,7 +198,7 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
                             state.copy(
                                 routeList = it.body.result.map { data ->
                                     data.toRouteUiData(::selectRoute)
-                                }
+                                },
                             )
                         }
                     }
@@ -191,58 +207,49 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
                         _event.emit(SelectSectorBottomSheetEvent.ShowToastMessage(it.msg))
                     }
                 }
-
             }
         }
     }
 
     private fun selectSectorName(item: SectorNameUiData) {
-
         _uiState.update { state ->
             state.copy(
                 sectorNameList = state.sectorNameList.map {
-                    it.copy(
-                        isSelected = it.sectorId == item.sectorId
-                    )
+                    it.copy(isSelected = it.sectorId == item.sectorId)
                 },
                 selectedSector = item,
-                selectedRoute = RouteUiData {}
+                selectedRoute = RouteUiData {},
             )
         }
 
         getRouteList(
             uiState.value.curFloor,
             item.sectorId,
-            if (uiState.value.selectedLevel.difficulty != -1) uiState.value.selectedLevel.difficulty else null
+            if (uiState.value.selectedLevel.difficulty != -1) uiState.value.selectedLevel.difficulty else null,
         )
-
     }
 
     private fun selectGymLevel(item: GymLevelUiData) {
         _uiState.update { state ->
             state.copy(
                 gymLevelList = state.gymLevelList.map {
-                    it.copy(
-                        isSelected = it.difficulty == item.difficulty
-                    )
+                    it.copy(isSelected = it.difficulty == item.difficulty)
                 },
                 selectedLevel = item,
-                selectedRoute = RouteUiData {}
+                selectedRoute = RouteUiData {},
             )
         }
 
         getRouteList(
             uiState.value.curFloor,
             if (uiState.value.selectedSector.sectorId != -1L) uiState.value.selectedSector.sectorId else null,
-            item.difficulty
+            item.difficulty,
         )
     }
 
     private fun selectRoute(item: RouteUiData) {
         _uiState.update { state ->
-            state.copy(
-                selectedRoute = item
-            )
+            state.copy(selectedRoute = item)
         }
     }
 
@@ -254,13 +261,11 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
             difficulty = uiState.value.selectedLevel.difficulty,
             sectorName = uiState.value.selectedRoute.sectorName.ifBlank { uiState.value.selectedSector.name },
             cragName = cragName,
-            gymLevelName = uiState.value.selectedRoute.gymLevelName.ifBlank { uiState.value.selectedLevel.levelName }
+            gymLevelName = uiState.value.selectedRoute.gymLevelName.ifBlank { uiState.value.selectedLevel.levelName },
         )
         viewModelScope.launch {
             _event.emit(
-                SelectSectorBottomSheetEvent.ApplyFilter(
-                    selectedFilter
-                )
+                SelectSectorBottomSheetEvent.ApplyFilter(selectedFilter),
             )
         }
     }

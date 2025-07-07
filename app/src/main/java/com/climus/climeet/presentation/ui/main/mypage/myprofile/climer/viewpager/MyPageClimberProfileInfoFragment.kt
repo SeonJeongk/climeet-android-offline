@@ -23,9 +23,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MyPageClimberProfileInfoFragment @Inject constructor(
-    private val userId: Long
+    private val userId: Long,
 ) : BaseFragment<FragmentEditClimberProfileInfoBinding>(R.layout.fragment_edit_climber_profile_info) {
-
     private val sharedViewModel: ClimberProfileInfoViewModel by activityViewModels()
     private val mainViewModel: MyPageClimberProfileViewModel by activityViewModels()
     private val viewModel: MyPageClimberProfileInfoViewModel by viewModels()
@@ -33,7 +32,10 @@ class MyPageClimberProfileInfoFragment @Inject constructor(
     private var adapter = SelectGymAdapter(0) {
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) { // api
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) { // api
         super.onViewCreated(view, savedInstanceState)
 
         binding.rvHomeHomegym.adapter = HomeGymAdapter()
@@ -54,7 +56,7 @@ class MyPageClimberProfileInfoFragment @Inject constructor(
 
     private fun initStateObserve() {
         repeatOnStarted {
-            sharedViewModel.uiState.collect{
+            sharedViewModel.uiState.collect {
                 binding.viewStickchart.setupChartData(it.chartUiList)
                 adapter.submitList(it.gymList)
             }
@@ -65,22 +67,25 @@ class MyPageClimberProfileInfoFragment @Inject constructor(
         repeatOnStarted {
             viewModel.event.collect {
                 when (it) {
-                    is MyPageClimberProfileEvent.ChangePrivacyState -> setPrivacyState(
-                        it.target,
-                        it.state
-                    )
+                    is MyPageClimberProfileEvent.ChangePrivacyState ->
+                        setPrivacyState(
+                            it.target,
+                            it.state,
+                        )
 
                     MyPageClimberProfileEvent.ShowPopupWindow -> showPopupWindow()
-                    is MyPageClimberProfileEvent.NavigateToGymProfile -> findNavController().toGymProfile(
-                        it.id
-                    )
+                    is MyPageClimberProfileEvent.NavigateToGymProfile ->
+                        findNavController().toGymProfile(it.id)
                 }
             }
         }
     }
 
     // 공개 범위 설정
-    private fun setPrivacyState(target: String, state: Boolean){
+    private fun setPrivacyState(
+        target: String,
+        state: Boolean,
+    ) {
         mainViewModel.setPrivacyState(target, state)
     }
 
@@ -92,7 +97,7 @@ class MyPageClimberProfileInfoFragment @Inject constructor(
             view,
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
-            true
+            true,
         )
 
         recyclerView.layoutManager = LinearLayoutManager(context)

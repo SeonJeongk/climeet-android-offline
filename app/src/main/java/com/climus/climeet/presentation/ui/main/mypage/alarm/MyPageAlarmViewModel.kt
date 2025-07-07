@@ -25,18 +25,20 @@ data class AlarmSettingSwitchState(
 )
 
 sealed class UpdateAlarmEvent {
-    data class ShowToastMessage(val msg: String) : UpdateAlarmEvent()
+    data class ShowToastMessage(
+        val msg: String,
+    ) : UpdateAlarmEvent()
 }
 
 @HiltViewModel
-class MyPageAlarmViewModel @Inject constructor(val repository: MainRepository) : ViewModel() {
-
+class MyPageAlarmViewModel @Inject constructor(
+    val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(AlarmSettingSwitchState())
     val uiState: StateFlow<AlarmSettingSwitchState> = _uiState.asStateFlow()
 
     private val _event = MutableSharedFlow<UpdateAlarmEvent>()
     val event: SharedFlow<UpdateAlarmEvent> = _event.asSharedFlow()
-
 
     init {
         fetchSwitchStatesFromServer()
@@ -45,14 +47,14 @@ class MyPageAlarmViewModel @Inject constructor(val repository: MainRepository) :
     private fun fetchSwitchStatesFromServer() {
         viewModelScope.launch {
             repository.getNotificationStates().let {
-                when(it){
+                when (it) {
                     is BaseState.Success -> {
                         _uiState.update { state ->
                             state.copy(
                                 follower = it.body.isAllowFollowNotification,
                                 like = it.body.isAllowLikeNotification,
                                 comment = it.body.isAllowCommentNotification,
-                                appPush = it.body.isAllowAdNotification
+                                appPush = it.body.isAllowAdNotification,
                             )
                         }
                     }
@@ -67,36 +69,28 @@ class MyPageAlarmViewModel @Inject constructor(val repository: MainRepository) :
 
     fun setFollowerSwitchState(isChecked: Boolean) {
         _uiState.update { state ->
-            state.copy(
-                follower = isChecked
-            )
+            state.copy(follower = isChecked)
         }
         Log.d("alarm", "팔로워 : ${uiState.value.follower}")
     }
 
     fun setLikeSwitchState(isChecked: Boolean) {
         _uiState.update { state ->
-            state.copy(
-                like = isChecked
-            )
+            state.copy(like = isChecked)
         }
         Log.d("alarm", "좋아요 : ${uiState.value.like}")
     }
 
     fun setCommentSwitchState(isChecked: Boolean) {
         _uiState.update { state ->
-            state.copy(
-                comment = isChecked
-            )
+            state.copy(comment = isChecked)
         }
         Log.d("alarm", "댓글 : ${uiState.value.comment}")
     }
 
     fun setAppPushSwitchState(isChecked: Boolean) {
         _uiState.update { state ->
-            state.copy(
-                appPush = isChecked
-            )
+            state.copy(appPush = isChecked)
         }
         Log.d("alarm", "앱푸시 : ${uiState.value.appPush}")
     }
@@ -107,10 +101,10 @@ class MyPageAlarmViewModel @Inject constructor(val repository: MainRepository) :
                 isAllowFollowNotification = uiState.value.follower,
                 isAllowLikeNotification = uiState.value.like,
                 isAllowCommentNotification = uiState.value.comment,
-                isAllowAdNotification = uiState.value.appPush
+                isAllowAdNotification = uiState.value.appPush,
             )
             repository.updateNotification(request).let {
-                when(it){
+                when (it) {
                     is BaseState.Success -> {
                         Log.d("mypage_alarm", "알림 설정 업데이트")
                     }
@@ -122,5 +116,4 @@ class MyPageAlarmViewModel @Inject constructor(val repository: MainRepository) :
             }
         }
     }
-
 }

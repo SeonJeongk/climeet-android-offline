@@ -21,16 +21,17 @@ import com.climus.climeet.presentation.ui.toSearchProfile
 import com.climus.climeet.presentation.ui.toShortsPlayer
 import dagger.hilt.android.AndroidEntryPoint
 
-
 @AndroidEntryPoint
 class ShortsFragment : BaseFragment<FragmentShortsBinding>(R.layout.fragment_shorts) {
-
     private val sharedViewModel: ShortsPlayerViewModel by activityViewModels()
     private val viewModel: ShortsViewModel by viewModels()
 
     private var bottomScrollState = true
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.svm = sharedViewModel
@@ -47,12 +48,10 @@ class ShortsFragment : BaseFragment<FragmentShortsBinding>(R.layout.fragment_sho
     }
 
     private fun addOnScrollListener() {
-
         binding.layoutScrollview.setOnScrollChangeListener { v, _, scrollY, _, _ ->
 
             if (scrollY > binding.layoutScrollview.getChildAt(0).measuredHeight - v.measuredHeight) {
-
-                if(bottomScrollState){
+                if (bottomScrollState) {
                     bottomScrollState = false
                     sharedViewModel.getShorts(ShortsOption.NEXT_PAGE)
                 }
@@ -67,10 +66,11 @@ class ShortsFragment : BaseFragment<FragmentShortsBinding>(R.layout.fragment_sho
             sharedViewModel.event.collect {
                 when (it) {
                     is ShortsPlayerEvent.ShowToastMessage -> showToastMessage(it.msg)
-                    is ShortsPlayerEvent.NavigateToShortsPlayer -> findNavController().toShortsPlayer(
-                        it.shortsId,
-                        it.position
-                    )
+                    is ShortsPlayerEvent.NavigateToShortsPlayer ->
+                        findNavController().toShortsPlayer(
+                            it.shortsId,
+                            it.position,
+                        )
                     is ShortsPlayerEvent.NavigateToAddFollow -> findNavController().toSearchProfile()
                     is ShortsPlayerEvent.NavigateToUserProfile -> findNavController().toClimerProfile(it.userId)
                     is ShortsPlayerEvent.NavigateToGymProfile -> findNavController().toGymProfile(it.gymId)
@@ -94,5 +94,4 @@ class ShortsFragment : BaseFragment<FragmentShortsBinding>(R.layout.fragment_sho
         val action = ShortsFragmentDirections.actionShortsFragmentToShortsBottomSheetFragment()
         navigate(action)
     }
-
 }

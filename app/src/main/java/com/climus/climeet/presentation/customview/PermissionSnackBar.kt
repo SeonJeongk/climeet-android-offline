@@ -10,12 +10,13 @@ import com.google.android.material.snackbar.Snackbar
 
 class PermissionSnackBar(
     view: View,
-    private val btnClickListener: () -> Unit
+    private val btnClickListener: () -> Unit,
 ) {
-
     companion object {
-
-        fun make(view: View, btnClickListener: () -> Unit) = PermissionSnackBar(view, btnClickListener)
+        fun make(
+            view: View,
+            btnClickListener: () -> Unit,
+        ) = PermissionSnackBar(view, btnClickListener)
     }
 
     private val context = view.context
@@ -29,7 +30,7 @@ class PermissionSnackBar(
         LayoutInflater.from(context),
         R.layout.dialog_permission_snackbar,
         null,
-        false
+        false,
     )
 
     init {

@@ -5,6 +5,6 @@ data class ShortsUpdatedFollowResponse(
     val followingUserId: Long,
     val followingUserName: String,
     val followingUserProfileUrl: String?,
-    val isUploadRecent: Boolean?=false,
-    val isGym: Boolean
+    val isUploadRecent: Boolean? = false,
+    val isGym: Boolean,
 )

@@ -11,5 +11,4 @@ object GymProfileData {
     fun setSelectedDate(date: LocalDate) {
         selectedDate = date
     }
-
 }

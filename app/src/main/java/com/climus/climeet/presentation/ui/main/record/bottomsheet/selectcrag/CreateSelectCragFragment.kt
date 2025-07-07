@@ -14,16 +14,18 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class CreateSelectCragFragment :
     BaseFragment<FragmentCreateSelectCragBinding>(R.layout.fragment_create_select_crag) {
-
-    private val ClimbingRecordViewModel: CreateClimbingRecordViewModel by activityViewModels()
+    private val climbingRecordViewModel: CreateClimbingRecordViewModel by activityViewModels()
     private val viewModel: CreateSelectCragViewModel by viewModels()
     private var adapter: CreateSelectCragRVAdapter? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
-        adapter = CreateSelectCragRVAdapter(viewModel, ClimbingRecordViewModel)
+        adapter = CreateSelectCragRVAdapter(viewModel, climbingRecordViewModel)
         binding.rvSearchCrag.adapter = adapter
 
         initStateObserve()
@@ -41,12 +43,11 @@ class CreateSelectCragFragment :
     private fun initEventObserve() {
         repeatOnStarted {
             viewModel.event.collect {
-                when(it){
+                when (it) {
                     is CreateSelectCragEvent.NavigateToBack -> findNavController().navigateUp()
                     is CreateSelectCragEvent.ShowToastMessage -> showToastMessage(it.msg)
                 }
             }
         }
     }
-
 }

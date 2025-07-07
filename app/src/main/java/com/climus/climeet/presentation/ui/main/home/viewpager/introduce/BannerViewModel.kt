@@ -5,9 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.response.BannerDetailInfoResponse
-import com.climus.climeet.data.model.response.BestClearClimberSimpleResponse
 import com.climus.climeet.data.repository.MainRepository
-import com.climus.climeet.presentation.ui.main.home.viewpager.ranking.CompleteClimbingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,23 +15,23 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class BannerUiState(
-    val bannerList: List<BannerDetailInfoResponse> = emptyList()
+    val bannerList: List<BannerDetailInfoResponse> = emptyList(),
 )
 
 @HiltViewModel
-class BannerViewModel @Inject constructor(private val repository: MainRepository): ViewModel() {
+class BannerViewModel @Inject constructor(
+    private val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(BannerUiState())
     val uiState: StateFlow<BannerUiState> = _uiState.asStateFlow()
 
     fun getBannerListBetweenDates() {
         viewModelScope.launch {
             repository.findBannerListBetweenDates().let {
-                when(it) {
+                when (it) {
                     is BaseState.Success -> {
                         _uiState.update { state ->
-                            state.copy(
-                                bannerList = it.body
-                            )
+                            state.copy(bannerList = it.body)
                         }
                     }
                     is BaseState.Error -> {

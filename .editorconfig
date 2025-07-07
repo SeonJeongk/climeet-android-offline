@@ -13,6 +13,12 @@ ktlint_code_style = ktlint_official
 ij_kotlin_allow_trailing_comma = true
 ij_kotlin_allow_trailing_comma_on_call_site = true
 ktlint_standard_no-wildcard-imports = enabled
+# @Inject, @JvmOverloads 등 생성자 annotation을 클래스 선언과 같은 줄에 허용합니다.
+ktlint_standard_annotation = disabled
+# 여러 줄 대입식의 시작을 선언과 같은 줄에 허용합니다.
+ktlint_standard_multiline-expression-wrapping = disabled
+# Room.databaseBuilder(), Glide.with() 등 체인의 첫 호출을 같은 줄에 허용합니다.
+ktlint_standard_chain-method-continuation = disabled
 
 [*.{xml,yml,yaml}]
 indent_size = 2

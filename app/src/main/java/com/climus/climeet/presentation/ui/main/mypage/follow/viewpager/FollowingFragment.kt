@@ -19,15 +19,18 @@ import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class FollowingFragment(val userId: Long) :
-    BaseFragment<FragmentFollowingBinding>(R.layout.fragment_following) {
-
+class FollowingFragment(
+    val userId: Long,
+) : BaseFragment<FragmentFollowingBinding>(R.layout.fragment_following) {
     private val viewModel: FollowingViewModel by viewModels()
 
     private var recyclerClimber: MutableList<FollowingUiData> = mutableListOf()
     private var recyclerGym: MutableList<FollowingUiData> = mutableListOf()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
@@ -43,7 +46,7 @@ class FollowingFragment(val userId: Long) :
         setupRecyclerView(
             binding.rvClimberFollowing,
             followingRVAdapter,
-            LinearLayoutManager.VERTICAL
+            LinearLayoutManager.VERTICAL,
         )
     }
 
@@ -52,7 +55,7 @@ class FollowingFragment(val userId: Long) :
         setupRecyclerView(
             binding.rvGymFollowing,
             followingRVAdapter,
-            LinearLayoutManager.VERTICAL
+            LinearLayoutManager.VERTICAL,
         )
     }
 
@@ -89,32 +92,33 @@ class FollowingFragment(val userId: Long) :
     }
 
     private fun tabListener() {
-        binding.tlMode.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                when (tab?.text) {
-                    "암장" -> {
-                        viewModel.changeMode(true)
-                        viewModel.getUserFollowing("Manager")
-                        binding.rvGymFollowing.visibility = View.VISIBLE
-                        binding.rvClimberFollowing.visibility = View.INVISIBLE
+        binding.tlMode.addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab?) {
+                    when (tab?.text) {
+                        "암장" -> {
+                            viewModel.changeMode(true)
+                            viewModel.getUserFollowing("Manager")
+                            binding.rvGymFollowing.visibility = View.VISIBLE
+                            binding.rvClimberFollowing.visibility = View.INVISIBLE
+                        }
 
-                    }
-
-                    "클라이머" -> {
-                        viewModel.changeMode(false)
-                        viewModel.getUserFollowing("Climber")
-                        binding.rvGymFollowing.visibility = View.INVISIBLE
-                        binding.rvClimberFollowing.visibility = View.VISIBLE
+                        "클라이머" -> {
+                            viewModel.changeMode(false)
+                            viewModel.getUserFollowing("Climber")
+                            binding.rvGymFollowing.visibility = View.INVISIBLE
+                            binding.rvClimberFollowing.visibility = View.VISIBLE
+                        }
                     }
                 }
-            }
 
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-            }
+                override fun onTabReselected(tab: TabLayout.Tab?) {
+                }
 
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-            }
-        })
+                override fun onTabUnselected(tab: TabLayout.Tab?) {
+                }
+            },
+        )
     }
 
     private fun setupRecyclerView(

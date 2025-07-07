@@ -16,17 +16,15 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-
 data class GymCompletionUiState(
     val mySkill: String? = "",
-    val chartUiList: List<StickChartUiData> = emptyList()
+    val chartUiList: List<StickChartUiData> = emptyList(),
 )
 
 @HiltViewModel
 class GymProfileAvgCompletionViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(GymCompletionUiState())
     val uiState: StateFlow<GymCompletionUiState> = _uiState.asStateFlow()
 
@@ -37,14 +35,11 @@ class GymProfileAvgCompletionViewModel @Inject constructor(
     }
 
     private fun getMyStatus() {
-
         viewModelScope.launch {
             when (val myGymSkillResult = repository.getMyGymSkill(gymId)) {
                 is BaseState.Success -> {
                     _uiState.update { state ->
-                        state.copy(
-                            mySkill = myGymSkillResult.body.string()
-                        )
+                        state.copy(mySkill = myGymSkillResult.body.string())
                     }
                 }
 
@@ -63,7 +58,7 @@ class GymProfileAvgCompletionViewModel @Inject constructor(
                     Log.d("gym_profile", "결과 : $body")
 
                     val list = body.difficulty.map { item ->
-                        val percent = if(totalCount == 0) {
+                        val percent = if (totalCount == 0) {
                             0
                         } else {
                             ((item.count.toFloat() / totalCount.toFloat()) * 100).roundToInt()
@@ -77,25 +72,27 @@ class GymProfileAvgCompletionViewModel @Inject constructor(
 
                         StickChartUiData(
                             percentString = "$percent%",
-                            percent = if (maxPercent == 0) 0f else (item.count.toFloat() / maxPercent.toFloat()) * 0.8f,
+                            percent = if (maxPercent ==
+                                0
+                            ) {
+                                0f
+                            } else {
+                                (item.count.toFloat() / maxPercent.toFloat()) * 0.8f
+                            },
                             levelName = item.gymDifficultyName,
                             levelHex = item.gymDifficultyColor,
-                            levelStringColor = color
+                            levelStringColor = color,
                         )
                     }
 
                     _uiState.update { state ->
-                        state.copy(
-                            chartUiList = list
-                        )
+                        state.copy(chartUiList = list)
                     }
                 }
 
                 is BaseState.Error -> {
                     _uiState.update { state ->
-                        state.copy(
-                            chartUiList = emptyList()
-                        )
+                        state.copy(chartUiList = emptyList())
                     }
                 }
             }

@@ -15,7 +15,7 @@ object LevelColorData {
         "갈색" to "#6E4C41",
         "회색" to "#8B8B8B",
         "검정" to "#000000",
-        "컴피" to "#BEDF22"
+        "컴피" to "#BEDF22",
     )
 
     val COLORS = colorNamesAndHexes.map { (name, hex) -> RouteColor(name, hex) }
@@ -30,7 +30,6 @@ object LevelColorData {
         "V6",
         "V7",
         "V8",
-        "V9+"
+        "V9+",
     )
-
 }

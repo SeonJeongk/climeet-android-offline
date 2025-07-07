@@ -6,19 +6,19 @@ data class GetGymFilteringKeyResponse(
     val gymId: Int,
     val layoutImageUrl: String? = "",
     val sectorList: List<SectorItem>,
-    val timePoint: String
+    val timePoint: String,
 )
 
 data class DifficultyItem(
     val climeetDifficultyName: String,
     val difficulty: Int,
     val gymDifficultyColor: String,
-    val gymDifficultyName: String
+    val gymDifficultyName: String,
 )
 
 data class SectorItem(
     val sectorId: Long,
     val floor: Int,
     val name: String,
-    val sectorImageUrl: String
+    val sectorImageUrl: String,
 )

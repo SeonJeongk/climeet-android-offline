@@ -7,17 +7,24 @@ import androidx.recyclerview.widget.RecyclerView
 import com.climus.climeet.databinding.ItemTimerRouteRecordBinding
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
 
-class ClimbingRecordAdapter(private val viewModel: SetTimerClimbingRecordViewModel) :
-    RecyclerView.Adapter<ClimbingRecordViewHolder>() {
+class ClimbingRecordAdapter(
+    private val viewModel: SetTimerClimbingRecordViewModel,
+) : RecyclerView.Adapter<ClimbingRecordViewHolder>() {
     var items: List<RouteUiData> = emptyList()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClimbingRecordViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ClimbingRecordViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemTimerRouteRecordBinding.inflate(inflater, parent, false)
         return ClimbingRecordViewHolder(binding, viewModel)
     }
 
-    override fun onBindViewHolder(holder: ClimbingRecordViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ClimbingRecordViewHolder,
+        position: Int,
+    ) {
         val context = holder.itemView.context
         holder.bind(items[position], context)
     }
@@ -27,10 +34,12 @@ class ClimbingRecordAdapter(private val viewModel: SetTimerClimbingRecordViewMod
 
 class ClimbingRecordViewHolder(
     val binding: ItemTimerRouteRecordBinding,
-    private val viewModel: SetTimerClimbingRecordViewModel
-) :
-    RecyclerView.ViewHolder(binding.root) {
-    fun bind(item: RouteUiData, context: Context) {
+    private val viewModel: SetTimerClimbingRecordViewModel,
+) : RecyclerView.ViewHolder(binding.root) {
+    fun bind(
+        item: RouteUiData,
+        context: Context,
+    ) {
         binding.item = item
 
         binding.root.setOnClickListener {

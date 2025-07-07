@@ -13,5 +13,5 @@ data class RouteRecordUiData(
     var isClear: Boolean = false,
     var isSelected: Boolean = false,
     val holdImg: Int = R.drawable.ic_white_hold,
-    val onClickListener: (Long) -> Unit
+    val onClickListener: (Long) -> Unit,
 )

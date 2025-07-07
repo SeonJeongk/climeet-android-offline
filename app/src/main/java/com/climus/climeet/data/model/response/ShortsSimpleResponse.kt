@@ -4,17 +4,13 @@ import com.google.gson.annotations.SerializedName
 
 data class ShortsSimpleResponse(
     @SerializedName("shortsId")
-    val shortsId : Long,
-
+    val shortsId: Long,
     @SerializedName("thumbnailImageUrl")
-    val thumbnailImageUrl : String,
-
+    val thumbnailImageUrl: String,
     @SerializedName("gymName")
-    val gymName : String,
-
+    val gymName: String,
     @SerializedName("difficulty")
-    val difficulty : Int,
-
+    val difficulty: Int,
     @SerializedName("thisWeekTotalClimbingTime")
-    val thisWeekTotalClimbingTime : Long
+    val thisWeekTotalClimbingTime: Long,
 )

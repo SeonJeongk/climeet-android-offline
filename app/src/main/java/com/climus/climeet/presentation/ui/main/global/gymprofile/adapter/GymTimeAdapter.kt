@@ -6,36 +6,41 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.climus.climeet.databinding.ItemProfileTimeBinding
 import com.climus.climeet.presentation.ui.main.global.gymprofile.model.GymBusinessHour
-import com.climus.climeet.presentation.ui.main.global.gymprofile.model.GymPrice
 
-class GymTimeAdapter(): RecyclerView.Adapter<GymTimeViewHolder>() {
+class GymTimeAdapter : RecyclerView.Adapter<GymTimeViewHolder>() {
+    private var timeList: List<GymBusinessHour> = emptyList()
 
-    private var timeList : List<GymBusinessHour> = emptyList()
-
-    override fun onBindViewHolder(holder: GymTimeViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: GymTimeViewHolder,
+        position: Int,
+    ) {
         holder.bind(timeList[position])
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GymTimeViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): GymTimeViewHolder =
         GymTimeViewHolder(
             ItemProfileTimeBinding.inflate(
-                LayoutInflater.from(
-                    parent.context
-                ), parent, false
-            )
+                LayoutInflater.from(parent.context),
+                parent,
+                false,
+            ),
         )
+
     override fun getItemCount(): Int = timeList.size
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setList(list: List<GymBusinessHour>){
+    fun setList(list: List<GymBusinessHour>) {
         timeList = list
         notifyDataSetChanged()
     }
 }
 
-class GymTimeViewHolder(private val binding: ItemProfileTimeBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-
+class GymTimeViewHolder(
+    private val binding: ItemProfileTimeBinding,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: GymBusinessHour) {
         var formattedTime = ""
 
@@ -44,7 +49,7 @@ class GymTimeViewHolder(private val binding: ItemProfileTimeBinding) :
             val closingTime = item.hours[1]
 
             formattedTime = "$openingTime - $closingTime"
-        }else{
+        } else {
             formattedTime = item.hours[0]
         }
         binding.tvTime.text = item.day + " " + formattedTime

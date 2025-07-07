@@ -10,21 +10,26 @@ import com.climus.climeet.presentation.ui.main.global.gymprofile.model.GymReview
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class GymReviewAdapter() : RecyclerView.Adapter<GymReviewViewHolder>() {
-
+class GymReviewAdapter : RecyclerView.Adapter<GymReviewViewHolder>() {
     private var reviewList: List<GymReview> = emptyList()
 
-    override fun onBindViewHolder(holder: GymReviewViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: GymReviewViewHolder,
+        position: Int,
+    ) {
         holder.bind(reviewList[position])
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GymReviewViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): GymReviewViewHolder =
         GymReviewViewHolder(
             ItemProfileReviewBinding.inflate(
-                LayoutInflater.from(
-                    parent.context
-                ), parent, false
-            )
+                LayoutInflater.from(parent.context),
+                parent,
+                false,
+            ),
         )
 
     override fun getItemCount(): Int = reviewList.size
@@ -36,8 +41,9 @@ class GymReviewAdapter() : RecyclerView.Adapter<GymReviewViewHolder>() {
     }
 }
 
-class GymReviewViewHolder(private val binding: ItemProfileReviewBinding) :
-    RecyclerView.ViewHolder(binding.root) {
+class GymReviewViewHolder(
+    private val binding: ItemProfileReviewBinding,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: GymReview) {
         val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
         val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())

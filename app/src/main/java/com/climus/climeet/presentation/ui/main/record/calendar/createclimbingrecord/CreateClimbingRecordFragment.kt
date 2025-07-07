@@ -22,13 +22,15 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class CreateClimbingRecordFragment :
     BaseFragment<FragmentCreateClimbingRecordBinding>(R.layout.fragment_create_climbing_record) {
-
     private val dateViewModel: SelectDateBottomSheetViewModel by viewModels()
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val viewModel: CreateClimbingRecordViewModel by activityViewModels()
     private lateinit var itemAdapter: RouteRecordAdapter
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         itemAdapter = RouteRecordAdapter(viewModel)
@@ -39,7 +41,6 @@ class CreateClimbingRecordFragment :
         setRecyclerView()
         initEventObserve()
         initItemObserve()
-
     }
 
     private fun setRecyclerView() {
@@ -62,7 +63,7 @@ class CreateClimbingRecordFragment :
                             requireContext(),
                             dateViewModel,
                             CreateRecordData.selectedDate,
-                            CreateRecordData::setSelectedDate
+                            CreateRecordData::setSelectedDate,
                         ) { date ->
                             viewModel.setSelectedDate(date)
                             calendarViewModel.setSelectedDate(date)
@@ -106,5 +107,4 @@ class CreateClimbingRecordFragment :
             CreateClimbingRecordFragmentDirections.actionCreateClimbingRecordFragmentToFragmentClimbingRecordComplete()
         navigate(action)
     }
-
 }

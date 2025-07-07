@@ -7,21 +7,26 @@ import androidx.recyclerview.widget.RecyclerView
 import com.climus.climeet.databinding.ItemProfileServiceBinding
 import com.climus.climeet.presentation.ui.main.global.gymprofile.model.GymService
 
-class GymServiceAdapter() : RecyclerView.Adapter<GymServiceViewHolder>() {
-
+class GymServiceAdapter : RecyclerView.Adapter<GymServiceViewHolder>() {
     private var serviceList: List<GymService> = emptyList()
 
-    override fun onBindViewHolder(holder: GymServiceViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: GymServiceViewHolder,
+        position: Int,
+    ) {
         holder.bind(serviceList[position])
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GymServiceViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): GymServiceViewHolder =
         GymServiceViewHolder(
             ItemProfileServiceBinding.inflate(
-                LayoutInflater.from(
-                    parent.context
-                ), parent, false
-            )
+                LayoutInflater.from(parent.context),
+                parent,
+                false,
+            ),
         )
 
     override fun getItemCount() = serviceList.size
@@ -33,9 +38,9 @@ class GymServiceAdapter() : RecyclerView.Adapter<GymServiceViewHolder>() {
     }
 }
 
-class GymServiceViewHolder(private val binding: ItemProfileServiceBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-
+class GymServiceViewHolder(
+    private val binding: ItemProfileServiceBinding,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: GymService) {
         binding.tvService.text = item.name
     }

@@ -4,5 +4,5 @@ data class GetClimberPrivacySettingResponse(
     val shortsPublic: Boolean,
     val homeGymPublic: Boolean,
     val averageCompletionRatePublic: Boolean,
-    val averageCompletionLevelPublic: Boolean
+    val averageCompletionLevelPublic: Boolean,
 )
