@@ -242,12 +242,12 @@ class MyPageAdminRouteFindingFragment :
                 } else {
                     if (isChecked) {
                         viewModel.changeFloorSector(2)
-                        tvSwitchFirst.setTextColor(R.color.white)
-                        tvSwitchSecond.setTextColor(R.color.black)
+                        tvSwitchFirst.setTextColor(requireContext().getColor(R.color.white))
+                        tvSwitchSecond.setTextColor(requireContext().getColor(R.color.black))
                     } else {
                         viewModel.changeFloorSector(1)
-                        tvSwitchFirst.setTextColor(R.color.black)
-                        tvSwitchSecond.setTextColor(R.color.white)
+                        tvSwitchFirst.setTextColor(requireContext().getColor(R.color.black))
+                        tvSwitchSecond.setTextColor(requireContext().getColor(R.color.white))
                     }
                 }
             }
@@ -265,8 +265,11 @@ class MyPageAdminRouteFindingFragment :
     }
 
     private fun setTvExplain() {
-        binding.tvExplain.text = "${viewModel.selectedLevel.value.colorName} 레벨은 이미 등록되어 있어요"
-        binding.tvExplain.setTextColor(resources.getColor(R.color.cm_red))
+        binding.tvExplain.text = getString(
+            R.string.route_finding_level_already_registered,
+            viewModel.selectedLevel.value.colorName,
+        )
+        binding.tvExplain.setTextColor(requireContext().getColor(R.color.cm_red))
     }
 
     private fun setRV() {
@@ -333,13 +336,13 @@ class MyPageAdminRouteFindingFragment :
 
     private fun setImage(
         uri: Uri,
-        ivIamge: AppCompatImageView,
+        ivImage: AppCompatImageView,
     ) {
         Glide.with(this)
             .load(uri)
             .apply(RequestOptions().dontTransform())
             .placeholder(R.drawable.ic_add_image_background)
-            .into(ivIamge)
+            .into(ivImage)
     }
 
     private fun showCustomSnackbar(message: String) {

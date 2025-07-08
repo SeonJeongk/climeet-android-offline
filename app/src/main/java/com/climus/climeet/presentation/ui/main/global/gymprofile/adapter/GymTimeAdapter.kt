@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.climus.climeet.R
 import com.climus.climeet.databinding.ItemProfileTimeBinding
 import com.climus.climeet.presentation.ui.main.global.gymprofile.model.GymBusinessHour
 
@@ -42,16 +43,14 @@ class GymTimeViewHolder(
     private val binding: ItemProfileTimeBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: GymBusinessHour) {
-        var formattedTime = ""
-
-        if (item.hours.size >= 2) {
+        val formattedTime = if (item.hours.size >= 2) {
             val openingTime = item.hours[0]
             val closingTime = item.hours[1]
 
-            formattedTime = "$openingTime - $closingTime"
+            binding.root.context.getString(R.string.gym_business_hours_range, openingTime, closingTime)
         } else {
-            formattedTime = item.hours[0]
+            item.hours[0]
         }
-        binding.tvTime.text = item.day + " " + formattedTime
+        binding.tvTime.text = binding.root.context.getString(R.string.gym_business_hours_day, item.day, formattedTime)
     }
 }

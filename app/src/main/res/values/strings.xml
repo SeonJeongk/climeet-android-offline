@@ -63,4 +63,7 @@
     <string name="plus">"+"</string>
     <string name="route_finding_update_complete">업데이트 완료</string>
 
+    <string name="gym_business_hours_range">%1$s - %2$s</string>
+    <string name="gym_business_hours_day">%1$s %2$s</string>
+    <string name="route_finding_level_already_registered">%1$s 레벨은 이미 등록되어 있어요</string>
 </resources>

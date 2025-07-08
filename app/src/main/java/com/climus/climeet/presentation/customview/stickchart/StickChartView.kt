@@ -18,6 +18,7 @@ import com.github.mikephil.charting.renderer.XAxisRenderer
 import com.github.mikephil.charting.utils.MPPointF
 import com.github.mikephil.charting.utils.Transformer
 import com.github.mikephil.charting.utils.ViewPortHandler
+import java.util.Locale
 
 class StickChartView @JvmOverloads constructor(
     context: Context,
@@ -101,7 +102,7 @@ class StickChartView @JvmOverloads constructor(
             if (value <= 0.01f) {
                 return "0%"
             }
-            return String.format("%.0f%%", value * 100)
+            return String.format(Locale.getDefault(), "%.0f%%", value * 100)
         }
     }
 
@@ -140,7 +141,7 @@ class StickChartView @JvmOverloads constructor(
                     val index = i / 2
                     if (index >= data.size) continue // Prevent out-of-bounds access
                     val label = valueFormatter.getAxisLabel(mXAxis.mEntries.getOrNull(index) ?: 0f, mXAxis)
-                    paint.color = Color.parseColor(data[index].levelStringColor)
+                    paint.color = data[index].levelStringColor.toColorInt()
                     drawLabel(canvas, label, x, pos, paint)
                 }
             }
