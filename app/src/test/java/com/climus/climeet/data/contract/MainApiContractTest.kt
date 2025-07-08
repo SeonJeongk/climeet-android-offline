@@ -23,7 +23,7 @@ class MainApiContractTest {
     private val gson = Gson()
 
     @Test
-    fun `filtering key fixture matches the current response DTO`() {
+    fun filteringKeyFixture_deserialize_matchesResponseContract() {
         val json = fixture("get-gym-filtering-key-response.json")
         val response = gson.fromJson(json, GetGymFilteringKeyResponse::class.java)
 
@@ -57,7 +57,7 @@ class MainApiContractTest {
     }
 
     @Test
-    fun `minimal route request keeps every optional filter nullable`() {
+    fun minimalRouteFixture_deserialize_preservesNullFilters() {
         val json = fixture("get-gym-route-info-request-minimal.json")
         val request = gson.fromJson(json, GetGymRouteInfoRequest::class.java)
 
@@ -76,7 +76,7 @@ class MainApiContractTest {
     }
 
     @Test
-    fun `filtered route request preserves every current field`() {
+    fun filteredRouteFixture_deserialize_preservesFields() {
         val json = fixture("get-gym-route-info-request-filtered.json")
         val request = gson.fromJson(json, GetGymRouteInfoRequest::class.java)
 
@@ -90,7 +90,7 @@ class MainApiContractTest {
     }
 
     @Test
-    fun `route response fixture matches the current response DTO`() {
+    fun routeResponseFixture_deserialize_matchesResponseContract() {
         val json = fixture("get-gym-route-info-response.json")
         val response = gson.fromJson(json, GetGymRouteInfoResponse::class.java)
 
@@ -101,7 +101,7 @@ class MainApiContractTest {
     }
 
     @Test
-    fun `record request fixture preserves the existing request body`() {
+    fun recordRequestFixture_roundTrip_preservesRequestBody() {
         val json = fixture("create-timer-climbing-record-request.json")
         val request = gson.fromJson(json, CreateTimerClimbingRecordRequest::class.java)
 
@@ -114,7 +114,7 @@ class MainApiContractTest {
     }
 
     @Test
-    fun `record success contract is 200 with an empty body`() {
+    fun recordSuccessFixture_readContract_returns200WithEmptyBody() {
         val contract = JsonParser()
             .parse(fixture("create-timer-climbing-record-success.json"))
             .asJsonObject
@@ -124,7 +124,7 @@ class MainApiContractTest {
     }
 
     @Test
-    fun `MainApi annotations keep the current route and record wire contract`() {
+    fun mainApiMethods_inspectAnnotations_preservesWireContract() {
         val filteringKey = MainApi::class.java.getDeclaredMethod(
             "getGymFilteringKey",
             Long::class.javaPrimitiveType,

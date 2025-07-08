@@ -19,7 +19,7 @@ class MainApiFixtureIntegrationTest {
     private val gson = Gson()
 
     @Test
-    fun `MainApi exchanges the published route and record contract without a live server`() =
+    fun publishedFixtures_callMainApi_preservesRouteAndRecordContract() =
         runBlocking {
             MockWebServer().use { server ->
                 server.enqueue(jsonResponse(fixture("get-gym-filtering-key-response.json")))
