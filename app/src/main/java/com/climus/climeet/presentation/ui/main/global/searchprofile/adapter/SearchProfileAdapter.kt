@@ -81,13 +81,10 @@ class SearchProfileViewHolder(
             item.navigateToProfile(item.id)
         }
 
-        if (item.imgUrl != null) {
-            Glide.with(binding.root.context)
-                .load(item.imgUrl)
-                .into(binding.ivProfile)
-        } else {
-            binding.ivProfile.setImageResource(R.drawable.oval_lightgreyfill_nostroke_noradius)
-        }
+        Glide.with(binding.root.context)
+            .load(item.imgUrl)
+            .error(R.drawable.img_profile)
+            .into(binding.ivProfile)
 
         binding.tvCragName.text = item.name
         binding.tvCragsFollow.text = item.followers.toString()

@@ -24,7 +24,6 @@ import com.climus.climeet.databinding.FragmentShortsDetailBinding
 import com.climus.climeet.presentation.base.BaseFragment
 import com.climus.climeet.presentation.ui.main.shorts.adapter.ShortsDetailListener
 import com.climus.climeet.presentation.ui.main.shorts.model.ShortsUiData
-import com.climus.climeet.presentation.util.Constants.TEST_IMG
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -97,7 +96,7 @@ class ShortsDetailFragment @Inject constructor(
     private fun setImage() {
         Glide.with(this)
             .load(data.profileImgUrl)
-            .error(TEST_IMG)
+            .error(R.drawable.img_profile)
             .into(binding.ivProfile)
     }
 

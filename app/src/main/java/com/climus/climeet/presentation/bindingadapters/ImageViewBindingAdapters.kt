@@ -14,7 +14,7 @@ fun bindProfileImg(
 ) {
     Glide.with(imageView.context)
         .load(url)
-        .error(R.drawable.test)
+        .error(R.drawable.img_profile)
         .into(imageView)
 }
 

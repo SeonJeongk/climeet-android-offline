@@ -1,7 +1,6 @@
 package com.climus.climeet.presentation.ui.main.global.searchcrag
 
 import com.climus.climeet.data.model.response.SearchGymItem
-import com.climus.climeet.presentation.util.Constants.TEST_IMG
 
 data class SearchCragUiData(
     val id: Long = -1,
@@ -16,7 +15,7 @@ fun SearchGymItem.toSearchCragUiData(
     onClickListener: (Long, String) -> Unit,
 ) = SearchCragUiData(
     id = id,
-    imgUrl = TEST_IMG,
+    imgUrl = "",
     name = name,
     keyword = keyword,
     onClickListener = onClickListener,
