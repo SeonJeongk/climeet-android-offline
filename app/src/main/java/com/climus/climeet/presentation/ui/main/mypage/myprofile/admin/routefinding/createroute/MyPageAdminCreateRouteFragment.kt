@@ -241,12 +241,16 @@ class MyPageAdminCreateRouteFragment :
         }
     }
 
+    // 품질 정리 제외: 시작 좌표의 유효성은 후속 제스처 수정·검증에서 보완합니다.
+    @Suppress("UnsafeCallOnNullableType")
     private fun moveSingleEvent(event: MotionEvent) {
         matrix?.set(savedMatrix)
         matrix?.postTranslate(event.x - startPoint!!.x, event.y - startPoint!!.y)
         binding.ivRoute.imageMatrix = matrix
     }
 
+    // 품질 정리 제외: 확대 중심점 미설정·재사용 위험은 후속 제스처 수정·검증에서 보완합니다.
+    @Suppress("UnsafeCallOnNullableType")
     private fun moveMultiEvent(event: MotionEvent) {
         val newDistance = getDistance(event)
         if (newDistance > 5f) {

@@ -53,10 +53,11 @@ class SetLevelBottomSheet(
             selectedLevel = LevelColorData.LEVELS[newVal]
             levelCheckRunnable?.let { handler.removeCallbacks(it) }
 
-            levelCheckRunnable = Runnable {
+            val pendingCheck = Runnable {
                 checkIfLevelAlreadySelected()
             }
-            handler.postDelayed(levelCheckRunnable!!, 250)
+            levelCheckRunnable = pendingCheck
+            handler.postDelayed(pendingCheck, 250)
         }
 
         binding.tvOk.setOnClickListener {

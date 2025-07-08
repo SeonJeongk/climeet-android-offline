@@ -151,7 +151,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
     fun setDate() {
         val date = selectedDate.value
         viewModelScope.launch(Dispatchers.Main) {
-            val koreanDayOfWeek = when (date?.dayOfWeek?.value) {
+            val koreanDayOfWeek = when (date.dayOfWeek?.value) {
                 1 -> "(월)"
                 2 -> "(화)"
                 3 -> "(수)"
@@ -174,7 +174,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
         val end = selectedEndTime.value
         var endString = ""
 
-        startString = if (start!!.hour < 12 || start.hour == 24) {
+        startString = if (start.hour < 12 || start.hour == 24) {
             if (start.hour == 24) {
                 String.format(Locale.getDefault(), "AM %02d:%02d", 12, start.minute)
             } else {
@@ -188,7 +188,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
             }
         }
 
-        endString = if (end!!.hour < 12 || end.hour == 24) {
+        endString = if (end.hour < 12 || end.hour == 24) {
             if (end.hour == 24) {
                 String.format(Locale.getDefault(), "AM %02d:%02d", 12, end.minute)
             } else {
@@ -211,7 +211,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
         selectedCragEvent.value = Pair(id, name)
         cragId = id
         cragName = name
-        selectedCragEvent.value?.let { getCragInfo(it.first) }
+        selectedCragEvent.value.let { getCragInfo(it.first) }
     }
 
     fun getCragInfo(id: Long) {
@@ -384,7 +384,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
     }
 
     fun addChallengeNum() {
-        challengeNumber.value = challengeNumber.value + 1
+        challengeNumber.value += 1
         _items.value = _items.value.map {
             if (it.routeId ==
                 uiState.value.selectedRoute.routeId
@@ -443,14 +443,13 @@ class CreateClimbingRecordViewModel @Inject constructor(
     }
 
     fun setToggle() {
-        isToggleOn.value = !(isToggleOn.value ?: false)
+        isToggleOn.value = !isToggleOn.value
     }
 
     private fun addItem(item: RouteUiData) {
         if (_items.value.none { it.routeId == item.routeId && it.sectorId == item.sectorId }) {
             val newItem = item.copy()
-            _items.value = _items.value + newItem
-        } else {
+            _items.value += newItem
         }
     }
 

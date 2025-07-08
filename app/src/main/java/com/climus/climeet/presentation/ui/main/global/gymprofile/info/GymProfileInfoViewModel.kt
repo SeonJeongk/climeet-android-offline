@@ -28,9 +28,9 @@ data class GymProfileTabInfoUiState(
     val location: String? = "암장 정보가 비어있어요",
     val tel: String? = "암장 정보가 비어있어요",
     val startTime: String = "휴무",
-    val gymBusinessHours: List<GymBusinessHour>? = emptyList(),
-    val gymServiceList: List<GymService>? = emptyList(),
-    val gymPriceList: List<GymPrice>? = emptyList(),
+    val gymBusinessHours: List<GymBusinessHour> = emptyList(),
+    val gymServiceList: List<GymService> = emptyList(),
+    val gymPriceList: List<GymPrice> = emptyList(),
     val averageRating: Float = 0f,
     val reviewNum: Int = 0,
     val myGymReview: Review? = null,
@@ -85,8 +85,8 @@ class GymProfileInfoViewModel @Inject constructor(
                             gymPriceList = result.body.priceList?.map { GymPrice(it.key, it.value) }
                                 ?: state.gymPriceList,
                             startTime = setTodayOpeningTime(state.gymBusinessHours),
-                            isTimeVisible = state.gymBusinessHours.isNullOrEmpty().not(),
-                            isTimeErrorVisible = state.gymBusinessHours.isNullOrEmpty(),
+                            isTimeVisible = state.gymBusinessHours.isNotEmpty(),
+                            isTimeErrorVisible = state.gymBusinessHours.isEmpty(),
                             isRvTimeVisible = false,
                             isIvToggleVisible = false,
                         )
@@ -150,9 +150,9 @@ class GymProfileInfoViewModel @Inject constructor(
         return completeHours
     }
 
-    private fun setTodayOpeningTime(gymBusinessHours: List<GymBusinessHour>?): String {
+    private fun setTodayOpeningTime(gymBusinessHours: List<GymBusinessHour>): String {
         val today = getCurrentDayOfWeek()
-        val todayBusinessHour = gymBusinessHours?.find { it.day == today }
+        val todayBusinessHour = gymBusinessHours.find { it.day == today }
 
         return if (todayBusinessHour != null &&
             todayBusinessHour.hours.isNotEmpty() &&

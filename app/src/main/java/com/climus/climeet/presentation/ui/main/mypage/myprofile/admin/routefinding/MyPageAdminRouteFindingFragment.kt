@@ -236,7 +236,7 @@ class MyPageAdminRouteFindingFragment :
     private fun changeSectorFloor() {
         with(binding) {
             switchSectorFloor.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked && !viewModel.isSecondFloorExist.value!!) {
+                if (isChecked && !(viewModel.isSecondFloorExist.value ?: false)) {
                     showCustomSnackbar("2층이 존재하지 않습니다.")
                     switchSectorFloor.isChecked = false
                 } else {

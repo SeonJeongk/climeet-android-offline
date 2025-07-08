@@ -19,8 +19,10 @@ class LoadingDialog(
         setContentView(binding.root)
         setCanceledOnTouchOutside(false)
         setCancelable(false)
-        window!!.setBackgroundDrawable(ColorDrawable())
-        window!!.setDimAmount(0.5f)
+        window?.apply {
+            setBackgroundDrawable(ColorDrawable())
+            setDimAmount(0.5f)
+        }
     }
 
     override fun show() {

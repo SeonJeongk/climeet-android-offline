@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -11,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.climus.climeet.R
-import com.climus.climeet.app.App
 import com.climus.climeet.app.App.Companion.sharedPreferences
 import com.climus.climeet.data.model.response.BannerDetailInfoResponse
 import com.climus.climeet.data.model.response.BestFollowGymSimpleResponse
@@ -86,38 +86,38 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         repeatOnStarted {
             viewModel.let { vm ->
                 vm.uiState.collect { uiState ->
-                    uiState.bannerList?.let { bannerList ->
+                    uiState.bannerList.let { bannerList ->
                         vpBanner = bannerList
                         setupIntroduceBanner(vpBanner)
                     }
 
-                    uiState.homegymList?.let { homegymList ->
+                    uiState.homegymList.let { homegymList ->
                         recyclerHomeGym = homegymList
                         setupHomeGymList()
                     }
 
-                    uiState.followOrderCragList?.let { cragList ->
+                    uiState.followOrderCragList.let { cragList ->
                         followOrderRecyclerCrag = cragList
                         setupFollowOrderPopularCrags()
                     }
 
-                    uiState.recordOrderCragList?.let { cragList ->
+                    uiState.recordOrderCragList.let { cragList ->
                         recordOrderRecyclerCrag = cragList
                         Log.d("record", recordOrderRecyclerCrag.toString())
                         setupRecordOrderPopularCrags()
                     }
 
-                    uiState.routeList?.let { routeList ->
+                    uiState.routeList.let { routeList ->
                         recyclerRoute = routeList
                         setupPopularRoutes()
                     }
 
                     uiState.myProfile.let { myProfile ->
-                        userProfile = uiState.myProfile
-                        if (userProfile != null) {
-                            App.sharedPreferences.edit()
-                                .putString("USER_ID", userProfile!!.userId.toString())
-                                .apply()
+                        userProfile = myProfile
+                        if (myProfile != null) {
+                            sharedPreferences.edit {
+                                putString("USER_ID", myProfile.userId.toString())
+                            }
                         }
                     }
                 }
@@ -262,7 +262,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                         // 현재 위치가 0이고, 좌측으로 스와이프하는 경우
                         if (currentPos == 0 && positionOffsetPixels > 0) {
                             viewPager.currentItem = 1
-                        } else if (currentPos == viewPager.adapter?.itemCount ?: 0 - 1 && positionOffsetPixels > 0) {
+                        } else if (
+                            currentPos == (viewPager.adapter?.itemCount ?: (0 - 1)) &&
+                            positionOffsetPixels > 0
+                        ) {
                             // 현재 위치가 마지막 페이지이고, 좌측으로 스와이프하는 경우
                             viewPager.currentItem = 0
                         }
@@ -289,9 +292,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     // 선택한 암장 프로필로 이동
     private fun navToGymProfile(gymId: Long) {
-        sharedPreferences.edit()
-            .putLong("gymId", gymId)
-            .apply()
+        sharedPreferences.edit { putLong("gymId", gymId) }
         Log.d("gym_profile", "홈에서 암장 아이디 : $gymId")
 
         // todo 여기는 일단 구분 안해줘도 될듯!

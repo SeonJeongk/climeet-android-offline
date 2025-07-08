@@ -103,7 +103,7 @@ class TimerViewModel @Inject constructor(
 
             // avgDifficulty 계산
             val avgDifficulty = if (routeData.isNotEmpty()) {
-                val totalDifficulty = routeData.sumBy { it.difficulty }
+                val totalDifficulty = routeData.sumOf { it.difficulty }
                 totalDifficulty / routeData.size
             } else {
                 0
@@ -114,10 +114,10 @@ class TimerViewModel @Inject constructor(
                 ClimbingRecord(route.routeId, route.attemptCount, route.isCompleted)
             }
 
-            var endTime: Long = if (isPaused.value == true) {
-                pauseTime.value!!
+            val endTime = if (isPaused.value == true) {
+                checkNotNull(pauseTime.value) { "일시정지 시간이 초기화되지 않았습니다." }
             } else {
-                time.value!!
+                checkNotNull(time.value) { "타이머 시간이 초기화되지 않았습니다." }
             }
 
             val hours = TimeUnit.MILLISECONDS.toHours(endTime)
@@ -132,9 +132,9 @@ class TimerViewModel @Inject constructor(
             requestBody = CreateTimerClimbingRecordRequest(
                 gymId = recordData.gymId,
                 date = recordData.date,
-                time = formattedTime!!,
+                time = formattedTime,
                 avgDifficulty = avgDifficulty,
-                routeRecordRequestDtoList = routeRecords ?: listOf(),
+                routeRecordRequestDtoList = routeRecords,
             )
             // Log.d("recorddd", "리퀘스트 : $requestBody")
 

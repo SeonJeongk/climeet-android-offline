@@ -53,7 +53,7 @@ class GymProfileViewModel @Inject constructor(
                     is BaseState.Success -> {
                         _uiState.update { state ->
                             state.copy(
-                                gymId = gymId.value!!,
+                                gymId = id,
                                 gymProfileImageUrl = result.body.gymProfileImageUrl,
                                 gymBackGroundImageUrl = result.body.gymBackGroundImageUrl,
                                 gymName = result.body.gymName,

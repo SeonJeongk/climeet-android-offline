@@ -98,28 +98,28 @@ class GymProfileInfoFragment : BaseFragment<FragmentGymProfileInfoBinding>(R.lay
                 }
 
                 // 서비스
-                if (it.gymServiceList?.isEmpty() == true) {
+                if (it.gymServiceList.isEmpty()) {
                     binding.rvService.visibility = View.GONE
                     binding.tvServiceError.visibility = View.VISIBLE
                 } else {
                     binding.rvService.visibility = View.VISIBLE
                     binding.tvServiceError.visibility = View.GONE
-                    serviceAdapter?.setList(it.gymServiceList!!)
+                    serviceAdapter?.setList(it.gymServiceList)
                 }
 
                 // 영업 시간
-                if (it.gymBusinessHours?.isNotEmpty() == true) {
-                    timeAdapter?.setList(it.gymBusinessHours!!)
+                if (it.gymBusinessHours.isNotEmpty()) {
+                    timeAdapter?.setList(it.gymBusinessHours)
                 }
 
                 // 요금 정보
-                if (it.gymPriceList?.isEmpty() == true) {
+                if (it.gymPriceList.isEmpty()) {
                     binding.rvPrice.visibility = View.GONE
                     binding.tvPriceError.visibility = View.VISIBLE
                 } else {
                     binding.rvPrice.visibility = View.VISIBLE
                     binding.tvPriceError.visibility = View.GONE
-                    priceAdapter?.setList(it.gymPriceList!!)
+                    priceAdapter?.setList(it.gymPriceList)
                 }
 
                 // 리뷰

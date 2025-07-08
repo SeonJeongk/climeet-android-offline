@@ -4,6 +4,7 @@ import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.Context
 import android.util.Log
+import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -151,27 +152,25 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
 
             if (_items.value.isEmpty()) {
                 withContext(Dispatchers.Main) {
-                    if (routeDataList != null) {
-                        isSelectedCrag.value = true
+                    isSelectedCrag.value = true
 
-                        routeDataList.forEach { routeData ->
-                            // API로 가져온 루트 정보 불러오기
-                            var matchedData = findMatchedData(routeData.routeId, routeData.sectorId, 1)
-                            if (matchedData != null) {
-                                setItem(matchedData, routeData)
-                            } else {
-                                // 2층이 존재하면 2층 데이터를 가져와 일치 확인하고, 있으면 넣어주기
-                                if (isSecondFloorExist) {
-                                    matchedData = findMatchedData(routeData.routeId, routeData.sectorId, 2)
-                                    if (matchedData != null) {
-                                        setItem(matchedData, routeData)
-                                    }
+                    routeDataList.forEach { routeData ->
+                        // API로 가져온 루트 정보 불러오기
+                        var matchedData = findMatchedData(routeData.routeId, routeData.sectorId, 1)
+                        if (matchedData != null) {
+                            setItem(matchedData, routeData)
+                        } else {
+                            // 2층이 존재하면 2층 데이터를 가져와 일치 확인하고, 있으면 넣어주기
+                            if (isSecondFloorExist) {
+                                matchedData = findMatchedData(routeData.routeId, routeData.sectorId, 2)
+                                if (matchedData != null) {
+                                    setItem(matchedData, routeData)
                                 }
                             }
                         }
-                        setAvgLevel()
-                        resetView.value = true // 일시정지 일 때 루트기록 보이게 화면 재설정
                     }
+                    setAvgLevel()
+                    resetView.value = true // 일시정지 일 때 루트기록 보이게 화면 재설정
                 }
             }
         }
@@ -186,7 +185,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         crag.isSelected = true
 
         // items에 추가
-        _items.value = _items.value + crag
+        _items.value += crag
     }
 
     // routeList에서 일치하는 데이터를 return
@@ -509,12 +508,11 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     private fun addItem(item: RouteUiData) {
         if (_items.value.none { it.routeId == item.routeId && it.sectorId == item.sectorId }) {
             val newItem = item.copy(isSelected = true)
-            _items.value = _items.value + newItem
+            _items.value += newItem
 
             // roomDB에 루트 기록 저장
             saveRouteRecord(newItem)
             setAvgLevel()
-        } else {
         }
     }
 
@@ -653,7 +651,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
 
                 delay(500)
                 withContext(Dispatchers.Main) {
-                    updateRecord.value = !updateRecord.value!!
+                    updateRecord.value = !(updateRecord.value ?: false)
                 }
             }
         }
@@ -698,7 +696,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
 
                 delay(500)
                 withContext(Dispatchers.Main) {
-                    updateRecord.value = !updateRecord.value!!
+                    updateRecord.value = !(updateRecord.value ?: false)
                 }
             }
         }
@@ -718,7 +716,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
 
                 delay(500)
                 withContext(Dispatchers.Main) {
-                    updateRecord.value = !updateRecord.value!!
+                    updateRecord.value = !(updateRecord.value ?: false)
                 }
                 // Log.d("recorddd", "id ${target.id} 루트 기록 삭제")
             }
@@ -737,7 +735,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         val current = total.value ?: return false
         val updated = adjustedRecordCount(current, increase)
         total.value = updated
-        sharedPreferences.edit().putString(preferenceKey, updated).apply()
+        sharedPreferences.edit { putString(preferenceKey, updated) }
         return true
     }
 
@@ -750,12 +748,8 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
             withContext(Dispatchers.Main) {
                 if (completedRoutes != null && totalComplete.value != "--") {
                     // 난이도 이름과 매칭
-                    if (gymLevelList.size >= completedRoutes && gymLevelList.isNotEmpty()) {
-                        avgLevel.value = gymLevelList[completedRoutes].levelName
-                    } else {
-                        avgLevel.value = getLevelName(completedRoutes)
-                    }
-                    sharedPreferences.edit().putString(TOP_LEVEL, avgLevel.value).apply()
+                    avgLevel.value = gymLevelList.getOrNull(completedRoutes)?.levelName ?: getLevelName(completedRoutes)
+                    sharedPreferences.edit { putString(TOP_LEVEL, avgLevel.value) }
                 } else {
                     avgLevel.value = "--"
                 }

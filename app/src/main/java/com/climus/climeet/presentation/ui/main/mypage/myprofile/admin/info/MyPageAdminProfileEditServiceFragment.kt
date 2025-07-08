@@ -61,7 +61,7 @@ class MyPageAdminProfileEditServiceFragment :
     }
 
     private fun updateServiceListSelectedState() {
-        val gymServiceList = sharedViewModel.uiState.value.gymServiceList ?: return
+        val gymServiceList = sharedViewModel.uiState.value.gymServiceList
         for (service in serviceList) {
             if (gymServiceList.any { it.name.replace("_", " ") == service.title }) {
                 service.isSelected = true
