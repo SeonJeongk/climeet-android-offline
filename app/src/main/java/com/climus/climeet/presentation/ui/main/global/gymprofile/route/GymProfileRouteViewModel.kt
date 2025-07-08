@@ -79,10 +79,7 @@ class GymProfileRouteViewModel @Inject constructor(
     val datePickText = MutableStateFlow("${initDate.year}년 ${initDate.monthValue}월 ${initDate.dayOfMonth}일")
     val selectedDate = MutableLiveData(initDate)
 
-    private val timePoint = MutableStateFlow(
-        "${initDate.year}-${String.format("%02d", initDate.monthValue)}-" +
-            "${String.format("%02d", initDate.dayOfMonth)}",
-    )
+    private val timePoint = MutableStateFlow(initDate.toString())
 
     var cragId: Long = 0
     var cragName: String = ""
@@ -106,15 +103,9 @@ class GymProfileRouteViewModel @Inject constructor(
     }
 
     fun setDate() {
-        val date = selectedDate.value
-        val year = date?.year
-        val month = date?.month?.value
-        val day = date?.dayOfMonth
-        datePickText.value = "${year}년 ${month}월 ${day}일"
-
-        val formattedMonth = month?.let { String.format("%02d", it) }
-        val formattedDay = day?.let { String.format("%02d", it) }
-        timePoint.value = "$year-$formattedMonth-$formattedDay"
+        val date = selectedDate.value ?: return
+        datePickText.value = "${date.year}년 ${date.monthValue}월 ${date.dayOfMonth}일"
+        timePoint.value = date.toString()
 
         viewModelScope.launch(Dispatchers.Main) {
             // 선택된 날짜로 루트 정보 다시 불러오기

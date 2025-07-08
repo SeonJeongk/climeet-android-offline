@@ -17,10 +17,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.climus.climeet.R
 import com.climus.climeet.presentation.ui.main.MainActivity
+import com.climus.climeet.presentation.util.formatTimerTime
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Timer
 import java.util.TimerTask
-import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class TimerService : Service() {
@@ -37,7 +37,7 @@ class TimerService : Service() {
     private var isRunning = false
     private var timer: Timer? = null
 
-    override fun onBind(intent: Intent): IBinder? = throw UnsupportedOperationException("Not yet implemented")
+    override fun onBind(intent: Intent): IBinder = throw UnsupportedOperationException("Not yet implemented")
 
     // command 를 통해 스톱워치 서비스 상태 변경
     override fun onStartCommand(
@@ -101,16 +101,7 @@ class TimerService : Service() {
 
     // 알림 생성
     private fun createNotification(elapsedTime: Long): Notification {
-        val hours = TimeUnit.MILLISECONDS.toHours(elapsedTime)
-        val minutes = TimeUnit.MILLISECONDS.toMinutes(elapsedTime) % 60
-        val seconds = TimeUnit.MILLISECONDS.toSeconds(elapsedTime) % 60
-
-        // 1시간 미만이면 분, 초만 보여준다
-        val timeFormat = if (hours > 0) {
-            String.format("%02d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            String.format("%02d:%02d", minutes, seconds)
-        }
+        val timeFormat = formatTimerTime(elapsedTime)
 
         // 알림창 클릭시 타이머 화면으로 이동
         val timerIntent = Intent(this, MainActivity::class.java).apply {
@@ -120,7 +111,7 @@ class TimerService : Service() {
         val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, timerIntent, PendingIntent.FLAG_IMMUTABLE)
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("$timeFormat")
+            .setContentTitle(timeFormat)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentIntent(pendingIntent)
 
@@ -157,7 +148,7 @@ class TimerService : Service() {
             startTime = System.currentTimeMillis()
         }
         timer = Timer().apply {
-            scheduleAtFixedRate(
+            schedule(
                 object : TimerTask() {
                     override fun run() {
                         elapsedTime += System.currentTimeMillis() - startTime

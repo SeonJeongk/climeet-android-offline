@@ -41,14 +41,7 @@
     <ID>HasPlatformType:CreateClimbingRecordViewModel.kt$CreateClimbingRecordViewModel$val defaultTime = LocalTime.of(11, 0, 0)</ID>
     <ID>HasPlatformType:CreateRecordData.kt$CreateRecordData$val today = LocalDate.now()</ID>
     <ID>HasPlatformType:DataModule.kt$DataModule$@Provides fun provideSharedPreferences(@ApplicationContext context: Context)</ID>
-    <ID>ImplicitDefaultLocale:GymProfileRouteViewModel.kt$GymProfileRouteViewModel$String.format("%02d", initDate.dayOfMonth)</ID>
-    <ID>ImplicitDefaultLocale:GymProfileRouteViewModel.kt$GymProfileRouteViewModel$String.format("%02d", initDate.monthValue)</ID>
-    <ID>ImplicitDefaultLocale:GymProfileRouteViewModel.kt$GymProfileRouteViewModel$String.format("%02d", it)</ID>
     <ID>ImplicitDefaultLocale:StickChartView.kt$StickChartView.PercentFormatter$String.format("%.0f%%", value * 100)</ID>
-    <ID>ImplicitDefaultLocale:TimerService.kt$TimerService$String.format("%02d:%02d", minutes, seconds)</ID>
-    <ID>ImplicitDefaultLocale:TimerService.kt$TimerService$String.format("%02d:%02d:%02d", hours, minutes, seconds)</ID>
-    <ID>ImplicitDefaultLocale:TimerViewModel.kt$TimerViewModel$String.format("%02d:%02d", minutes, seconds)</ID>
-    <ID>ImplicitDefaultLocale:TimerViewModel.kt$TimerViewModel$String.format("%02d:%02d:%02d", hours, minutes, seconds)</ID>
     <ID>InjectDispatcher:SetTimerClimbingRecordViewModel.kt$SetTimerClimbingRecordViewModel$IO</ID>
     <ID>InjectDispatcher:TimerFragment.kt$TimerFragment$IO</ID>
     <ID>InjectDispatcher:TimerViewModel.kt$TimerViewModel$IO</ID>

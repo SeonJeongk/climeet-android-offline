@@ -23,6 +23,7 @@ import com.climus.climeet.presentation.ui.main.global.toGymLevelUiData
 import com.climus.climeet.presentation.ui.main.global.toRouteUiData
 import com.climus.climeet.presentation.ui.main.global.toSectorNameUiData
 import com.climus.climeet.presentation.ui.main.record.model.CreateRecordData
+import com.climus.climeet.presentation.util.formatRecordTimeRange
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -37,7 +38,6 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
-import java.util.Locale
 import javax.inject.Inject
 
 data class CreateClimbingRecordUiState(
@@ -170,38 +170,9 @@ class CreateClimbingRecordViewModel @Inject constructor(
 
     fun setTime() {
         val start = selectedStartTime.value
-        var startString = ""
         val end = selectedEndTime.value
-        var endString = ""
 
-        startString = if (start.hour < 12 || start.hour == 24) {
-            if (start.hour == 24) {
-                String.format(Locale.getDefault(), "AM %02d:%02d", 12, start.minute)
-            } else {
-                String.format(Locale.getDefault(), "AM %02d:%02d", start.hour, start.minute)
-            }
-        } else {
-            if (start.hour == 12) {
-                String.format(Locale.getDefault(), "PM %02d:%02d", 12, start.minute)
-            } else {
-                String.format(Locale.getDefault(), "PM %02d:%02d", start.hour - 12, start.minute)
-            }
-        }
-
-        endString = if (end.hour < 12 || end.hour == 24) {
-            if (end.hour == 24) {
-                String.format(Locale.getDefault(), "AM %02d:%02d", 12, end.minute)
-            } else {
-                String.format(Locale.getDefault(), "AM %02d:%02d", end.hour, end.minute)
-            }
-        } else {
-            if (end.hour == 12) {
-                String.format(Locale.getDefault(), "PM %02d:%02d", 12, end.minute)
-            } else {
-                String.format(Locale.getDefault(), "PM %02d:%02d", end.hour - 12, end.minute)
-            }
-        }
-        timePickText.value = "$startString - $endString"
+        timePickText.value = formatRecordTimeRange(start, end)
     }
 
     fun selectCrag(

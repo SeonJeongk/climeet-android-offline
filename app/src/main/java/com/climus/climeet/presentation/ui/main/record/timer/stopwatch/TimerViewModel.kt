@@ -18,11 +18,11 @@ import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.request.ClimbingRecord
 import com.climus.climeet.data.model.request.CreateTimerClimbingRecordRequest
 import com.climus.climeet.data.repository.MainRepository
+import com.climus.climeet.presentation.util.formatTimerTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -60,37 +60,13 @@ class TimerViewModel @Inject constructor(
 
     // 흘러가는 시간 형식 설정
     val timeFormat: LiveData<String> = time.map { elapsedTime ->
-        if (elapsedTime == 0L) {
-            "00:00"
-        } else {
-            val hours = TimeUnit.MILLISECONDS.toHours(elapsedTime)
-            val minutes = TimeUnit.MILLISECONDS.toMinutes(elapsedTime) % 60
-            val seconds = TimeUnit.MILLISECONDS.toSeconds(elapsedTime) % 60
-
-            if (hours > 0) {
-                String.format("%02d:%02d:%02d", hours, minutes, seconds)
-            } else {
-                String.format("%02d:%02d", minutes, seconds)
-            }
-        }
+        formatTimerTime(elapsedTime)
     }
 
     // 일시정지 시간 형식 설정
     // 서비스에서 보낸 broadcast를 통해 pauseTime값이 업데이트 되면, pauseTimeFormat을 설정한다
     val pauseTimeFormat: LiveData<String> = pauseTime.map { pauseTime ->
-        if (pauseTime == 0L) {
-            "00:00"
-        } else {
-            val hours = TimeUnit.MILLISECONDS.toHours(pauseTime)
-            val minutes = TimeUnit.MILLISECONDS.toMinutes(pauseTime) % 60
-            val seconds = TimeUnit.MILLISECONDS.toSeconds(pauseTime) % 60
-
-            if (hours > 0) {
-                String.format("%02d:%02d:%02d", hours, minutes, seconds)
-            } else {
-                String.format("%02d:%02d", minutes, seconds)
-            }
-        }
+        formatTimerTime(pauseTime)
     }
 
     fun sendClimbingRecord() {
@@ -120,13 +96,7 @@ class TimerViewModel @Inject constructor(
                 checkNotNull(time.value) { "타이머 시간이 초기화되지 않았습니다." }
             }
 
-            val hours = TimeUnit.MILLISECONDS.toHours(endTime)
-            val minutes = TimeUnit.MILLISECONDS.toMinutes(endTime) -
-                TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(endTime))
-            val seconds = TimeUnit.MILLISECONDS.toSeconds(endTime) -
-                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(endTime))
-
-            val formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+            val formattedTime = formatTimerTime(endTime, alwaysShowHours = true)
 
             // 요청 바디 생성
             requestBody = CreateTimerClimbingRecordRequest(
