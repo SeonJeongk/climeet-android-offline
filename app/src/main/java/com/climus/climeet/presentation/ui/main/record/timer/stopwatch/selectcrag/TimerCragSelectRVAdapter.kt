@@ -67,7 +67,7 @@ class TimerCragSelectRVAdapter(
             binding.data = data
 
             binding.btnSelect.setOnClickListener {
-                data.onClickListener(data.id, data.name, data.imgUrl)
+                data.onClickListener(data.id, data.name)
             }
         }
     }

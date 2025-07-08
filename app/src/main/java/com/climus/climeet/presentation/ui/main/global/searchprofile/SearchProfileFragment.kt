@@ -66,7 +66,7 @@ class SearchProfileFragment : BaseFragment<FragmentSearchProfileBinding>(R.layou
                 adapter?.setList(uiState.profileList, viewModel.keyword.value)
                 Log.d("profileList", uiState.profileList.toString())
 
-                uiState.followGymList?.let { followGymList ->
+                uiState.followGymList.let { followGymList ->
                     recyclerFollowingHomeGym = followGymList
                     setupFollowingHomeGymList()
                 }
@@ -113,11 +113,9 @@ class SearchProfileFragment : BaseFragment<FragmentSearchProfileBinding>(R.layou
                     }
                 }
 
-                override fun onTabReselected(tab: TabLayout.Tab?) {
-                }
+                override fun onTabReselected(tab: TabLayout.Tab?) = Unit
 
-                override fun onTabUnselected(tab: TabLayout.Tab?) {
-                }
+                override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
             },
         )
     }

@@ -18,7 +18,7 @@ class FollowingCragInfoAdapter(
         viewType: Int,
     ): FollowingCragInfoViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = ItemHomegymRouteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemHomegymRouteBinding.inflate(layoutInflater, parent, false)
         return FollowingCragInfoViewHolder(binding)
     }
 
@@ -46,11 +46,9 @@ class FollowingCragInfoAdapter(
 
         fun bind(gym: UserHomeGymDetailResponse) {
             binding.tvHomgymName.text = gym.gymName
-            if (gym.gymProfileUrl != null) {
-                Glide.with(binding.root.context)
-                    .load(gym.gymProfileUrl)
-                    .into(binding.ivCragProfileArea)
-            }
+            Glide.with(binding.root.context)
+                .load(gym.gymProfileUrl)
+                .into(binding.ivCragProfileArea)
 
             setupRouteRecyclerView(gym.routeSimpleInfos, gym.gymName)
         }

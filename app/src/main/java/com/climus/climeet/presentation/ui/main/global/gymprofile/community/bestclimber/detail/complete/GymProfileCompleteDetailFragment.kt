@@ -16,7 +16,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.Glide
 import com.climus.climeet.R
-import com.climus.climeet.data.model.response.GymCompleteBestClimberResponse
 import com.climus.climeet.databinding.FragmentCompleteDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +25,6 @@ import kotlinx.coroutines.launch
 class GymProfileCompleteDetailFragment : Fragment() {
     private lateinit var binding: FragmentCompleteDetailBinding
     private val viewModel: GymProfileCompleteDetailViewModel by activityViewModels()
-    private var rankingList: List<GymCompleteBestClimberResponse> = emptyList()
 
     private lateinit var profileImg1: ImageView
     private lateinit var profileImg2: ImageView

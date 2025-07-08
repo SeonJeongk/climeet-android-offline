@@ -153,7 +153,6 @@ class TimerCragSelectBottomSheetViewModel @Inject constructor(
     fun navigateToBack(
         cragId: Long,
         cragName: String,
-        cragImgUrl: String,
     ) {
         viewModelScope.launch {
             _event.emit(CragSelectEvent.NavigateToBack(cragId, cragName))

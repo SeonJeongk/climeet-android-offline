@@ -279,7 +279,6 @@ class ShortsCommentBottomSheetViewModel @Inject constructor(
 
     private fun changeLikeStatus(
         commentId: Long,
-        position: Int,
         status: LikeStatus,
         isLike: Boolean,
         isDislike: Boolean,

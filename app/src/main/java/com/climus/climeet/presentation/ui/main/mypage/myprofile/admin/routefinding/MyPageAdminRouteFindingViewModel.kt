@@ -92,11 +92,6 @@ sealed class MyPageAdminRouteFindingEvent {
 class MyPageAdminRouteFindingViewModel @Inject constructor(
     private val repository: MainRepository,
 ) : ViewModel() {
-    fun empty(
-        t1: String,
-        t2: String,
-    ) {}
-
     private val _event = MutableSharedFlow<MyPageAdminRouteFindingEvent>()
     val event: SharedFlow<MyPageAdminRouteFindingEvent> = _event.asSharedFlow()
 
@@ -305,22 +300,20 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
                         }
 
                         val chipDataList: List<UiRouteChipData> =
-                            result.routeList?.map { data -> data.toUiRouteChipData() }
-                                ?: emptyList()
+                            result.routeList?.map { data -> data.toUiRouteChipData() }.orEmpty()
                         val routeItemList = groupBySectorName(chipDataList)
 
                         _uiState.update { state ->
                             val updatedLayoutList: List<UiLayoutItem> =
-                                result.layoutList?.map { data -> data.toUiLayoutItem() }
-                                    ?: emptyList()
+                                result.layoutList?.map { data -> data.toUiLayoutItem() }.orEmpty()
                             val completeLayoutList = listOf(
                                 UiLayoutItem(
                                     floor = 1,
-                                    gymImg = updatedLayoutList.find { it.floor == 1 }?.gymImg ?: "",
+                                    gymImg = updatedLayoutList.find { it.floor == 1 }?.gymImg.orEmpty(),
                                 ),
                                 UiLayoutItem(
                                     floor = 2,
-                                    gymImg = updatedLayoutList.find { it.floor == 2 }?.gymImg ?: "",
+                                    gymImg = updatedLayoutList.find { it.floor == 2 }?.gymImg.orEmpty(),
                                 ),
                             )
 
@@ -329,8 +322,9 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
                                     data.toUiLevelItem(::setLevelColor)
                                 }.orEmpty(),
                                 layoutList = completeLayoutList,
-                                sectorList = result.sectorList?.map { data -> data.toUiSectorItem(::setSector) }
-                                    ?: emptyList(),
+                                sectorList = result.sectorList?.map { data ->
+                                    data.toUiSectorItem(::setSector)
+                                }.orEmpty(),
                                 chipList = chipDataList,
                                 routeList = routeItemList,
                             )
@@ -373,7 +367,8 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
     fun setSelectedDate(updateDate: LocalDate) {
         selectedDate.update { updateDate }
         selectedDateText.update {
-            "${updateDate.year}년 ${updateDate.monthValue}월 ${updateDate.dayOfMonth}일 (${dayOfWeekMap[updateDate.dayOfWeek]})"
+            "${updateDate.year}년 ${updateDate.monthValue}월 ${updateDate.dayOfMonth}일 " +
+                "(${dayOfWeekMap[updateDate.dayOfWeek]})"
         }
         getRouteFindingData()
     }
@@ -610,8 +605,6 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
             }
         }
     }
-
-    fun noUse(dateDate: LocalDate) {}
 
     fun showDatePicker() {
         viewModelScope.launch {

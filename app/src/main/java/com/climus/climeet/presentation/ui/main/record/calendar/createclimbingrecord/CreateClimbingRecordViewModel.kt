@@ -96,7 +96,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
     val selectedDate = MutableStateFlow(initDate)
 
     val defaultTimeText = "시간을 입력해주세요 (선택)"
-    val defaultTime = LocalTime.of(11, 0, 0)
+    val defaultTime: LocalTime = LocalTime.of(11, 0, 0)
     val timePickText = MutableStateFlow(defaultTimeText)
     val selectedStartTime = MutableStateFlow(defaultTime)
     val selectedEndTime = MutableStateFlow(defaultTime)
@@ -118,7 +118,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
     val alpha = MutableLiveData(1f)
 
     init {
-        CreateRecordData.setSelectedTime(LocalTime.now(), LocalTime.of(11, 0, 0))
+        CreateRecordData.setSelectedTime(LocalTime.now(), defaultTime)
         selectCrag(0, "클라이밍 암장을 선택해주세요")
     }
 
@@ -159,7 +159,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
                 5 -> "(금)"
                 6 -> "(토)"
                 7 -> "(일)"
-                else -> throw IllegalArgumentException()
+                else -> throw IllegalArgumentException("Unsupported day of week: ${date.dayOfWeek}")
             }
             val year = date.year
             val month = date.month.value
@@ -182,7 +182,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
         selectedCragEvent.value = Pair(id, name)
         cragId = id
         cragName = name
-        selectedCragEvent.value.let { getCragInfo(it.first) }
+        getCragInfo(selectedCragEvent.value.first)
     }
 
     fun getCragInfo(id: Long) {
@@ -449,7 +449,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
     private fun getTimeDiff(): LocalTime {
         val start = selectedStartTime.value
         val end = selectedEndTime.value
-        if (start.equals(end)) return LocalTime.of(0, 0, 0)
+        if (start == end) return LocalTime.of(0, 0, 0)
 
         if (start.isBefore(end)) {
             val totalSeconds = ChronoUnit.SECONDS.between(start, end)

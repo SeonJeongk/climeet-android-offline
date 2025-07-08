@@ -613,9 +613,6 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         }
     }
 
-    private fun itemClicked(id: RouteUiData) {
-    }
-
     // 평균 완등률 더보기
     fun setAvgToggle() {
         isAvgToggleOn.value = !(isAvgToggleOn.value ?: false)

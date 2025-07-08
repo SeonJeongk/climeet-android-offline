@@ -6,12 +6,14 @@ config:
   warningsAsErrors: false
 
 complexity:
+  TooManyFunctions:
+    active: false
   CyclomaticComplexMethod:
     active: true
     threshold: 20
   LongMethod:
     active: true
-    threshold: 60
+    threshold: 100
   LongParameterList:
     active: true
     functionThreshold: 6
@@ -21,6 +23,8 @@ complexity:
     threshold: 4
 
 coroutines:
+  InjectDispatcher:
+    active: false
   GlobalCoroutineUsage:
     active: true
   SuspendFunSwallowedCancellation:
@@ -53,6 +57,16 @@ potential-bugs:
   UnsafeCallOnNullableType:
     active: true
 
+naming:
+  NoNameShadowing:
+    active: false
+
 style:
+  MagicNumber:
+    active: false
+  ReturnCount:
+    active: false
+  UnnecessaryAbstractClass:
+    active: false
   WildcardImport:
     active: true

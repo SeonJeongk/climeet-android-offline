@@ -8,6 +8,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.withStyledAttributes
 import com.climus.climeet.R
 import java.lang.Float.min
 
@@ -21,11 +22,11 @@ class EmptyCircleView @JvmOverloads constructor(
     var ecTextSize: Float = 0F
 
     init {
-        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.EmptyCircleView)
-        ecColor = typedArray.getColor(R.styleable.EmptyCircleView_ecColor, Color.WHITE)
-        ecText = typedArray.getString(R.styleable.EmptyCircleView_ecText) ?: ""
-        ecTextSize = typedArray.getDimension(R.styleable.EmptyCircleView_ecTextSize, 0F)
-        typedArray.recycle()
+        context.withStyledAttributes(attrs, R.styleable.EmptyCircleView) {
+            ecColor = getColor(R.styleable.EmptyCircleView_ecColor, Color.WHITE)
+            ecText = getString(R.styleable.EmptyCircleView_ecText).orEmpty()
+            ecTextSize = getDimension(R.styleable.EmptyCircleView_ecTextSize, 0F)
+        }
     }
 
     @SuppressLint("DrawAllocation")

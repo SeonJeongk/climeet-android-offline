@@ -88,8 +88,7 @@ class GymProfileFragment : BaseFragment<FragmentGymProfileBinding>(R.layout.frag
                     }
                 }
 
-                override fun onTabReselected(tab: TabLayout.Tab?) {
-                }
+                override fun onTabReselected(tab: TabLayout.Tab?) = Unit
             },
         )
     }

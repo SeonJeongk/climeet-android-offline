@@ -1,10 +1,10 @@
 package com.climus.climeet.presentation.ui.main.shorts.player
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.OptIn
+import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.media3.common.MediaItem
@@ -89,7 +89,6 @@ class ShortsDetailFragment @Inject constructor(
                         )
 
                     is ShortsDetailEvent.PatchFavorite -> parentViewModel.patchFavorite(data.shortsId, it.state)
-                    is ShortsDetailEvent.PatchBookMark -> parentViewModel.patchBookMark(data.shortsId, it.state)
                 }
             }
         }
@@ -127,7 +126,7 @@ class ShortsDetailFragment @Inject constructor(
     @OptIn(UnstableApi::class)
     private fun getProgressiveMediaSource(): MediaSource =
         ProgressiveMediaSource.Factory(dataSourceFactory)
-            .createMediaSource(MediaItem.fromUri(Uri.parse(data.videoUrl)))
+            .createMediaSource(MediaItem.fromUri(data.videoUrl.toUri()))
 
     private fun releasePlayer() {
         player?.apply {

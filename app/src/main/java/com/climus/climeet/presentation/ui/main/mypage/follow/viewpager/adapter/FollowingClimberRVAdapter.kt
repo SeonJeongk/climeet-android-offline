@@ -11,7 +11,7 @@ import com.climus.climeet.presentation.ui.main.mypage.follow.model.FollowingUiDa
 import com.climus.climeet.presentation.ui.main.mypage.follow.viewpager.FollowingViewModel
 
 class FollowingClimberRVAdapter(
-    private val followingClimberList: MutableList<FollowingUiData>,
+    private val followingClimberList: List<FollowingUiData>,
     private val viewModel: FollowingViewModel,
 ) : RecyclerView.Adapter<FollowingClimberViewHolder>() {
     private val followStatus = mutableMapOf<Int, Boolean>()

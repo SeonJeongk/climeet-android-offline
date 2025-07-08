@@ -56,10 +56,6 @@ class MyPageClimberProfileViewModel @Inject constructor(
                                 avgCompletionRatePublic = it.body.averageCompletionRatePublic,
                             )
                         }
-                        Log.d(
-                            "mypage_climber",
-                            "받아온 공개 범위 : home = ${uiState.value.homeGymPublic}, avgComplete = ${uiState.value.avgCompletionRatePublic}, avgLevel = ${uiState.value.avgCompletionLevelPublic}",
-                        )
                     }
 
                     is BaseState.Error -> {

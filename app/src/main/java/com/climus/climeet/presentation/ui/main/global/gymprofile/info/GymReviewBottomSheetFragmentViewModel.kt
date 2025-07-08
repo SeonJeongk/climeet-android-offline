@@ -52,7 +52,7 @@ class GymReviewBottomSheetFragmentViewModel @Inject constructor(
                 rating = reviewRating.value ?: 5F,
             )
 
-            repository.createGymReview(gymId, request).let { it ->
+            repository.createGymReview(gymId, request).let {
                 when (it) {
                     is BaseState.Success -> {
                         // 성공
@@ -83,7 +83,7 @@ class GymReviewBottomSheetFragmentViewModel @Inject constructor(
 
             Log.d("gym_profile", "수정된 리뷰 : $request")
 
-            repository.editGymReview(gymId, request).let { it ->
+            repository.editGymReview(gymId, request).let {
                 when (it) {
                     is BaseState.Success -> {
                         // 다음 리뷰를 위해 값 초기화

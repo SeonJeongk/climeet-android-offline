@@ -567,10 +567,10 @@ class ShortsPlayerViewModel @Inject constructor(
 //        }
     }
 
-    fun patchBookMark(
-        shortsId: Long,
-        bookMarkState: Boolean,
-    ) {
+//    fun patchBookMark(
+//        shortsId: Long,
+//        bookMarkState: Boolean,
+//    ) {
 //        _uiState.update { state ->
 //            state.copy(
 //                shortsList = uiState.value.shortsList.map {
@@ -585,7 +585,7 @@ class ShortsPlayerViewModel @Inject constructor(
 //                }
 //            )
 //        }
-    }
+//    }
 }
 
 enum class ShortsOption {

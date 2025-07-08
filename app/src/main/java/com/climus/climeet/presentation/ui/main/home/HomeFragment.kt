@@ -221,7 +221,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     private fun setupIntroduceBanner(vpBanner: List<BannerDetailInfoResponse>) {
-        val bannerAdapter = BannerVPAdapter(this, binding.vpHomeIntroduceBanner)
+        val bannerAdapter = BannerVPAdapter(this)
 
         for (bannerInfo in vpBanner) {
             val bannerFragment = BannerFragment(bannerInfo)

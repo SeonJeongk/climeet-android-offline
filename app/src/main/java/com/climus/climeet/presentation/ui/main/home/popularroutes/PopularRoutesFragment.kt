@@ -33,15 +33,11 @@ class PopularRoutesFragment : BaseFragment<FragmentPopularRoutesBinding>(R.layou
 
     private fun initEventObserve() {
         repeatOnStarted {
-            viewModel?.let { vm ->
-                vm.uiState.collect { uiState ->
-
-                    uiState.routeList?.let { routeList ->
-                        Log.d("RouteList", routeList.toString())
-                        recyclerRoute = routeList
-                        setupPopularRoutesList()
-                    }
-                }
+            viewModel.uiState.collect { uiState ->
+                val routeList = uiState.routeList
+                Log.d("RouteList", routeList.toString())
+                recyclerRoute = routeList
+                setupPopularRoutesList()
             }
         }
     }

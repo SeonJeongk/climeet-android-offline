@@ -112,7 +112,6 @@ class ShortsMainCommentViewHolder(
                     "DISLIKE" ->
                         item.changeLikeStatus(
                             item.commentId,
-                            absoluteAdapterPosition,
                             LikeStatus.DISLIKE_MINUS,
                             false,
                             false,
@@ -121,7 +120,6 @@ class ShortsMainCommentViewHolder(
                     "LIKE" ->
                         item.changeLikeStatus(
                             item.commentId,
-                            absoluteAdapterPosition,
                             LikeStatus.DISLIKE_PLUS_AND_LIKE_MINUS,
                             false,
                             false,
@@ -130,7 +128,6 @@ class ShortsMainCommentViewHolder(
                     else ->
                         item.changeLikeStatus(
                             item.commentId,
-                            absoluteAdapterPosition,
                             LikeStatus.DISLIKE_PLUS,
                             false,
                             true,
@@ -143,7 +140,6 @@ class ShortsMainCommentViewHolder(
                     "LIKE" ->
                         item.changeLikeStatus(
                             item.commentId,
-                            absoluteAdapterPosition,
                             LikeStatus.LIKE_MINUS,
                             false,
                             false,
@@ -152,7 +148,6 @@ class ShortsMainCommentViewHolder(
                     "DISLIKE" ->
                         item.changeLikeStatus(
                             item.commentId,
-                            absoluteAdapterPosition,
                             LikeStatus.LIKE_PLUS_AND_DISLIKE_MINUS,
                             false,
                             false,
@@ -161,7 +156,6 @@ class ShortsMainCommentViewHolder(
                     else ->
                         item.changeLikeStatus(
                             item.commentId,
-                            absoluteAdapterPosition,
                             LikeStatus.LIKE_PLUS,
                             true,
                             false,
@@ -215,7 +209,6 @@ class ShortsSubCommentViewHolder(
                     "DISLIKE" ->
                         item.changeLikeStatus(
                             item.commentId,
-                            absoluteAdapterPosition,
                             LikeStatus.DISLIKE_MINUS,
                             false,
                             false,
@@ -224,7 +217,6 @@ class ShortsSubCommentViewHolder(
                     "LIKE" ->
                         item.changeLikeStatus(
                             item.commentId,
-                            absoluteAdapterPosition,
                             LikeStatus.DISLIKE_PLUS_AND_LIKE_MINUS,
                             false,
                             false,
@@ -233,7 +225,6 @@ class ShortsSubCommentViewHolder(
                     else ->
                         item.changeLikeStatus(
                             item.commentId,
-                            absoluteAdapterPosition,
                             LikeStatus.DISLIKE_PLUS,
                             false,
                             true,
@@ -246,7 +237,6 @@ class ShortsSubCommentViewHolder(
                     "LIKE" ->
                         item.changeLikeStatus(
                             item.commentId,
-                            absoluteAdapterPosition,
                             LikeStatus.LIKE_MINUS,
                             false,
                             false,
@@ -255,7 +245,6 @@ class ShortsSubCommentViewHolder(
                     "DISLIKE" ->
                         item.changeLikeStatus(
                             item.commentId,
-                            absoluteAdapterPosition,
                             LikeStatus.LIKE_PLUS_AND_DISLIKE_MINUS,
                             false,
                             false,
@@ -264,7 +253,6 @@ class ShortsSubCommentViewHolder(
                     else ->
                         item.changeLikeStatus(
                             item.commentId,
-                            absoluteAdapterPosition,
                             LikeStatus.LIKE_PLUS,
                             true,
                             false,

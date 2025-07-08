@@ -2,7 +2,6 @@ package com.climus.climeet.presentation.ui.main
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -36,7 +35,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::inflate) {
     private val viewModel: MainViewModel by viewModels()
 
-    private lateinit var neededPermissionList: MutableList<String>
+    private lateinit var neededPermissionList: List<String>
     private lateinit var navController: NavController
 
     private val storagePermissionList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -76,23 +75,20 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         }
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.home_fragment ||
-                destination.id == R.id.shorts_fragment ||
-                destination.id == R.id.myPage_fragment ||
-                destination.id == R.id.bestClimerFragment ||
-                destination.id == R.id.popularShortsFragment ||
-                destination.id == R.id.popularCragsFragment ||
-                destination.id == R.id.popularRoutesFragment ||
-                destination.id == R.id.set_timer_climbing_record_fragment ||
-                destination.id == R.id.calendar_fragment ||
-                destination.id == R.id.timerMainFragment ||
-                destination.id == R.id.timerMainFragment ||
-                destination.id == R.id.record_fragment
-            ) {
-                // todo bnv show 해야되는 frag
-                binding.mainBnv.visibility = View.VISIBLE
-            } else {
-                binding.mainBnv.visibility = View.INVISIBLE
+            binding.mainBnv.visibility = when (destination.id) {
+                R.id.home_fragment,
+                R.id.shorts_fragment,
+                R.id.myPage_fragment,
+                R.id.bestClimerFragment,
+                R.id.popularShortsFragment,
+                R.id.popularCragsFragment,
+                R.id.popularRoutesFragment,
+                R.id.set_timer_climbing_record_fragment,
+                R.id.calendar_fragment,
+                R.id.timerMainFragment,
+                R.id.record_fragment,
+                -> View.VISIBLE
+                else -> View.INVISIBLE
             }
         }
 
@@ -127,16 +123,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
     // 비디오만 보여주는 권한 확인
     private fun onCheckVideoPermissions() {
-        neededPermissionList = mutableListOf()
-
-        storagePermissionList.forEach { permission ->
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    permission,
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                neededPermissionList.add(permission)
-            }
+        neededPermissionList = storagePermissionList.filter { permission ->
+            ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED
         }
 
         if (neededPermissionList.isNotEmpty()) {
@@ -152,16 +140,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
     // 사진 권한 확인
     private fun onCheckImagePermissions() {
-        neededPermissionList = mutableListOf()
-
-        storagePermissionList.forEach { permission ->
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    permission,
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                neededPermissionList.add(permission)
-            }
+        neededPermissionList = storagePermissionList.filter { permission ->
+            ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED
         }
 
         if (neededPermissionList.isNotEmpty()) {
@@ -177,16 +157,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
     // 카메라 권한
     private fun onCheckCameraPermissions() {
-        neededPermissionList = mutableListOf()
-
-        cameraPermissionList.forEach { permission ->
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    permission,
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                neededPermissionList.add(permission)
-            }
+        neededPermissionList = cameraPermissionList.filter { permission ->
+            ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED
         }
 
         if (neededPermissionList.isNotEmpty()) {
@@ -206,43 +178,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode !in listOf(STORAGE_PERMISSION_VIDEO, STORAGE_PERMISSION_IMAGE, CAMERA_PERMISSION)) return
+
+        neededPermissionList.forEach { permission ->
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) return
+        }
+
         when (requestCode) {
-            STORAGE_PERMISSION_VIDEO -> {
-                neededPermissionList.forEach {
-                    if (ContextCompat.checkSelfPermission(
-                            this,
-                            it,
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        return
-                    }
-                }
-                openGalleryForVideo()
-            }
-            STORAGE_PERMISSION_IMAGE -> {
-                neededPermissionList.forEach {
-                    if (ContextCompat.checkSelfPermission(
-                            this,
-                            it,
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        return
-                    }
-                }
-                openGalleryForImage()
-            }
-            CAMERA_PERMISSION -> {
-                neededPermissionList.forEach {
-                    if (ContextCompat.checkSelfPermission(
-                            this,
-                            it,
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        return
-                    }
-                }
-                openCamera()
-            }
+            STORAGE_PERMISSION_VIDEO -> openGalleryForVideo()
+            STORAGE_PERMISSION_IMAGE -> openGalleryForImage()
+            CAMERA_PERMISSION -> openCamera()
         }
     }
 
@@ -278,7 +223,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     private val galleryLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 
-            if (result.resultCode == Activity.RESULT_OK) {
+            if (result.resultCode == RESULT_OK) {
                 val uri = result.data?.data
 
                 uri?.let {
@@ -291,13 +236,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                 } ?: run {
                     showToastMessage("파일 불러오기 실패")
                 }
-            } else if (result.resultCode == Activity.RESULT_CANCELED) {
+            } else if (result.resultCode == RESULT_CANCELED) {
                 navController.navigateUp()
             }
         }
 
     private val imageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
+        if (result.resultCode == RESULT_OK) {
             viewModel.cameraImage.value = false
 
             val uri = result.data?.data
@@ -308,7 +253,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     }
 
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
+        if (result.resultCode == RESULT_OK) {
 
             viewModel.cameraImage.value = true
             val bitmap = result.data?.extras?.get("data") as Bitmap

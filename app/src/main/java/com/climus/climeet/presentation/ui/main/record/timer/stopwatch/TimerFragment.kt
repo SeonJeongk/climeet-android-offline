@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.core.content.edit
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.climus.climeet.R
@@ -180,7 +181,7 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
             viewLifecycleOwner,
             Observer {
                 var items: List<LevelItemForAvg>
-                val levelAdapter = RecordAverageAdapter(recordVM)
+                val levelAdapter = RecordAverageAdapter()
                 binding.rvAvgRecord.adapter = levelAdapter
 
                 CoroutineScope(Dispatchers.IO).launch {
@@ -282,22 +283,17 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
         timerVM.isStop.value = sharedPreferences.getBoolean(KEY_IS_STOP, true)
         timerVM.isRunning.value = sharedPreferences.getBoolean(KEY_IS_RUNNING, true)
         timerVM.pauseTime.value = sharedPreferences.getLong(PAUSE_TIME, 0L)
-//        Log.d(
-//            "TIMER",
-//            "TimerFragment [setViewModel] spf값 반영 \nisStart : ${timerVM.isStart.value}, isPause : ${timerVM.isPaused.value}, isRestart : ${timerVM.isRestart.value}, isStop : ${timerVM.isStop.value}, isRunning : ${timerVM.isStart.value}, pauseTime = ${timerVM.pauseTime.value}"
-//        )
     }
 
     // viewmodel -> spf
     // 현재 뷰모델 변수 값을 spf에 저장해준다
     private fun updateStatePref() {
-        with(sharedPreferences.edit()) {
+        sharedPreferences.edit {
             timerVM.isStart.value?.let { putBoolean(KEY_IS_START, it) }
             timerVM.isPaused.value?.let { putBoolean(KEY_IS_PAUSE, it) }
             timerVM.isRestart.value?.let { putBoolean(KEY_IS_RESTART, it) }
             timerVM.isStop.value?.let { putBoolean(KEY_IS_STOP, it) }
             timerVM.isRunning.value?.let { putBoolean(KEY_IS_RUNNING, it) }
-            apply()
         }
     }
 
@@ -307,7 +303,7 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
         // todo : pauseTimeFormat에 저장된 시간을 spf에 업데이트 해준다 (TimerViewModel에서는 spf에 저장해 줄 방법을 모르겠어서 이렇게 설정해 둔 상태)
         timerVM.pauseTimeFormat.observe(viewLifecycleOwner) { pauseTime ->
             if (pauseTime != null && pauseTime != "00:00") {
-                sharedPreferences.edit().putString("pauseTimeFormat", pauseTime).apply()
+                sharedPreferences.edit { putString("pauseTimeFormat", pauseTime) }
                 binding.tvTime.text = pauseTime
             }
         }
@@ -438,11 +434,11 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
             CoroutineScope(Dispatchers.IO).launch {
                 if (timerVM.isPaused.value == true) {
                     timerVM.pauseTime.value?.let { pauseTime ->
-                        sharedPreferences.edit().putLong("stopTime", pauseTime).commit()
+                        sharedPreferences.edit(commit = true) { putLong("stopTime", pauseTime) }
                     }
                 } else {
                     timerVM.time.value?.let { time ->
-                        sharedPreferences.edit().putLong("stopTime", time).commit()
+                        sharedPreferences.edit(commit = true) { putLong("stopTime", time) }
                     }
                 }
             }
@@ -516,9 +512,9 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
         // todo : 서비스가 실행된 뒤 setViewModel함수를 호출해 spf값을 반영해주는게 가능하면 아래처럼 일일이 변수 업데이트 할 필요 없음
         updateViewModel(start = false, pause = false, restart = false, stop = true, running = false)
 
-        sharedPreferences.edit().putString(TOP_CHALLENGE, "--").apply()
-        sharedPreferences.edit().putString(TOP_COMPLETE, "--").apply()
-        sharedPreferences.edit().putString(TOP_LEVEL, "--").apply()
+        sharedPreferences.edit { putString(TOP_CHALLENGE, "--") }
+        sharedPreferences.edit { putString(TOP_COMPLETE, "--") }
+        sharedPreferences.edit { putString(TOP_LEVEL, "--") }
         binding.tvTitle.text = getString(R.string.timer_crag_set_inform)
 
         // 루트기록 관련 초기화

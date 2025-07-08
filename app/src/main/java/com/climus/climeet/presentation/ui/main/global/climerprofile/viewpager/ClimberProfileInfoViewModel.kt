@@ -187,8 +187,8 @@ class ClimberProfileInfoViewModel @Inject constructor(
                     when (result) {
                         is BaseState.Success -> {
                             val body = result.body
-                            val total = result.body.totalCompletedCount ?: run { 0 }
-                            val attempt = result.body.attemptRouteCount ?: run { 1 }
+                            val total = body.totalCompletedCount
+                            val attempt = body.attemptRouteCount
 
                             val percent = (total.toFloat() / attempt * 100).roundToInt()
 

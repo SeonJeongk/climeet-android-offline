@@ -54,7 +54,7 @@ class ShortsSearchCragViewHolder(
         binding.item = item
 
         binding.btnRegister.setOnClickListener {
-            item.onClickListener(item.id, item.name, item.imgUrl)
+            item.onClickListener(item.id, item.name)
         }
     }
 }

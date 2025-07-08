@@ -8,9 +8,7 @@ import com.climus.climeet.presentation.ui.main.record.model.LevelItemForAvg
 import kotlin.math.roundToInt
 
 // ------------------------- 평균 완등률 드롭 다운 -------------------------------
-class RecordAverageAdapter(
-    private val viewModel: SetTimerClimbingRecordViewModel,
-) : RecyclerView.Adapter<RecordAverageAdapter.RecordAvgViewHolder>() {
+class RecordAverageAdapter : RecyclerView.Adapter<RecordAverageAdapter.RecordAvgViewHolder>() {
     private var items: List<LevelItemForAvg> = emptyList()
 
     // 레벨별 완등 기록 TimerFragment에서 넘겨받아 저장

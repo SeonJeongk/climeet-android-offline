@@ -25,7 +25,6 @@ class ShortsPlayerFragment :
     private var adapter: ShortsDetailAdapter? = null
 
     private val args: ShortsPlayerFragmentArgs by navArgs()
-    private val curShortsId by lazy { args.shortsId }
     private val curPosition by lazy { args.position }
 
     override fun onViewCreated(

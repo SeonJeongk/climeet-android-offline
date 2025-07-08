@@ -53,7 +53,7 @@ class GymProfileAvgCompletionViewModel @Inject constructor(
                     val body = result.body
 
                     val maxPercent = body.difficulty.maxOfOrNull { it.count } ?: 0
-                    var totalCount = body.difficulty.sumBy { it.count }
+                    val totalCount = body.difficulty.sumBy { it.count }
 
                     Log.d("gym_profile", "결과 : $body")
 

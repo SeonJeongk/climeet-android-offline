@@ -42,10 +42,6 @@ sealed class ShortsDetailEvent {
     data class PatchFavorite(
         val state: Boolean,
     ) : ShortsDetailEvent()
-
-    data class PatchBookMark(
-        val state: Boolean,
-    ) : ShortsDetailEvent()
 }
 
 @HiltViewModel
@@ -130,8 +126,6 @@ class ShortsDetailViewModel @Inject constructor(
                                 },
                             )
                         }
-
-                        _event.emit(ShortsDetailEvent.PatchBookMark(uiState.value.isBookMarked))
                     }
 
                     is BaseState.Error -> {

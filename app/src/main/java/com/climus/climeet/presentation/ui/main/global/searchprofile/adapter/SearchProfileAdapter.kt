@@ -30,7 +30,7 @@ class SearchProfileAdapter : RecyclerView.Adapter<SearchProfileViewHolder>() {
         position: Int,
     ) {
         val item = searchList[position]
-        holder.bind(searchList[position], keyword, position)
+        holder.bind(searchList[position], keyword)
 
         holder.binding.btnFollowing.setOnClickListener {
             item.unFollow(item.id)
@@ -72,7 +72,6 @@ class SearchProfileViewHolder(
     fun bind(
         item: SearchProfileUiData,
         keyword: String,
-        position: Int,
     ) {
         binding.keyword = keyword
         binding.item = item

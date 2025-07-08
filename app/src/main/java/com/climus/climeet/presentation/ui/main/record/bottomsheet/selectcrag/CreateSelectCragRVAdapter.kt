@@ -36,7 +36,7 @@ class CreateSelectCragRVAdapter(
 
         // 암장을 선택하는 버튼 클릭 시
         holder.binding.btnSelect.setOnClickListener {
-            CreateRecordData.setSelecetedCrag(cragData)
+            CreateRecordData.setSelectedCrag(cragData)
             viewModel.navigateToBack()
             parentViewModel.selectCrag(cragData.id, cragData.name)
             parentViewModel.isSelectedCrag.value = true

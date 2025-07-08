@@ -24,8 +24,8 @@ class FollowingFragment(
 ) : BaseFragment<FragmentFollowingBinding>(R.layout.fragment_following) {
     private val viewModel: FollowingViewModel by viewModels()
 
-    private var recyclerClimber: MutableList<FollowingUiData> = mutableListOf()
-    private var recyclerGym: MutableList<FollowingUiData> = mutableListOf()
+    private var recyclerClimber: List<FollowingUiData> = emptyList()
+    private var recyclerGym: List<FollowingUiData> = emptyList()
 
     override fun onViewCreated(
         view: View,
@@ -75,13 +75,13 @@ class FollowingFragment(
             viewModel.let { vm ->
                 vm.uiState.collect { uiState ->
                     uiState.climberFollowingList.let { followingList ->
-                        recyclerClimber = followingList.toMutableList()
+                        recyclerClimber = followingList.toList()
                         Log.d("recycler", recyclerClimber.toString())
 
                         setupFollowingList()
                     }
                     uiState.gymFollowingList.let { homeGymList ->
-                        recyclerGym = homeGymList.toMutableList()
+                        recyclerGym = homeGymList.toList()
                         Log.d("recycler", recyclerGym.toString())
 
                         setupFollowingGymList()
@@ -112,11 +112,9 @@ class FollowingFragment(
                     }
                 }
 
-                override fun onTabReselected(tab: TabLayout.Tab?) {
-                }
+                override fun onTabReselected(tab: TabLayout.Tab?) = Unit
 
-                override fun onTabUnselected(tab: TabLayout.Tab?) {
-                }
+                override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
             },
         )
     }

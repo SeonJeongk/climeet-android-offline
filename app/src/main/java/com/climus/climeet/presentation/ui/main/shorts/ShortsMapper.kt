@@ -15,7 +15,7 @@ import com.climus.climeet.presentation.util.Constants.climeetColor
 
 fun SearchAvailableGymItem.toSearchCragUiData(
     keyword: String,
-    onClickListener: (Long, String, String) -> Unit,
+    onClickListener: (Long, String) -> Unit,
 ) = SearchCragUiData(
     id = id,
     imgUrl = profileImageUrl,
@@ -62,7 +62,7 @@ fun ShortsItem.toShortsUiData(): ShortsUiData {
         videoUrl = shortsDetailInfo.videoUrl,
         profileImgUrl = shortsDetailInfo.userShortsSimpleInfo.profileImgUrl,
         userName = shortsDetailInfo.userShortsSimpleInfo.profileName,
-        description = shortsDetailInfo.description ?: "",
+        description = shortsDetailInfo.description.orEmpty(),
         sectorId = shortsDetailInfo.sectorId,
         sectorName = shortsDetailInfo.sectorName,
         sectorImgUrl = shortsDetailInfo.routeImageUrl,
@@ -92,7 +92,7 @@ fun ShortsUpdatedFollowResponse.toUpdatedFollowUiData(
 )
 
 fun ShortsMainCommentItem.toShortsCommentUiData(
-    changeLikeStatus: (Long, Int, LikeStatus, Boolean, Boolean) -> Unit,
+    changeLikeStatus: (Long, LikeStatus, Boolean, Boolean) -> Unit,
     showMoreComment: (Long, Int, Int, Int) -> Unit,
     addSubComment: (Long, Int, String) -> Unit,
     remainSubCommentCount: Int = -1,
@@ -117,7 +117,7 @@ fun ShortsMainCommentItem.toShortsCommentUiData(
 )
 
 fun ShortsSubCommentItem.toShortsCommentUiData(
-    changeLikeStatus: (Long, Int, LikeStatus, Boolean, Boolean) -> Unit,
+    changeLikeStatus: (Long, LikeStatus, Boolean, Boolean) -> Unit,
     showMoreComment: (Long, Int, Int, Int) -> Unit,
     addSubComment: (Long, Int, String) -> Unit,
     remainSubCommentCount: Int = -1,

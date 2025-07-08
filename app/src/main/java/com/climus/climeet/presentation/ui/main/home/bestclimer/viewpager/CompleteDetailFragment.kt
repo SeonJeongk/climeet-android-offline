@@ -18,7 +18,6 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.climus.climeet.MainNavDirections
 import com.climus.climeet.R
-import com.climus.climeet.data.model.response.BestClearClimberSimpleResponse
 import com.climus.climeet.databinding.FragmentCompleteDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +27,6 @@ import kotlinx.coroutines.launch
 class CompleteDetailFragment : Fragment() {
     private lateinit var binding: FragmentCompleteDetailBinding
     private val viewModel: CompleteDetailViewModel by viewModels()
-    private var rankingList: List<BestClearClimberSimpleResponse> = emptyList()
 
     private lateinit var profileImg1: ImageView
     private lateinit var profileImg2: ImageView

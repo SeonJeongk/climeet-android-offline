@@ -1,5 +1,4 @@
 import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import java.util.Properties
 
 val localProperties = Properties().apply {
@@ -119,7 +118,6 @@ detekt {
     toolVersion = "1.23.8"
     source.setFrom("src/main/java", "src/test/java", "src/androidTest/java")
     config.setFrom(rootProject.files("config/detekt/detekt.yml"))
-    baseline = rootProject.file("config/detekt/baseline.xml")
     buildUponDefaultConfig = true
     parallel = true
     ignoreFailures = false
@@ -135,11 +133,6 @@ tasks.withType<Detekt>().configureEach {
         sarif.required.set(false)
         md.required.set(false)
     }
-}
-
-tasks.withType<DetektCreateBaselineTask>().configureEach {
-    jvmTarget = "1.8"
-    exclude("**/build/**", "**/generated/**")
 }
 
 dependencies {

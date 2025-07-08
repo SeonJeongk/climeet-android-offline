@@ -45,7 +45,6 @@ class MyPageAdminCreateRouteFragment :
     BaseFragment<FragmentMypageAdminCreateRouteBinding>(R.layout.fragment_mypage_admin_create_route) {
     private val viewModel: MyPageAdminRouteFindingViewModel by activityViewModels()
 
-    private lateinit var neededPermissionList: ArrayList<String>
     private val requiredPermissionList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
     } else {
@@ -117,7 +116,7 @@ class MyPageAdminCreateRouteFragment :
     }
 
     private fun onCheckPermissions() {
-        neededPermissionList = arrayListOf()
+        val neededPermissionList = arrayListOf<String>()
 
         requiredPermissionList.forEach { permission ->
             if (ContextCompat.checkSelfPermission(
