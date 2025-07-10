@@ -26,14 +26,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ShortsCommentBottomSheetFragment : BottomSheetDialogFragment() {
-
-    private var _binding: FragmentShortsCommentBottomSheetBinding? = null
-    private val binding get() = _binding!!
+    private var viewBinding: FragmentShortsCommentBottomSheetBinding? = null
+    private val binding get() = checkNotNull(viewBinding) { "Binding is only available while the view exists" }
 
     private val args: ShortsCommentBottomSheetFragmentArgs by navArgs()
     private val shortsId by lazy { args.shortsId }
@@ -53,13 +51,13 @@ class ShortsCommentBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
-        _binding = DataBindingUtil.inflate(
+        viewBinding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_shorts_comment_bottom_sheet,
             container,
-            false
+            false,
         )
         return binding.root
     }
@@ -79,11 +77,15 @@ class ShortsCommentBottomSheetFragment : BottomSheetDialogFragment() {
         BottomSheetBehavior.from(bottomSheet).state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
-        inputMethodManager =
-            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+        inputMethodManager = requireContext().getSystemService(
+            Context.INPUT_METHOD_SERVICE,
+        ) as android.view.inputmethod.InputMethodManager
         binding.vm = viewModel
         adapter = ShortsCommentAdapter()
         binding.rvComment.adapter = adapter
@@ -140,24 +142,28 @@ class ShortsCommentBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun recyclerViewListener() {
-        binding.rvComment.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        binding.rvComment.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(
+                    recyclerView: RecyclerView,
+                    dx: Int,
+                    dy: Int,
+                ) {
+                    super.onScrolled(recyclerView, dx, dy)
 
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
+                    val lastVisibleItemPosition =
+                        (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+                    val itemTotalCount = recyclerView.adapter?.itemCount?.minus(1)
 
-                val lastVisibleItemPosition =
-                    (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
-                val itemTotalCount = recyclerView.adapter?.itemCount?.minus(1)
-
-                if (lastVisibleItemPosition == itemTotalCount) {
-                    viewModel.getCommentList()
+                    if (lastVisibleItemPosition == itemTotalCount) {
+                        viewModel.getCommentList()
+                    }
                 }
-            }
-        })
+            },
+        )
     }
 
     private fun editTextListener() {
-
         binding.btnCancelAdding.setOnClickListener {
             viewModel.changeAddCommentType(AddCommentType.MAIN)
             binding.tvAddingSubComment.visibility = View.GONE
@@ -179,5 +185,4 @@ class ShortsCommentBottomSheetFragment : BottomSheetDialogFragment() {
         binding.etComment.requestFocus()
         inputMethodManager?.showSoftInput(binding.etComment, 0)
     }
-
 }

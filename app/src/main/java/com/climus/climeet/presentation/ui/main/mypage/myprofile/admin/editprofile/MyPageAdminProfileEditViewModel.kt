@@ -25,17 +25,20 @@ data class SetAdminNickUiState(
     val nameState: InputState = InputState.Empty,
 )
 
-sealed class AdminProfileEditEvent{
+sealed class AdminProfileEditEvent {
     data object NavigateToBack : AdminProfileEditEvent()
+
     data object NavigateToProfile : AdminProfileEditEvent()
-    data class ShowToastMessage(val msg: String) : AdminProfileEditEvent()
+
+    data class ShowToastMessage(
+        val msg: String,
+    ) : AdminProfileEditEvent()
 }
 
 @HiltViewModel
 class MyPageAdminProfileEditViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(SetAdminNickUiState())
     val uiState: StateFlow<SetAdminNickUiState> = _uiState.asStateFlow()
 
@@ -58,14 +61,18 @@ class MyPageAdminProfileEditViewModel @Inject constructor(
         nameObserve()
     }
 
-    fun initState(state: Boolean, name: String, profile: String) {
+    fun initState(
+        state: Boolean,
+        name: String,
+        profile: String,
+    ) {
         backgroundUpdated.value = state
         nextAvailable.value = state
         profileImage = profile
         gymName = name
     }
 
-    private fun imageObserve(){
+    private fun imageObserve() {
         AdminEditProfileForm.profileUriState.onEach { uri ->
             if (uri.isNotBlank()) {
                 profileUpdated.value = true
@@ -85,10 +92,10 @@ class MyPageAdminProfileEditViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    private fun updateGymProfile(){
-        viewModelScope.launch{
+    private fun updateGymProfile() {
+        viewModelScope.launch {
             // todo : 배경
-            if (AdminEditProfileForm.isBackgroundChange){
+            if (AdminEditProfileForm.isBackgroundChange) {
                 val image = AdminEditProfileForm.getBackgroundPath()
                 repository.updateAdminBackgroundImage(ImgUrlRequest(image)).let {
                     when (it) {
@@ -103,7 +110,7 @@ class MyPageAdminProfileEditViewModel @Inject constructor(
             }
 
             // todo : 프로필
-            if (profileUpdated.value){
+            if (profileUpdated.value) {
                 repository.updateAdminProfileImage(ImgUrlRequest(profileImageToChange)).let {
                     when (it) {
                         is BaseState.Success -> {
@@ -117,10 +124,10 @@ class MyPageAdminProfileEditViewModel @Inject constructor(
             }
 
             // todo : 암장 이름
-            if(newName.value != gymName && newName.value.isNotEmpty()){
+            if (newName.value != gymName && newName.value.isNotEmpty()) {
                 Log.d("mypage_admin", "수정된 암장 이름 : $newName")
                 repository.updateAdminName(PatchAdminNameRequest(newName.value)).let {
-                    when(it) {
+                    when (it) {
                         is BaseState.Success -> {
                             Log.d("mypage_admin", "프로필 이름 수정")
                             AdminEditProfileForm.setNameUpdatedState(true)

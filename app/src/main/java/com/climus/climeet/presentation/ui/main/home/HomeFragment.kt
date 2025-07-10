@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -11,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.climus.climeet.R
-import com.climus.climeet.app.App
 import com.climus.climeet.app.App.Companion.sharedPreferences
 import com.climus.climeet.data.model.response.BannerDetailInfoResponse
 import com.climus.climeet.data.model.response.BestFollowGymSimpleResponse
@@ -34,7 +34,6 @@ import com.climus.climeet.presentation.ui.main.shorts.player.ShortsOption
 import com.climus.climeet.presentation.ui.main.shorts.player.ShortsPlayerEvent
 import com.climus.climeet.presentation.ui.main.shorts.player.ShortsPlayerViewModel
 import com.climus.climeet.presentation.ui.toGymProfile
-import com.climus.climeet.presentation.ui.toRouteFinding
 import com.climus.climeet.presentation.ui.toSearchProfile
 import com.climus.climeet.presentation.ui.toShortsPlayer
 import com.google.android.material.tabs.TabLayoutMediator
@@ -42,7 +41,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
-
     private val viewModel: HomeViewModel by viewModels()
     private var vpBanner: List<BannerDetailInfoResponse> = emptyList()
     private var recyclerHomeGym: List<UserHomeGymSimpleResponse> = emptyList()
@@ -53,7 +51,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     private val sharedViewModel: ShortsPlayerViewModel by activityViewModels()
     private var userProfile: UserProfileInfoResponse? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.getBannerListBetweenDates()
         viewModel.getGymRankingOrderFollowCount()
@@ -83,42 +84,41 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     private fun initEventObserve() {
         repeatOnStarted {
-            viewModel?.let { vm ->
+            viewModel.let { vm ->
                 vm.uiState.collect { uiState ->
-                    uiState.bannerList?.let { bannerList ->
+                    uiState.bannerList.let { bannerList ->
                         vpBanner = bannerList
                         setupIntroduceBanner(vpBanner)
                     }
 
-                    uiState.homegymList?.let { homegymList ->
+                    uiState.homegymList.let { homegymList ->
                         recyclerHomeGym = homegymList
                         setupHomeGymList()
                     }
 
-                    uiState.followOrderCragList?.let { cragList ->
+                    uiState.followOrderCragList.let { cragList ->
                         followOrderRecyclerCrag = cragList
                         setupFollowOrderPopularCrags()
                     }
 
-                    uiState.recordOrderCragList?.let { cragList ->
+                    uiState.recordOrderCragList.let { cragList ->
                         recordOrderRecyclerCrag = cragList
                         Log.d("record", recordOrderRecyclerCrag.toString())
                         setupRecordOrderPopularCrags()
                     }
 
-                    uiState.routeList?.let { routeList ->
+                    uiState.routeList.let { routeList ->
                         recyclerRoute = routeList
                         setupPopularRoutes()
                     }
 
                     uiState.myProfile.let { myProfile ->
-                        userProfile = uiState.myProfile
-                        if (userProfile != null) {
-                            App.sharedPreferences.edit()
-                                .putString("USER_ID", userProfile!!.userId.toString())
-                                .apply()
+                        userProfile = myProfile
+                        if (myProfile != null) {
+                            sharedPreferences.edit {
+                                putString("USER_ID", myProfile.userId.toString())
+                            }
                         }
-
                     }
                 }
             }
@@ -128,10 +128,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             sharedViewModel.event.collect {
                 when (it) {
                     is ShortsPlayerEvent.ShowToastMessage -> showToastMessage(it.msg)
-                    is ShortsPlayerEvent.NavigateToShortsPlayer -> findNavController().toShortsPlayer(
-                        it.shortsId,
-                        it.position
-                    )
+                    is ShortsPlayerEvent.NavigateToShortsPlayer ->
+                        findNavController().toShortsPlayer(
+                            it.shortsId,
+                            it.position,
+                        )
 
                     else -> {}
                 }
@@ -140,7 +141,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     private fun setupOnClickListener() {
-
         binding.icHomeSerach.setOnClickListener {
             findNavController().toSearchProfile()
         }
@@ -166,15 +166,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             binding.homeFollowOrder.setTextColor(
                 ContextCompat.getColor(
                     requireActivity(),
-                    R.color.black
-                )
+                    R.color.black,
+                ),
             )
             binding.homeRecordOrder.setBackgroundResource(R.drawable.rect_grey6fill_nostroke_5radius)
             binding.homeRecordOrder.setTextColor(
                 ContextCompat.getColor(
                     requireActivity(),
-                    R.color.white
-                )
+                    R.color.white,
+                ),
             )
             binding.rvHomeFollowOrderPopularCrags.visibility = View.VISIBLE
             binding.rvHomeRecordOrderPopularCrags.visibility = View.INVISIBLE
@@ -185,20 +185,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             binding.homeRecordOrder.setTextColor(
                 ContextCompat.getColor(
                     requireActivity(),
-                    R.color.black
-                )
+                    R.color.black,
+                ),
             )
             binding.homeFollowOrder.setBackgroundResource(R.drawable.rect_grey6fill_nostroke_5radius)
             binding.homeFollowOrder.setTextColor(
                 ContextCompat.getColor(
                     requireActivity(),
-                    R.color.white
-                )
+                    R.color.white,
+                ),
             )
             binding.rvHomeFollowOrderPopularCrags.visibility = View.INVISIBLE
             binding.rvHomeRecordOrderPopularCrags.visibility = View.VISIBLE
         }
-
     }
 
     private fun navigateToBestClimer() {
@@ -221,9 +220,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         findNavController().navigate(action)
     }
 
-
     private fun setupIntroduceBanner(vpBanner: List<BannerDetailInfoResponse>) {
-        val bannerAdapter = BannerVPAdapter(this, binding.vpHomeIntroduceBanner)
+        val bannerAdapter = BannerVPAdapter(this)
 
         for (bannerInfo in vpBanner) {
             val bannerFragment = BannerFragment(bannerInfo)
@@ -237,49 +235,51 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         indicator.text = getString(R.string.viewpager2_banner, 1, itemCount)
 
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            var currentState = 0
-            var currentPos = 0
+        viewPager.registerOnPageChangeCallback(
+            object : ViewPager2.OnPageChangeCallback() {
+                var currentState = 0
+                var currentPos = 0
 
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                currentPos = position
-                val currentPageNumber = position + 1
-                val totalPages = viewPager.adapter?.itemCount ?: 0
-                indicator.text =
-                    getString(R.string.viewpager2_banner, currentPageNumber, totalPages)
-            }
-
-            override fun onPageScrollStateChanged(state: Int) {
-                currentState = state
-                super.onPageScrollStateChanged(state)
-            }
-
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-                if (currentState == ViewPager2.SCROLL_STATE_DRAGGING && currentPos == position) {
-                    // 현재 위치가 0이고, 좌측으로 스와이프하는 경우
-                    if (currentPos == 0 && positionOffsetPixels > 0) {
-                        viewPager.currentItem = 1
-                    }
-                    // 현재 위치가 마지막 페이지이고, 좌측으로 스와이프하는 경우
-                    else if (currentPos == viewPager.adapter?.itemCount ?: 0 - 1 && positionOffsetPixels > 0) {
-                        viewPager.currentItem = 0
-                    }
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    currentPos = position
+                    val currentPageNumber = position + 1
+                    val totalPages = viewPager.adapter?.itemCount ?: 0
+                    indicator.text = getString(R.string.viewpager2_banner, currentPageNumber, totalPages)
                 }
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-            }
-        })
 
+                override fun onPageScrollStateChanged(state: Int) {
+                    currentState = state
+                    super.onPageScrollStateChanged(state)
+                }
+
+                override fun onPageScrolled(
+                    position: Int,
+                    positionOffset: Float,
+                    positionOffsetPixels: Int,
+                ) {
+                    if (currentState == ViewPager2.SCROLL_STATE_DRAGGING && currentPos == position) {
+                        // 현재 위치가 0이고, 좌측으로 스와이프하는 경우
+                        if (currentPos == 0 && positionOffsetPixels > 0) {
+                            viewPager.currentItem = 1
+                        } else if (
+                            currentPos == (viewPager.adapter?.itemCount ?: (0 - 1)) &&
+                            positionOffsetPixels > 0
+                        ) {
+                            // 현재 위치가 마지막 페이지이고, 좌측으로 스와이프하는 경우
+                            viewPager.currentItem = 0
+                        }
+                    }
+                    super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+                }
+            },
+        )
     }
 
     private fun setupRecyclerView(
         recyclerView: RecyclerView,
         adapter: RecyclerView.Adapter<*>,
-        orientation: Int
+        orientation: Int,
     ) {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireActivity(), orientation, false)
@@ -292,12 +292,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     // 선택한 암장 프로필로 이동
     private fun navToGymProfile(gymId: Long) {
-
-        sharedPreferences.edit().putLong("gymId", gymId)
-            .apply()
+        sharedPreferences.edit { putLong("gymId", gymId) }
         Log.d("gym_profile", "홈에서 암장 아이디 : $gymId")
 
-        //todo 여기는 일단 구분 안해줘도 될듯!
+        // todo 여기는 일단 구분 안해줘도 될듯!
         // - 암장관리자일때 선택한 프로필이 내 프로필일 경우만 암장관리자의 암장 프로필 접근 해야함
 
         findNavController().toGymProfile(gymId)
@@ -325,7 +323,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         setupRecyclerView(
             binding.rvHomeShorts,
             popularShortsRVAdapter,
-            LinearLayoutManager.HORIZONTAL
+            LinearLayoutManager.HORIZONTAL,
         )
     }
 
@@ -335,7 +333,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         setupRecyclerView(
             binding.rvHomeFollowOrderPopularCrags,
             followOrderPopularCragRVAdapter,
-            LinearLayoutManager.HORIZONTAL
+            LinearLayoutManager.HORIZONTAL,
         )
     }
 
@@ -345,7 +343,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         setupRecyclerView(
             binding.rvHomeRecordOrderPopularCrags,
             recordOrderPopularCragRVAdapter,
-            LinearLayoutManager.HORIZONTAL
+            LinearLayoutManager.HORIZONTAL,
         )
     }
 
@@ -354,8 +352,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         setupRecyclerView(
             binding.rvHomePopularRoutes,
             popularRouteRVAdapter,
-            LinearLayoutManager.HORIZONTAL
+            LinearLayoutManager.HORIZONTAL,
         )
     }
-
 }

@@ -12,25 +12,23 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.climus.climeet.app.App.Companion.sharedPreferences
-import com.climus.climeet.data.model.request.ClimbingRecord
-import com.climus.climeet.data.model.request.CreateTimerClimbingRecordRequest
-import com.climus.climeet.data.repository.MainRepository
 import com.climus.climeet.data.local.ClimbingRecordData
 import com.climus.climeet.data.local.RouteRecordData
 import com.climus.climeet.data.model.BaseState
+import com.climus.climeet.data.model.request.ClimbingRecord
+import com.climus.climeet.data.model.request.CreateTimerClimbingRecordRequest
+import com.climus.climeet.data.repository.MainRepository
+import com.climus.climeet.presentation.util.formatTimerTime
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class TimerViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _time = MutableLiveData<Long>().apply { value = 0L }
     val time: LiveData<Long> get() = _time
     var pauseState = MutableLiveData<String>()
@@ -47,7 +45,10 @@ class TimerViewModel @Inject constructor(
     // 스톱워치 경과시간과 일시정지 여부를 전달받음
     // pauseState를 String으로 전달받는 이유 : default값을 설정하지 않기 위해
     private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
+        override fun onReceive(
+            context: Context,
+            intent: Intent,
+        ) {
             _time.value = intent.getLongExtra("elapsedTime", 0L)
             val state = intent.getStringExtra("pauseState")
             if (state != null) {
@@ -59,37 +60,13 @@ class TimerViewModel @Inject constructor(
 
     // 흘러가는 시간 형식 설정
     val timeFormat: LiveData<String> = time.map { elapsedTime ->
-        if (elapsedTime == 0L) {
-            "00:00"
-        } else {
-            val hours = TimeUnit.MILLISECONDS.toHours(elapsedTime)
-            val minutes = TimeUnit.MILLISECONDS.toMinutes(elapsedTime) % 60
-            val seconds = TimeUnit.MILLISECONDS.toSeconds(elapsedTime) % 60
-
-            if (hours > 0) {
-                String.format("%02d:%02d:%02d", hours, minutes, seconds)
-            } else {
-                String.format("%02d:%02d", minutes, seconds)
-            }
-        }
+        formatTimerTime(elapsedTime)
     }
 
     // 일시정지 시간 형식 설정
     // 서비스에서 보낸 broadcast를 통해 pauseTime값이 업데이트 되면, pauseTimeFormat을 설정한다
     val pauseTimeFormat: LiveData<String> = pauseTime.map { pauseTime ->
-        if (pauseTime == 0L) {
-            "00:00"
-        } else {
-            val hours = TimeUnit.MILLISECONDS.toHours(pauseTime)
-            val minutes = TimeUnit.MILLISECONDS.toMinutes(pauseTime) % 60
-            val seconds = TimeUnit.MILLISECONDS.toSeconds(pauseTime) % 60
-
-            if (hours > 0) {
-                String.format("%02d:%02d:%02d", hours, minutes, seconds)
-            } else {
-                String.format("%02d:%02d", minutes, seconds)
-            }
-        }
+        formatTimerTime(pauseTime)
     }
 
     fun sendClimbingRecord() {
@@ -102,7 +79,7 @@ class TimerViewModel @Inject constructor(
 
             // avgDifficulty 계산
             val avgDifficulty = if (routeData.isNotEmpty()) {
-                val totalDifficulty = routeData.sumBy { it.difficulty }
+                val totalDifficulty = routeData.sumOf { it.difficulty }
                 totalDifficulty / routeData.size
             } else {
                 0
@@ -113,29 +90,21 @@ class TimerViewModel @Inject constructor(
                 ClimbingRecord(route.routeId, route.attemptCount, route.isCompleted)
             }
 
-            var endTime: Long = if (isPaused.value == true) {
-                pauseTime.value!!
+            val endTime = if (isPaused.value == true) {
+                checkNotNull(pauseTime.value) { "일시정지 시간이 초기화되지 않았습니다." }
             } else {
-                time.value!!
+                checkNotNull(time.value) { "타이머 시간이 초기화되지 않았습니다." }
             }
 
-            val hours = TimeUnit.MILLISECONDS.toHours(endTime)
-            val minutes = TimeUnit.MILLISECONDS.toMinutes(endTime) - TimeUnit.HOURS.toMinutes(
-                TimeUnit.MILLISECONDS.toHours(endTime)
-            )
-            val seconds = TimeUnit.MILLISECONDS.toSeconds(endTime) - TimeUnit.MINUTES.toSeconds(
-                TimeUnit.MILLISECONDS.toMinutes(endTime)
-            )
-
-            val formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+            val formattedTime = formatTimerTime(endTime, alwaysShowHours = true)
 
             // 요청 바디 생성
             requestBody = CreateTimerClimbingRecordRequest(
                 gymId = recordData.gymId,
                 date = recordData.date,
-                time = formattedTime!!,
+                time = formattedTime,
                 avgDifficulty = avgDifficulty,
-                routeRecordRequestDtoList = routeRecords ?: listOf()
+                routeRecordRequestDtoList = routeRecords,
             )
             // Log.d("recorddd", "리퀘스트 : $requestBody")
 
@@ -163,7 +132,8 @@ class TimerViewModel @Inject constructor(
 
     fun registerReceiver(context: Context) {
         LocalBroadcastManager.getInstance(context).registerReceiver(
-            broadcastReceiver, IntentFilter(STOPWATCH_UPDATE)
+            broadcastReceiver,
+            IntentFilter(STOPWATCH_UPDATE),
         )
     }
 

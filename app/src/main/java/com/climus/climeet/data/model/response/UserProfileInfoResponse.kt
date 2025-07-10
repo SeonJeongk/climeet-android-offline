@@ -3,23 +3,16 @@ package com.climus.climeet.data.model.response
 import com.google.gson.annotations.SerializedName
 
 data class UserProfileInfoResponse(
-
     @SerializedName("userId")
-    val userId : Long,
-
+    val userId: Long,
     @SerializedName("userName")
-    val userName : String,
-
+    val userName: String,
     @SerializedName("profileImgUrl")
-    val profileImgUrl : String,
-
+    val profileImgUrl: String,
     @SerializedName("followerCount")
-    val followerCount : Int,
-
+    val followerCount: Int,
     @SerializedName("followingCount")
-    val followingCount : Int,
-
+    val followingCount: Int,
     @SerializedName("isManager")
-    val isManager : Boolean
-
+    val isManager: Boolean,
 )

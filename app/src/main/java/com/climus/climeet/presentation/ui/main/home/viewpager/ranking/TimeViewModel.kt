@@ -15,23 +15,23 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class TimeUiState(
-    val rankingList: List<BestTimeClimberSimpleResponse> = emptyList()
+    val rankingList: List<BestTimeClimberSimpleResponse> = emptyList(),
 )
 
 @HiltViewModel
-class TimeViewModel @Inject constructor(private val repository: MainRepository): ViewModel() {
+class TimeViewModel @Inject constructor(
+    private val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(TimeUiState())
     val uiState: StateFlow<TimeUiState> = _uiState.asStateFlow()
 
     fun getClimberRankingOrderTime() {
         viewModelScope.launch {
             repository.findClimberRankingOrderTime().let {
-                when(it) {
+                when (it) {
                     is BaseState.Success -> {
                         _uiState.update { state ->
-                            state.copy(
-                                rankingList = it.body
-                            )
+                            state.copy(rankingList = it.body)
                         }
                     }
                     is BaseState.Error -> {

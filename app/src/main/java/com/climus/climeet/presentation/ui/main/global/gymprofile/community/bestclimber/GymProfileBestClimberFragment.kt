@@ -9,9 +9,12 @@ import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class GymProfileBestClimberFragment : BaseFragment<FragmentGymProfileBestClimberBinding>(R.layout.fragment_gym_profile_best_climber) {
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+class GymProfileBestClimberFragment :
+    BaseFragment<FragmentGymProfileBestClimberBinding>(R.layout.fragment_gym_profile_best_climber) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         setupBestClimer()

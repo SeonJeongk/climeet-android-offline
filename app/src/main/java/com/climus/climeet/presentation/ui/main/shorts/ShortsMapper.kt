@@ -15,19 +15,16 @@ import com.climus.climeet.presentation.util.Constants.climeetColor
 
 fun SearchAvailableGymItem.toSearchCragUiData(
     keyword: String,
-    onClickListener: (Long, String, String) -> Unit
+    onClickListener: (Long, String) -> Unit,
 ) = SearchCragUiData(
     id = id,
     imgUrl = profileImageUrl,
     name = name,
     keyword = keyword,
-    onClickListener = onClickListener
+    onClickListener = onClickListener,
 )
 
-fun ShortsItem.toShortsThumbnailUiData(
-    onClickListener: (Long, Int) -> Unit
-): ShortsThumbnailUiData {
-
+fun ShortsItem.toShortsThumbnailUiData(onClickListener: (Long, Int) -> Unit): ShortsThumbnailUiData {
     var climeetLevelColor = ""
     climeetColor[climeetDifficultyName]?.let {
         climeetLevelColor = it
@@ -35,17 +32,17 @@ fun ShortsItem.toShortsThumbnailUiData(
 
     return ShortsThumbnailUiData(
         shortsId = shortsId,
-        thumbnailImg = thumbnailImageUrl ?: "https://climeet-production-bucket.s3.ap-northeast-2.amazonaws.com/default_profile.jpeg",
+        thumbnailImg = thumbnailImageUrl
+            ?: "https://climeet-production-bucket.s3.ap-northeast-2.amazonaws.com/default_profile.jpeg",
         gymName = gymName,
         originLevelColor = shortsDetailInfo.gymDifficultyColor,
         climeetLevelColor = climeetLevelColor,
         climeetDifficultyName = climeetDifficultyName,
-        onClickListener = onClickListener
+        onClickListener = onClickListener,
     )
 }
 
 fun ShortsItem.toShortsUiData(): ShortsUiData {
-
     var climeetLevelColor = ""
     climeetColor[climeetDifficultyName]?.let {
         climeetLevelColor = it
@@ -54,7 +51,8 @@ fun ShortsItem.toShortsUiData(): ShortsUiData {
     return ShortsUiData(
         isManager = isManager,
         shortsId = shortsId,
-        thumbnailImg = thumbnailImageUrl ?: "https://climeet-production-bucket.s3.ap-northeast-2.amazonaws.com/default_profile.jpeg",
+        thumbnailImg = thumbnailImageUrl
+            ?: "https://climeet-production-bucket.s3.ap-northeast-2.amazonaws.com/default_profile.jpeg",
         gymId = shortsDetailInfo.gymId,
         gymName = gymName,
         climeetLevelColor = climeetLevelColor,
@@ -64,7 +62,7 @@ fun ShortsItem.toShortsUiData(): ShortsUiData {
         videoUrl = shortsDetailInfo.videoUrl,
         profileImgUrl = shortsDetailInfo.userShortsSimpleInfo.profileImgUrl,
         userName = shortsDetailInfo.userShortsSimpleInfo.profileName,
-        description = shortsDetailInfo.description ?: "",
+        description = shortsDetailInfo.description.orEmpty(),
         sectorId = shortsDetailInfo.sectorId,
         sectorName = shortsDetailInfo.sectorName,
         sectorImgUrl = shortsDetailInfo.routeImageUrl,
@@ -74,15 +72,14 @@ fun ShortsItem.toShortsUiData(): ShortsUiData {
         sharedCount = shortsDetailInfo.shareCount,
         isSoundEnabled = shortsDetailInfo.isSoundEnabled,
         isLiked = shortsDetailInfo.liked,
-        isBookMarked = shortsDetailInfo.bookmarked
+        isBookMarked = shortsDetailInfo.bookmarked,
     )
 }
 
-
 fun ShortsUpdatedFollowResponse.toUpdatedFollowUiData(
     viewType: Int,
-    onClickListener: (Long,Long, Boolean) -> Unit,
-    navigateToAddFollow: () -> Unit
+    onClickListener: (Long, Long, Boolean) -> Unit,
+    navigateToAddFollow: () -> Unit,
 ) = UpdatedFollowUiData(
     gymId = gymId,
     userId = followingUserId,
@@ -91,11 +88,11 @@ fun ShortsUpdatedFollowResponse.toUpdatedFollowUiData(
     name = followingUserName,
     onClickListener = onClickListener,
     navigateToAddFollow = navigateToAddFollow,
-    isGym = isGym
+    isGym = isGym,
 )
 
 fun ShortsMainCommentItem.toShortsCommentUiData(
-    changeLikeStatus: (Long, Int, LikeStatus, Boolean, Boolean) -> Unit,
+    changeLikeStatus: (Long, LikeStatus, Boolean, Boolean) -> Unit,
     showMoreComment: (Long, Int, Int, Int) -> Unit,
     addSubComment: (Long, Int, String) -> Unit,
     remainSubCommentCount: Int = -1,
@@ -116,16 +113,15 @@ fun ShortsMainCommentItem.toShortsCommentUiData(
     showMoreComment = showMoreComment,
     addSubComment = addSubComment,
     remainSubCommentCount = remainSubCommentCount,
-    isLastSubComment = isLastSubComment
+    isLastSubComment = isLastSubComment,
 )
 
 fun ShortsSubCommentItem.toShortsCommentUiData(
-    changeLikeStatus: (Long, Int, LikeStatus, Boolean, Boolean) -> Unit,
+    changeLikeStatus: (Long, LikeStatus, Boolean, Boolean) -> Unit,
     showMoreComment: (Long, Int, Int, Int) -> Unit,
     addSubComment: (Long, Int, String) -> Unit,
     remainSubCommentCount: Int = -1,
     isLastSubComment: Boolean = false,
-    subCommentPage: Int = 0
 ) = ShortsCommentUiData(
     commentId = commentId,
     nickName = nickname,
@@ -142,5 +138,4 @@ fun ShortsSubCommentItem.toShortsCommentUiData(
     addSubComment = addSubComment,
     remainSubCommentCount = remainSubCommentCount,
     isLastSubComment = isLastSubComment,
-    subCommentPage = subCommentPage
 )

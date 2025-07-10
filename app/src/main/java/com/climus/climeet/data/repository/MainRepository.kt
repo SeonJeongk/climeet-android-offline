@@ -45,7 +45,6 @@ import com.climus.climeet.data.model.response.GymProfileTabInfoResponse
 import com.climus.climeet.data.model.response.GymProfileTopInfoResponse
 import com.climus.climeet.data.model.response.GymTimeBestClimberResponse
 import com.climus.climeet.data.model.response.GymWeekStatsResponse
-import com.climus.climeet.data.model.response.MyPageClimberProfilePrivacyResponse
 import com.climus.climeet.data.model.response.MyPageProfileResponse
 import com.climus.climeet.data.model.response.MyStatsMonthResponse
 import com.climus.climeet.data.model.response.SearchAvailableGymResponse
@@ -62,59 +61,54 @@ import com.climus.climeet.data.model.response.UserFollowingInfoResponse
 import com.climus.climeet.data.model.response.UserHomeGymDetailResponse
 import com.climus.climeet.data.model.response.UserHomeGymSimpleResponse
 import com.climus.climeet.data.model.response.UserProfileInfoResponse
-import com.climus.climeet.data.model.response.userShortsSortType
+import com.climus.climeet.data.model.response.UserShortsSortType
 import com.climus.climeet.data.model.response.UserShortsVisibilityType
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.http.Query
 
 interface MainRepository {
-
     suspend fun climberNickNameCheck(nickName: String): BaseState<Boolean>
 
-    suspend fun uploadFile(
-        file: MultipartBody.Part
-    ): BaseState<UploadImgResponse>
+    suspend fun uploadFile(file: MultipartBody.Part): BaseState<UploadImgResponse>
 
     suspend fun searchGym(
         gymName: String,
         page: Int,
-        size: Int
+        size: Int,
     ): BaseState<SearchGymResponse>
 
     suspend fun getUserFollowing(
         @Query("userId") userId: Long?,
-        @Query("userCategory") userCategory: String
+        @Query("userCategory") userCategory: String,
     ): BaseState<List<UserFollowingInfoResponse>>
 
     suspend fun getUserFollowers(
         @Query("userId") userId: Long?,
-        @Query("userCategory") userCategory: String
+        @Query("userCategory") userCategory: String,
     ): BaseState<List<UserFollowerInfoResponse>>
 
     suspend fun searchAvailableGym(
         gymName: String,
         page: Int,
-        size: Int
+        size: Int,
     ): BaseState<SearchAvailableGymResponse>
 
-    suspend fun getUserProfile(
-    ): BaseState<UserProfileInfoResponse>
+    suspend fun getUserProfile(): BaseState<UserProfileInfoResponse>
 
     suspend fun getRecentShorts(
         page: Int,
         size: Int,
-        filter: Map<String, Long>
+        filter: Map<String, Long>,
     ): BaseState<ShortsListResponse>
 
     suspend fun getPopularShorts(
         page: Int,
         size: Int,
-        filter: Map<String, Long>
+        filter: Map<String, Long>,
     ): BaseState<ShortsListResponse>
 
-    suspend fun getGymsFollowing(
-    ): BaseState<List<UserHomeGymDetailResponse>>
+    suspend fun getGymsFollowing(): BaseState<List<UserHomeGymDetailResponse>>
 
     suspend fun getShortsUpdatedFollow(): BaseState<List<ShortsUpdatedFollowResponse>>
 
@@ -137,204 +131,159 @@ interface MainRepository {
     suspend fun getHomeGyms(): BaseState<List<UserHomeGymSimpleResponse>>
 
     suspend fun getClimberPrivacySetting(
-        @Query("climberId") climberId: Int
+        @Query("climberId") climberId: Int,
     ): BaseState<GetClimberPrivacySettingResponse>
 
     suspend fun getClimberSearchingList(
         @Query("page") page: Int,
         @Query("size") size: Int,
-        @Query("climberName") climberName: String
+        @Query("climberName") climberName: String,
     ): BaseState<ClimberDetailInfoResponse>
 
     suspend fun getSelectDateRecord(
         startDate: String,
-        endDate: String
+        endDate: String,
     ): BaseState<List<GetSelectDateRecordResponse>>
 
-    suspend fun followUser(
-        followingUserId: Long
-    ): BaseState<ResponseBody>
+    suspend fun followUser(followingUserId: Long): BaseState<ResponseBody>
 
-    suspend fun unfollowUser(
-        followingUserId: Long
-    ): BaseState<ResponseBody>
+    suspend fun unfollowUser(followingUserId: Long): BaseState<ResponseBody>
 
-    suspend fun followGym(
-        gymId: Long
-    ): BaseState<ResponseBody>
+    suspend fun followGym(gymId: Long): BaseState<ResponseBody>
 
-    suspend fun unFollowGym(
-        gymId: Long
-    ): BaseState<ResponseBody>
+    suspend fun unFollowGym(gymId: Long): BaseState<ResponseBody>
 
-    suspend fun getGymFilteringKey(
-        gymId: Long,
-    ): BaseState<GetGymFilteringKeyResponse>
+    suspend fun getGymFilteringKey(gymId: Long): BaseState<GetGymFilteringKeyResponse>
 
     suspend fun getGymFilteringKeyTime(
         gymId: Long,
-        timePoint: String
+        timePoint: String,
     ): BaseState<GetGymFilteringKeyResponse>
 
-    suspend fun getGymRouteFindingData(
-        timePoint: String
-    ): BaseState<GetRouteFindingData>
+    suspend fun getGymRouteFindingData(timePoint: String): BaseState<GetRouteFindingData>
 
     suspend fun getGymRouteInfoList(
         gymId: Long,
-        body: GetGymRouteInfoRequest
+        body: GetGymRouteInfoRequest,
     ): BaseState<GetGymRouteInfoResponse>
 
-    suspend fun updateGymRouteVersion(
-        body: UpdateGymRouteVersionRequest
-    ): BaseState<ResponseBody>
+    suspend fun updateGymRouteVersion(body: UpdateGymRouteVersionRequest): BaseState<ResponseBody>
 
-    suspend fun createTimerClimbingRecord(
-        body: CreateTimerClimbingRecordRequest
-    ): BaseState<ResponseBody>
+    suspend fun createTimerClimbingRecord(body: CreateTimerClimbingRecordRequest): BaseState<ResponseBody>
 
-    suspend fun getGymProfile(
-        gymId: Long
-    ): BaseState<GetGymProfileResponse>
+    suspend fun getGymProfile(gymId: Long): BaseState<GetGymProfileResponse>
 
     suspend fun uploadShorts(
         video: MultipartBody.Part?,
-        body: ShortsDetailRequest
+        body: ShortsDetailRequest,
     ): BaseState<Unit>
 
-    suspend fun patchBookMark(
-        shortsId: Long
-    ): BaseState<Unit>
+    suspend fun patchBookMark(shortsId: Long): BaseState<Unit>
 
-    suspend fun patchFavorite(
-        shortsId: Long
-    ): BaseState<Unit>
+    suspend fun patchFavorite(shortsId: Long): BaseState<Unit>
 
     suspend fun getShortsSubCommentList(
         shortsId: Long,
         parentCommentId: Long,
         page: Int,
-        size: Int
+        size: Int,
     ): BaseState<ShortsSubCommentResponse>
 
     suspend fun getShortsCommentList(
         shortsId: Long,
         page: Int,
-        size: Int
+        size: Int,
     ): BaseState<ShortsMainCommentResponse>
 
     suspend fun addShortsComment(
         shortsId: Long,
         filter: Map<String, Long>,
-        body: AddShortsCommentRequest
+        body: AddShortsCommentRequest,
     ): BaseState<ShortsMainCommentItem>
 
     suspend fun patchShortsCommentInteraction(
         shortsCommentId: Long,
         isLike: Boolean,
-        isDislike: Boolean
+        isDislike: Boolean,
     ): BaseState<String>
 
-    suspend fun getGymProfileTopInfo(
-        gymId: Long
-    ): BaseState<GymProfileTopInfoResponse>
+    suspend fun getGymProfileTopInfo(gymId: Long): BaseState<GymProfileTopInfoResponse>
 
-    suspend fun getGymProfileTabInfo(
-        gymId: Long
-    ): BaseState<GymProfileTabInfoResponse>
+    suspend fun getGymProfileTabInfo(gymId: Long): BaseState<GymProfileTabInfoResponse>
 
     suspend fun getMyStatsMonth(
         year: Int,
-        month: Int
+        month: Int,
     ): BaseState<MyStatsMonthResponse>
 
     suspend fun getGymReview(
         gymId: Long,
         page: Int,
-        size: Int
+        size: Int,
     ): BaseState<GetGymProfileReviewResponse>
 
     suspend fun createGymReview(
         gymId: Long,
-        body: CreateGymProfileReviewRequest
+        body: CreateGymProfileReviewRequest,
     ): BaseState<ResponseBody>
 
     suspend fun editGymReview(
         gymId: Long,
-        body: CreateGymProfileReviewRequest
+        body: CreateGymProfileReviewRequest,
     ): BaseState<ResponseBody>
 
-    suspend fun getGymClimberRankingOrderClearCount(
-        gymId: Long
-    ): BaseState<List<GymCompleteBestClimberResponse>>
+    suspend fun getGymClimberRankingOrderClearCount(gymId: Long): BaseState<List<GymCompleteBestClimberResponse>>
 
-    suspend fun getGymClimberRankingOrderLevel(
-        gymId: Long
-    ): BaseState<List<GymLevelBestClimberResponse>>
+    suspend fun getGymClimberRankingOrderLevel(gymId: Long): BaseState<List<GymLevelBestClimberResponse>>
 
-    suspend fun getGymClimberRankingOrderTime(
-        gymId: Long
-    ): BaseState<List<GymTimeBestClimberResponse>>
+    suspend fun getGymClimberRankingOrderTime(gymId: Long): BaseState<List<GymTimeBestClimberResponse>>
 
-    suspend fun getGymSkillDistribution(
-        gymId: Long
-    ): BaseState<List<GetGymSkillDistributionResponse>>
+    suspend fun getGymSkillDistribution(gymId: Long): BaseState<List<GetGymSkillDistributionResponse>>
 
-    suspend fun getMyGymSkill(
-        gymId: Long
-    ): BaseState<ResponseBody>
+    suspend fun getMyGymSkill(gymId: Long): BaseState<ResponseBody>
 
-    suspend fun getGymStatsWeek(
-        gymId: Long
-    ): BaseState<GymWeekStatsResponse>
+    suspend fun getGymStatsWeek(gymId: Long): BaseState<GymWeekStatsResponse>
 
     suspend fun getMyPageProfile(): BaseState<MyPageProfileResponse>
 
     suspend fun editHomeGymPrivacy(): BaseState<ResponseBody>
+
     suspend fun editAvgCompletePrivacy(): BaseState<ResponseBody>
+
     suspend fun editAvgCompleteLevelPrivacy(): BaseState<ResponseBody>
 
-    suspend fun updateUserProfileImage(
-        image: MultipartBody.Part
-    ): BaseState<ResponseBody>
+    suspend fun updateUserProfileImage(image: MultipartBody.Part): BaseState<ResponseBody>
 
-    suspend fun updateUserName(
-        name: String,
-    ): BaseState<ResponseBody>
+    suspend fun updateUserName(name: String): BaseState<ResponseBody>
 
-    suspend fun updateAdminProfileImage(
-        body: ImgUrlRequest
-    ): BaseState<ResponseBody>
+    suspend fun updateAdminProfileImage(body: ImgUrlRequest): BaseState<ResponseBody>
 
-    suspend fun updateAdminName(
-        body: PatchAdminNameRequest
-    ): BaseState<ResponseBody>
+    suspend fun updateAdminName(body: PatchAdminNameRequest): BaseState<ResponseBody>
 
-    suspend fun updateAdminBackgroundImage(
-        body: ImgUrlRequest
-    ): BaseState<ResponseBody>
+    suspend fun updateAdminBackgroundImage(body: ImgUrlRequest): BaseState<ResponseBody>
 
-    suspend fun updateGymService(
-        body: GymServiceUpdateRequest,
-    ): BaseState<ResponseBody>
+    suspend fun updateGymService(body: GymServiceUpdateRequest): BaseState<ResponseBody>
 
     suspend fun getNotificationStates(): BaseState<GetNotificationStatesResponse>
 
-    suspend fun updateNotification(
-        body: NotificationUpdateRequest
-    ): BaseState<ResponseBody>
+    suspend fun updateNotification(body: NotificationUpdateRequest): BaseState<ResponseBody>
 
     suspend fun getMyShortsComments(
         page: Int,
-        size: Int
+        size: Int,
     ): BaseState<GetMyShortsCommentsResponse>
 
     // -------- RoomDB ClimbingRecordDao 암장 정보 ----------
     fun insert(climbingRecordData: ClimbingRecordData)
+
     fun update(climbingRecordData: ClimbingRecordData)
+
     fun delete(climbingRecordData: ClimbingRecordData)
+
     fun deleteAllRecord()
+
     fun getAllRecord(): List<ClimbingRecordData>
+
     fun getRecord(id: Int): ClimbingRecordData
 
     // ------ RoomDB RouteRecordDao 루트 기록 정보 ---------
@@ -352,7 +301,10 @@ interface MainRepository {
 
     fun getRouteById(id: Int): RouteRecordData
 
-    fun findExistRoute(sectorId: Long, routeId: Long): RouteRecordData?
+    fun findExistRoute(
+        sectorId: Long,
+        routeId: Long,
+    ): RouteRecordData?
 
     fun getAverageDifficultyOfCompleted(): Double?
 
@@ -365,81 +317,65 @@ interface MainRepository {
     suspend fun getGymListToFollow(
         gymname: String,
         page: Int,
-        size: Int
+        size: Int,
     ): BaseState<GetGymListToFollowResponse>
 
-    suspend fun getClimberProfileStatistics(
-        userId: Long
-    ): BaseState<GetClimberProfileStatisticsResponse>
+    suspend fun getClimberProfileStatistics(userId: Long): BaseState<GetClimberProfileStatisticsResponse>
 
     suspend fun getClimberProfileTargetGymStatistics(
         userId: Long,
-        gymId: Long
+        gymId: Long,
     ): BaseState<GetClimberProfileTargetGymStatisticsResponse>
 
-    suspend fun getUserClimbedGymList(
-        userId: Int
-    ): BaseState<List<ClimbedGym>>
+    suspend fun getUserClimbedGymList(userId: Int): BaseState<List<ClimbedGym>>
 
     suspend fun getMyStatsTargetGymMonth(
         gymId: Long,
         year: Int,
-        month: Int
+        month: Int,
     ): BaseState<GetMyStatsTargetGymMonthResponse>
 
     suspend fun getMyClimbedGymList(
         year: Int,
-        month: Int
+        month: Int,
     ): BaseState<List<ClimbedGym>>
 
     suspend fun getUserShorts(
         uploaderId: Long,
         page: Int,
         size: Int,
-        sortType: userShortsSortType
+        sortType: UserShortsSortType,
     ): BaseState<ShortsListResponse>
 
-    suspend fun getShortsById(
-        shortsId: Long
-    ): BaseState<ShortsListResponse>
+    suspend fun getShortsById(shortsId: Long): BaseState<ShortsListResponse>
 
     suspend fun getMyShorts(
         shortsVisibility: UserShortsVisibilityType,
         page: Int,
-        size: Int
+        size: Int,
     ): BaseState<ShortsListResponse>
 
     suspend fun getShortsLikedList(
         page: Int,
-        size: Int
+        size: Int,
     ): BaseState<ShortsListResponse>
 
     suspend fun getShortsBookmarkedList(
         page: Int,
-        size: Int
+        size: Int,
     ): BaseState<ShortsListResponse>
 
-    suspend fun getUserHomeGyms(
-        userId: Long
-    ): BaseState<List<UserHomeGymSimpleResponse>>
+    suspend fun getUserHomeGyms(userId: Long): BaseState<List<UserHomeGymSimpleResponse>>
 
-    suspend fun getUserInfo(
-        userId: Long
-    ): BaseState<GetUserInfoResponse>
+    suspend fun getUserInfo(userId: Long): BaseState<GetUserInfoResponse>
 
     suspend fun getAnnouncement(): BaseState<List<GetAnnouncementResponse>>
 
-    suspend fun getAnnouncementDetail(
-        boardId: Long
-    ): BaseState<GetAnnouncementDetailResponse>
+    suspend fun getAnnouncementDetail(boardId: Long): BaseState<GetAnnouncementDetailResponse>
 
-    suspend fun updateAnnouncementLike(
-        boardId: Long
-    ): BaseState<ResponseBody>
+    suspend fun updateAnnouncementLike(boardId: Long): BaseState<ResponseBody>
 
-    suspend fun updateAnnouncementUnlike(
-        boardId: Long
-    ): BaseState<ResponseBody>
+    suspend fun updateAnnouncementUnlike(boardId: Long): BaseState<ResponseBody>
 
     suspend fun getAdminGymId(): BaseState<Int>
 }

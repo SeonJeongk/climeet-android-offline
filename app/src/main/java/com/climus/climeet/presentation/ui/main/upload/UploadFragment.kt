@@ -2,7 +2,6 @@ package com.climus.climeet.presentation.ui.main.upload
 
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
@@ -21,7 +20,6 @@ import com.climus.climeet.presentation.base.BaseFragment
 import com.climus.climeet.presentation.customview.CheckPublicBottomSheet
 import com.climus.climeet.presentation.ui.main.MainViewModel
 import com.climus.climeet.presentation.ui.main.global.selectsector.BottomSheetState
-import com.climus.climeet.presentation.util.Constants.TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,11 +29,13 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 
 class UploadFragment : BaseFragment<FragmentUploadBinding>(R.layout.fragment_upload) {
-
     private val parentViewModel: MainViewModel by activityViewModels()
     private val viewModel: UploadViewModel by activityViewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.initViewModel()
@@ -86,7 +86,6 @@ class UploadFragment : BaseFragment<FragmentUploadBinding>(R.layout.fragment_upl
 
     private fun startCompress(uri: Uri) {
         CoroutineScope(Dispatchers.Main).launch {
-
             val uris = listOf(uri)
             VideoCompressor.start(
                 context = App.getContext(),
@@ -94,7 +93,7 @@ class UploadFragment : BaseFragment<FragmentUploadBinding>(R.layout.fragment_upl
                 isStreamable = false,
                 sharedStorageConfiguration = SharedStorageConfiguration(
                     saveAt = SaveLocation.movies,
-                    subFolderName = "climeet"
+                    subFolderName = "climeet",
                 ),
                 configureWith = Configuration(
                     quality = VideoQuality.LOW,
@@ -102,7 +101,10 @@ class UploadFragment : BaseFragment<FragmentUploadBinding>(R.layout.fragment_upl
                     isMinBitrateCheckEnabled = false,
                 ),
                 listener = object : CompressionListener {
-                    override fun onProgress(index: Int, percent: Float) {
+                    override fun onProgress(
+                        index: Int,
+                        percent: Float,
+                    ) {
                         viewModel.setCompressProgress(percent.toInt())
                     }
 
@@ -111,28 +113,33 @@ class UploadFragment : BaseFragment<FragmentUploadBinding>(R.layout.fragment_upl
                         viewModel.startCompress()
                     }
 
-                    override fun onSuccess(index: Int, size: Long, path: String?) {
+                    override fun onSuccess(
+                        index: Int,
+                        size: Long,
+                        path: String?,
+                    ) {
                         binding.ivThumbnail.alpha = 1F
 
                         path?.let {
                             val file = File(it)
                             val requestFile = file.asRequestBody("video/mp4".toMediaTypeOrNull())
-                            val videoFile =
-                                MultipartBody.Part.createFormData("video", file.name, requestFile)
+                            val videoFile = MultipartBody.Part.createFormData("video", file.name, requestFile)
                             viewModel.finishCompress(videoFile, size)
                         } ?: run {
-
                         }
                     }
 
-                    override fun onFailure(index: Int, failureMessage: String) {
+                    override fun onFailure(
+                        index: Int,
+                        failureMessage: String,
+                    ) {
                         showToastMessage(failureMessage)
                     }
 
                     override fun onCancelled(index: Int) {
                         showToastMessage("압축 취소됨")
                     }
-                }
+                },
             )
         }
     }

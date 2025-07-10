@@ -11,20 +11,20 @@ import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentUploadCompleteBinding
 import com.climus.climeet.presentation.base.BaseFragment
 import com.climus.climeet.presentation.ui.main.upload.UploadViewModel
-import com.climus.climeet.presentation.ui.toShortsPlayer
 import kotlinx.coroutines.delay
 
-class UploadCompleteFragment :
-    BaseFragment<FragmentUploadCompleteBinding>(R.layout.fragment_upload_complete) {
-
+class UploadCompleteFragment : BaseFragment<FragmentUploadCompleteBinding>(R.layout.fragment_upload_complete) {
     private val sharedViewModel: UploadViewModel by activityViewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
-            onBackPressedCallback
+            onBackPressedCallback,
         )
 
         binding.vm = sharedViewModel

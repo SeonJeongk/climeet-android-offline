@@ -14,36 +14,31 @@ import com.climus.climeet.data.model.response.UserHomeGymSimpleResponse
 import com.climus.climeet.presentation.ui.main.global.climerprofile.model.ProfileHomeGymUiData
 import com.climus.climeet.presentation.ui.main.global.searchprofile.model.SearchProfileUiData
 import com.climus.climeet.presentation.ui.main.global.searchprofile.model.UserFollowingUiData
-import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.GymLevelUiData
+import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.SectorNameUiData
 import com.climus.climeet.presentation.ui.main.mypage.announce.model.AnnouncementUiData
 import com.climus.climeet.presentation.ui.main.mypage.follow.model.FollowUiData
 import com.climus.climeet.presentation.ui.main.mypage.follow.model.FollowingUiData
 import com.climus.climeet.presentation.util.Constants
 
-fun SectorItem.toSectorNameUiData(
-    onClickListener: (SectorNameUiData) -> Unit
-) = SectorNameUiData(
-    sectorId = sectorId,
-    name = name,
-    floor = floor,
-    onClickListener = onClickListener
-)
+fun SectorItem.toSectorNameUiData(onClickListener: (SectorNameUiData) -> Unit) =
+    SectorNameUiData(
+        sectorId = sectorId,
+        name = name,
+        floor = floor,
+        onClickListener = onClickListener,
+    )
 
-fun DifficultyItem.toGymLevelUiData(
-    onClickListener: (GymLevelUiData) -> Unit
-) = GymLevelUiData(
-    levelName = gymDifficultyName,
-    levelColor = gymDifficultyColor,
-    difficulty = difficulty,
-    onClickListener = onClickListener
-)
+fun DifficultyItem.toGymLevelUiData(onClickListener: (GymLevelUiData) -> Unit) =
+    GymLevelUiData(
+        levelName = gymDifficultyName,
+        levelColor = gymDifficultyColor,
+        difficulty = difficulty,
+        onClickListener = onClickListener,
+    )
 
-fun RouteItem.toRouteUiData(
-    onClickListener: (RouteUiData) -> Unit
-): RouteUiData {
-
+fun RouteItem.toRouteUiData(onClickListener: (RouteUiData) -> Unit): RouteUiData {
     val holdColor = Constants.holdColor[holdColor] ?: run {
         R.drawable.ic_white_hold
     }
@@ -58,7 +53,7 @@ fun RouteItem.toRouteUiData(
         climeetLevelName = climeetDifficultyName,
         routeImg = routeImageUrl,
         holdImg = holdColor,
-        onClickListener = onClickListener
+        onClickListener = onClickListener,
     )
 }
 
@@ -66,7 +61,7 @@ fun GymListToFollowItem.toSearchProfileUiData(
     keyword: String,
     navigateToProfile: (Long) -> Unit,
     follow: (Long) -> Unit,
-    unFollow: (Long) -> Unit
+    unFollow: (Long) -> Unit,
 ) = SearchProfileUiData(
     id = gymId,
     imgUrl = profileImageUrl,
@@ -76,14 +71,14 @@ fun GymListToFollowItem.toSearchProfileUiData(
     navigateToProfile = navigateToProfile,
     follow = follow,
     unFollow = unFollow,
-    isFollowing = isFollow
+    isFollowing = isFollow,
 )
 
 fun ClimberDetailInfoItem.toSearchProfileUiData(
     keyword: String,
     navigateToProfile: (Long) -> Unit,
     follow: (Long) -> Unit,
-    unFollow: (Long) -> Unit
+    unFollow: (Long) -> Unit,
 ) = SearchProfileUiData(
     id = userId,
     imgUrl = profileImgUrl,
@@ -93,13 +88,13 @@ fun ClimberDetailInfoItem.toSearchProfileUiData(
     navigateToProfile = navigateToProfile,
     follow = follow,
     unFollow = unFollow,
-    isFollowing = isFollower
+    isFollowing = isFollower,
 )
 
 fun UserFollowSimpleResponse.toUserFollowingUiData(
     navigateToProfile: (Long) -> Unit,
     follow: (Long) -> Unit,
-    unFollow: (Long) -> Unit
+    unFollow: (Long) -> Unit,
 ) = UserFollowingUiData(
     id = userId,
     imgUrl = userProfileUrl,
@@ -108,13 +103,13 @@ fun UserFollowSimpleResponse.toUserFollowingUiData(
     navigateToProfile = navigateToProfile,
     follow = follow,
     unFollow = unFollow,
-    isFollowing = true
+    isFollowing = true,
 )
 
 fun UserHomeGymSimpleResponse.toUserFollowingUiData(
     navigateToProfile: (Long) -> Unit,
     follow: (Long) -> Unit,
-    unFollow: (Long) -> Unit
+    unFollow: (Long) -> Unit,
 ) = UserFollowingUiData(
     id = gymId,
     imgUrl = gymProfileUrl,
@@ -123,13 +118,13 @@ fun UserHomeGymSimpleResponse.toUserFollowingUiData(
     navigateToProfile = navigateToProfile,
     follow = follow,
     unFollow = unFollow,
-    isFollowing = true
+    isFollowing = true,
 )
 
 fun UserFollowerInfoResponse.toUserFollowerUiData(
     navigateToProfile: (Long) -> Unit,
     follow: (Long) -> Unit,
-    unFollow: (Long) -> Unit
+    unFollow: (Long) -> Unit,
 ) = FollowUiData(
     userId = userId,
     userName = userName,
@@ -139,13 +134,13 @@ fun UserFollowerInfoResponse.toUserFollowerUiData(
     isFollowing = isFollower,
     navigateToProfile = navigateToProfile,
     follow = follow,
-    unFollow = unFollow
+    unFollow = unFollow,
 )
 
 fun UserFollowingInfoResponse.toUserFollowingUiData(
     navigateToProfile: (Long) -> Unit,
     follow: (Long) -> Unit,
-    unFollow: (Long) -> Unit
+    unFollow: (Long) -> Unit,
 ) = FollowingUiData(
     userId = userId,
     userName = userName,
@@ -155,25 +150,25 @@ fun UserFollowingInfoResponse.toUserFollowingUiData(
     isFollowing = isFollower,
     navigateToProfile = navigateToProfile,
     follow = follow,
-    unFollow = unFollow
+    unFollow = unFollow,
 )
 
-fun UserHomeGymSimpleResponse.toProfileHomeGymUiData(
-    onClickListener: (Long) -> Unit
-) = ProfileHomeGymUiData(
-    gymId = gymId,
-    profileImg = gymProfileUrl,
-    name = gymName,
-    followerString = "팔로워 $followerCount",
-    onClickListener = onClickListener
-)
+fun UserHomeGymSimpleResponse.toProfileHomeGymUiData(onClickListener: (Long) -> Unit) =
+    ProfileHomeGymUiData(
+        gymId = gymId,
+        profileImg = gymProfileUrl,
+        name = gymName,
+        followerString = "팔로워 $followerCount",
+        onClickListener = onClickListener,
+    )
 
-fun GetAnnouncementResponse.toAnnouncementUiData() = AnnouncementUiData(
-    boardId = boardId,
-    createdAt = createdAt,
-    likeCount = likeCount,
-    title = title,
-    content = content,
-    profileImageUrl = profileImageUrl,
-    image = image
-)
+fun GetAnnouncementResponse.toAnnouncementUiData() =
+    AnnouncementUiData(
+        boardId = boardId,
+        createdAt = createdAt,
+        likeCount = likeCount,
+        title = title,
+        content = content,
+        profileImageUrl = profileImageUrl,
+        image = image,
+    )

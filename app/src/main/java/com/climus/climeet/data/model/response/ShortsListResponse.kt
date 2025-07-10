@@ -3,7 +3,7 @@ package com.climus.climeet.data.model.response
 data class ShortsListResponse(
     val hasNext: Boolean,
     val page: Int,
-    val result: List<ShortsItem>
+    val result: List<ShortsItem>,
 )
 
 data class ShortsItem(
@@ -14,7 +14,7 @@ data class ShortsItem(
     val gymName: String?,
     val shortsDetailInfo: ShortsDetailInfo,
     val shortsId: Long,
-    val thumbnailImageUrl: String?
+    val thumbnailImageUrl: String?,
 )
 
 data class ShortsDetailInfo(
@@ -35,15 +35,15 @@ data class ShortsDetailInfo(
     val shareCount: Int,
     val shortsId: Long,
     val userShortsSimpleInfo: UserShortsSimpleInfo,
-    val videoUrl: String
+    val videoUrl: String,
 )
 
 data class UserShortsSimpleInfo(
     val profileImgUrl: String,
     val profileName: String,
-    val userId: Long
+    val userId: Long,
 )
 
-enum class userShortsSortType { LATEST, POPULAR }
+enum class UserShortsSortType { LATEST, POPULAR }
 
 enum class UserShortsVisibilityType { PUBLIC, FOLLOWERS_ONLY, PRIVATE }

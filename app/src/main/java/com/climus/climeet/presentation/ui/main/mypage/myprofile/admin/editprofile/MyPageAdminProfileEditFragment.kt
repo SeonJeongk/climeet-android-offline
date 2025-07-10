@@ -23,7 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MyPageAdminProfileEditFragment :
     BaseFragment<FragmentMypageAdminProfileEditBinding>(R.layout.fragment_mypage_admin_profile_edit) {
-
     private val mainViewModel: MainViewModel by activityViewModels()
     private val parentViewModel: MyPageAdminMyProfileViewModel by activityViewModels()
     private val viewModel: MyPageAdminProfileEditViewModel by viewModels()
@@ -36,13 +35,16 @@ class MyPageAdminProfileEditFragment :
     private val gymProfile by lazy { args.gymProfile }
     private val background by lazy { args.gymBackground }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.svm = mainViewModel
         binding.vm = viewModel
 
-        Log.d("tqlkf", "${backgroundState}")
+        Log.d("tqlkf", "$backgroundState")
         viewModel.initState(backgroundState, gymName, gymProfile)
 
         gymId = parentViewModel.getGymId()
@@ -101,16 +103,20 @@ class MyPageAdminProfileEditFragment :
         }
     }
 
-    private fun NavController.toMyPageAdminEditBackground(){
-        val action =
-            MyPageAdminProfileEditFragmentDirections.actionMyPageAdminProfileEditFragmentToMyPageAdminProfileEditBackgroundFragment(gymName, gymProfile, background)
+    private fun NavController.toMyPageAdminEditBackground() {
+        val action = MyPageAdminProfileEditFragmentDirections
+            .actionMyPageAdminProfileEditFragmentToMyPageAdminProfileEditBackgroundFragment(
+                gymName,
+                gymProfile,
+                background,
+            )
         navigate(action)
     }
 
     private fun NavController.toMyPageAdminProfile() {
         val action =
             MyPageAdminProfileEditFragmentDirections.actionMyPageAdminProfileEditFragmentToMyPageAdminMyProfileFragment(
-                gymId
+                gymId,
             )
         navigate(action)
     }

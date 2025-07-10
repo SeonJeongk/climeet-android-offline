@@ -1,3 +1,4 @@
+import io.gitlab.arturbosch.detekt.Detekt
 import java.util.Properties
 
 val localProperties = Properties().apply {
@@ -31,8 +32,7 @@ val testServerUrl = providers.gradleProperty("testServerUrl").orNull?.also { url
     }
 }
 
-fun buildConfigString(value: String): String =
-    "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
+fun buildConfigString(value: String): String = "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
 
 plugins {
     id("com.android.application")
@@ -40,6 +40,8 @@ plugins {
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
     id("androidx.navigation.safeargs.kotlin")
+    id("org.jlleitschuh.gradle.ktlint")
+    id("io.gitlab.arturbosch.detekt")
 }
 
 if (file("google-services.json").isFile) {
@@ -77,7 +79,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -91,6 +93,45 @@ android {
     buildFeatures {
         dataBinding = true
         buildConfig = true
+    }
+}
+
+ktlint {
+    version.set("1.5.0")
+    android.set(true)
+    outputToConsole.set(true)
+    ignoreFailures.set(false)
+    filter {
+        exclude("**/build/**")
+        exclude("**/generated/**")
+    }
+    kotlinScriptAdditionalPaths {
+        include(
+            rootProject.fileTree(rootProject.projectDir) {
+                include("*.gradle.kts")
+            },
+        )
+    }
+}
+
+detekt {
+    toolVersion = "1.23.8"
+    source.setFrom("src/main/java", "src/test/java", "src/androidTest/java")
+    config.setFrom(rootProject.files("config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
+    parallel = true
+    ignoreFailures = false
+}
+
+tasks.withType<Detekt>().configureEach {
+    jvmTarget = "1.8"
+    exclude("**/build/**", "**/generated/**")
+    reports {
+        xml.required.set(false)
+        html.required.set(false)
+        txt.required.set(false)
+        sarif.required.set(false)
+        md.required.set(false)
     }
 }
 
@@ -108,8 +149,8 @@ dependencies {
 
     // hilt
     val hiltVersion = "2.48"
-    implementation("com.google.dagger:hilt-android:${hiltVersion}")
-    kapt("com.google.dagger:hilt-android-compiler:${hiltVersion}")
+    implementation("com.google.dagger:hilt-android:$hiltVersion")
+    kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
 
     // retrofit
     val retrofitVersion = "2.9.0"
@@ -147,10 +188,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
 
     // Calendar
-    implementation ("com.kizitonwose.calendar:view:2.4.1")
+    implementation("com.kizitonwose.calendar:view:2.4.1")
 
     // View Pager
-    implementation ("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
 
     // firebase
     implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
@@ -168,5 +209,5 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging-ktx")
 
     // MPAndroidChart
-    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }

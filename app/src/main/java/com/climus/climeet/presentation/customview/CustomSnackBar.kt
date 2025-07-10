@@ -8,8 +8,9 @@ import com.climus.climeet.R
 import com.climus.climeet.databinding.DialogSnackbarBinding
 import com.google.android.material.snackbar.Snackbar
 
-class CustomSnackBar(view: View) {
-
+class CustomSnackBar(
+    view: View,
+) {
     private val context = view.context
     private val snackBar = Snackbar.make(view, "", 5000).apply {
         anchorView = view
@@ -21,7 +22,7 @@ class CustomSnackBar(view: View) {
         LayoutInflater.from(context),
         R.layout.dialog_snackbar,
         null,
-        false
+        false,
     )
 
     init {

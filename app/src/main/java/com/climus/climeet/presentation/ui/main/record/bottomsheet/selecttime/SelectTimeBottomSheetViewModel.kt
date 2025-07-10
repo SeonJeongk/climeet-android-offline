@@ -1,6 +1,5 @@
 package com.climus.climeet.presentation.ui.main.record.bottomsheet.selecttime
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.climus.climeet.presentation.ui.main.record.model.CreateRecordData
@@ -26,7 +25,6 @@ sealed class SelectTimeBottomEvent {
 
 @HiltViewModel
 class SelectTimeBottomViewModel @Inject constructor() : ViewModel() {
-
     private val _event = MutableSharedFlow<SelectTimeBottomEvent>()
     val event: SharedFlow<SelectTimeBottomEvent> = _event.asSharedFlow()
 
@@ -68,11 +66,16 @@ class SelectTimeBottomViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun setTimeToString(time: Int, min: Int, ap: String) =
-        String.format(Locale.getDefault(), "$ap %02d:%02d", time, min)
+    fun setTimeToString(
+        time: Int,
+        min: Int,
+        ap: String,
+    ) = String.format(Locale.getDefault(), "$ap %02d:%02d", time, min)
 
-
-    fun setStartTime(hour: Int, min: Int) {
+    fun setStartTime(
+        hour: Int,
+        min: Int,
+    ) {
         startTime.value = LocalTime.of(hour, min, 0)
         if (hour < 12 || hour == 24) {
             if (hour == 24) {
@@ -80,7 +83,6 @@ class SelectTimeBottomViewModel @Inject constructor() : ViewModel() {
             } else {
                 startTimeString.value = setTimeToString(hour, min, "오전")
             }
-
         } else {
             if (hour == 12) {
                 startTimeString.value = setTimeToString(12, min, "오후")
@@ -90,7 +92,10 @@ class SelectTimeBottomViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun setEndTime(hour: Int, min: Int) {
+    fun setEndTime(
+        hour: Int,
+        min: Int,
+    ) {
         endTime.value = LocalTime.of(hour, min, 0)
         if (hour < 12 || hour == 24) {
             if (hour == 24) {
@@ -98,7 +103,6 @@ class SelectTimeBottomViewModel @Inject constructor() : ViewModel() {
             } else {
                 endTimeString.value = setTimeToString(hour, min, "오전")
             }
-
         } else {
             if (hour == 12) {
                 endTimeString.value = setTimeToString(12, min, "오후")

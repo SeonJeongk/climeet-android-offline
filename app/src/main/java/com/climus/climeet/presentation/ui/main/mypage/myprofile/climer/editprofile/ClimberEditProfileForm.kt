@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.StateFlow
 import okhttp3.MultipartBody
 
 object ClimberEditProfileForm {
-
     private lateinit var profileImg: MultipartBody.Part
 
     private val _imageUriState = MutableStateFlow("")
@@ -16,13 +15,14 @@ object ClimberEditProfileForm {
         profileImg = image
         _imageUriState.value = image.toString()
 
-        Log.d("form", "이미지 파일 저장 : 이름=${image.headers?.get("Content-Disposition")}, " +
-                "타입=${image.body.contentType()}, 크기=${image.body.contentLength()}")
+        Log.d(
+            "form",
+            "이미지 파일 저장 : 이름=${image.headers?.get("Content-Disposition")}, " +
+                "타입=${image.body.contentType()}, 크기=${image.body.contentLength()}",
+        )
     }
 
-    fun getProfileImagePath(): MultipartBody.Part {
-        return profileImg
-    }
+    fun getProfileImagePath(): MultipartBody.Part = profileImg
 
     fun resetState() {
         _imageUriState.value = ""

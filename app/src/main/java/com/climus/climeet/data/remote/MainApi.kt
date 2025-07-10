@@ -58,7 +58,7 @@ import com.climus.climeet.data.model.response.UserFollowingInfoResponse
 import com.climus.climeet.data.model.response.UserHomeGymDetailResponse
 import com.climus.climeet.data.model.response.UserHomeGymSimpleResponse
 import com.climus.climeet.data.model.response.UserProfileInfoResponse
-import com.climus.climeet.data.model.response.userShortsSortType
+import com.climus.climeet.data.model.response.UserShortsSortType
 import com.climus.climeet.data.model.response.UserShortsVisibilityType
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
@@ -75,33 +75,33 @@ import retrofit2.http.Query
 import retrofit2.http.QueryMap
 
 interface MainApi {
-
     @GET("api/climber/check-nickname/{nickName}")
     suspend fun climberNickNameCheck(
-        @Path("nickName") nickName: String
+        @Path("nickName") nickName: String,
     ): Response<Boolean>
 
     @Multipart
     @POST("api/file")
-    suspend fun uploadFile(@Part file: MultipartBody.Part): Response<UploadImgResponse>
+    suspend fun uploadFile(
+        @Part file: MultipartBody.Part,
+    ): Response<UploadImgResponse>
 
     @GET("api/gyms/search/all")
     suspend fun searchGym(
         @Query("gymname") gymName: String,
         @Query("page") page: Int,
-        @Query("size") size: Int
+        @Query("size") size: Int,
     ): Response<SearchGymResponse>
 
     @GET("api/gyms/search")
     suspend fun searchAvailableGym(
         @Query("gymname") gymName: String,
         @Query("page") page: Int,
-        @Query("size") size: Int
+        @Query("size") size: Int,
     ): Response<SearchAvailableGymResponse>
 
     @GET("/api/climber-following")
-    suspend fun getClimberFollowing(
-    ): Response<List<UserFollowSimpleResponse>>
+    suspend fun getClimberFollowing(): Response<List<UserFollowSimpleResponse>>
 
     @GET("api/shorts/latest")
     suspend fun getRecentShorts(
@@ -112,34 +112,34 @@ interface MainApi {
 
     @POST("/follow-relationship")
     suspend fun followUser(
-        @Query("followingUserId") userId: Long
+        @Query("followingUserId") userId: Long,
     ): Response<ResponseBody>
 
     @DELETE("/follow-relationship")
     suspend fun unfollowUser(
-        @Query("followingUserId") userId: Long
+        @Query("followingUserId") userId: Long,
     ): Response<ResponseBody>
 
     @POST("/follow-relationship/gym")
     suspend fun followGym(
-        @Query("gymId") gymId: Long
+        @Query("gymId") gymId: Long,
     ): Response<ResponseBody>
 
     @DELETE("/follow-relationship/gym")
     suspend fun unfollowGym(
-        @Query("gymId") gymId: Long
+        @Query("gymId") gymId: Long,
     ): Response<ResponseBody>
 
     @GET("/api/climber/privacy-setting")
     suspend fun getClimberPrivacySetting(
-        @Query("climberId") climberId: Int
+        @Query("climberId") climberId: Int,
     ): Response<GetClimberPrivacySettingResponse>
 
     @GET("/api/climber/search")
     suspend fun getClimberSearchingList(
         @Query("page") page: Int,
         @Query("size") size: Int,
-        @Query("climberName") climberName: String
+        @Query("climberName") climberName: String,
     ): Response<ClimberDetailInfoResponse>
 
     @GET("api/shorts/popular")
@@ -155,7 +155,7 @@ interface MainApi {
     @GET("/api/climbing-records/between-dates")
     suspend fun getSelectDateRecord(
         @Query("startDate") startDate: String,
-        @Query("endDate") endDate: String
+        @Query("endDate") endDate: String,
     ): Response<List<GetSelectDateRecordResponse>>
 
     @GET("/api/banners")
@@ -174,25 +174,19 @@ interface MainApi {
     suspend fun getHomeGyms(): Response<List<UserHomeGymSimpleResponse>>
 
     @GET("/api/home/rank/weeks/gyms/follow")
-    suspend fun findGymRankingOrderFollowCount(
-    ): Response<List<BestFollowGymSimpleResponse>>
+    suspend fun findGymRankingOrderFollowCount(): Response<List<BestFollowGymSimpleResponse>>
 
     @GET("/api/home/rank/weeks/gyms/record")
-    suspend fun findGymRankingListOrderSelectionCount(
-    ): Response<List<BestRecordGymDetailInfoResponse>>
+    suspend fun findGymRankingListOrderSelectionCount(): Response<List<BestRecordGymDetailInfoResponse>>
 
     @GET("/api/gym-following")
-    suspend fun getGymsFollowing(
-    ): Response<List<UserHomeGymDetailResponse>>
+    suspend fun getGymsFollowing(): Response<List<UserHomeGymDetailResponse>>
 
     @GET("/api/home/rank/weeks/routes")
-    suspend fun findRouteRankingOrderSelectionCount(
-    ): Response<List<BestRouteDetailInfoResponse>>
+    suspend fun findRouteRankingOrderSelectionCount(): Response<List<BestRouteDetailInfoResponse>>
 
     @GET("/api/profile")
-    suspend fun getUserProfile(
-    ): Response<UserProfileInfoResponse>
-
+    suspend fun getUserProfile(): Response<UserProfileInfoResponse>
 
     @GET("/api/gyms/{gymId}/version/key")
     suspend fun getGymFilteringKey(
@@ -202,50 +196,50 @@ interface MainApi {
     @GET("/api/gyms/{gymId}/version/key")
     suspend fun getGymFilteringKeyTime(
         @Path("gymId") gymId: Long,
-        @Query("timePoint") timePoint: String
+        @Query("timePoint") timePoint: String,
     ): Response<GetGymFilteringKeyResponse>
 
     @GET("/api/gyms/{gymId}/version/all")
     suspend fun getGymRouteFindingData(
-        @Query("timePoint") timePoint: String
+        @Query("timePoint") timePoint: String,
     ): Response<GetRouteFindingData>
 
     @POST("/api/gyms/{gymId}/version/route")
     suspend fun getGymRouteInfoList(
         @Path("gymId") gymId: Long,
-        @Body params: GetGymRouteInfoRequest
+        @Body params: GetGymRouteInfoRequest,
     ): Response<GetGymRouteInfoResponse>
 
     @POST("/api/gyms/version")
     suspend fun updateGymRouteVersion(
-        @Body params: UpdateGymRouteVersionRequest
+        @Body params: UpdateGymRouteVersionRequest,
     ): Response<ResponseBody>
 
     @POST("/api/climbing-records")
     suspend fun createTimerClimbingRecord(
-        @Body params: CreateTimerClimbingRecordRequest
+        @Body params: CreateTimerClimbingRecordRequest,
     ): Response<ResponseBody>
 
     @GET("/api/gyms/{gymId}")
     suspend fun getGymProfile(
-        @Path("gymId") gymId: Long
+        @Path("gymId") gymId: Long,
     ): Response<GetGymProfileResponse>
 
     @Multipart
     @POST("/api/shorts")
     suspend fun uploadShorts(
         @Part video: MultipartBody.Part?,
-        @Part("createShortsRequest") createShortsRequest: ShortsDetailRequest
+        @Part("createShortsRequest") createShortsRequest: ShortsDetailRequest,
     ): Response<Unit>
 
     @PATCH("/api/shorts/{shortsId}/bookmarks")
     suspend fun patchBookMarks(
-        @Path("shortsId") shortsId: Long
+        @Path("shortsId") shortsId: Long,
     ): Response<Unit>
 
     @PATCH("/api/Shorts/{shortsId}/likes")
     suspend fun patchFavorites(
-        @Path("shortsId") shortsId: Long
+        @Path("shortsId") shortsId: Long,
     ): Response<Unit>
 
     @GET("/api/shorts/{shortsId}/{parentCommentId}")
@@ -253,88 +247,88 @@ interface MainApi {
         @Path("shortsId") shortsId: Long,
         @Path("parentCommentId") parentCommentId: Long,
         @Query("page") page: Int,
-        @Query("size") size: Int
+        @Query("size") size: Int,
     ): Response<ShortsSubCommentResponse>
 
     @GET("/api/shorts/{shortsId}/shortsComments")
     suspend fun getShortsCommentList(
         @Path("shortsId") shortsId: Long,
         @Query("page") page: Int,
-        @Query("size") size: Int
+        @Query("size") size: Int,
     ): Response<ShortsMainCommentResponse>
 
     @GET("/api/followees")
     suspend fun getUserFollowing(
         @Query("userId") userId: Long?,
-        @Query("userCategory") userCategory: String
+        @Query("userCategory") userCategory: String,
     ): Response<List<UserFollowingInfoResponse>>
 
     @GET("/api/followers")
     suspend fun getUserFollowers(
         @Query("userId") userId: Long?,
-        @Query("userCategory") userCategory: String
+        @Query("userCategory") userCategory: String,
     ): Response<List<UserFollowerInfoResponse>>
 
     @POST("/api/shorts/{shortsId}/shortsComments")
     suspend fun addShortsComment(
         @Path("shortsId") shortsId: Long,
         @QueryMap filter: Map<String, Long>,
-        @Body params: AddShortsCommentRequest
+        @Body params: AddShortsCommentRequest,
     ): Response<ShortsMainCommentItem>
 
     @PATCH("/api/shortsComments/{shortsCommentId}")
     suspend fun patchShortsCommentInteraction(
         @Path("shortsCommentId") shortsCommentId: Long,
         @Query("isLike") isLike: Boolean,
-        @Query("isDislike") isDislike: Boolean
+        @Query("isDislike") isDislike: Boolean,
     ): Response<String>
 
     @GET("/api/gyms/{gymId}")
     suspend fun getGymProfileTopInfo(
-        @Path("gymId") gymId: Long
+        @Path("gymId") gymId: Long,
     ): Response<GymProfileTopInfoResponse>
 
     @GET("/api/gyms/{gymId}/tab")
     suspend fun getGymProfileTabInfo(
-        @Path("gymId") gymId: Long
+        @Path("gymId") gymId: Long,
     ): Response<GymProfileTabInfoResponse>
 
     @GET("/api/climbing-records/users/statistics/months")
     suspend fun getMyStatsMonth(
         @Query("year") year: Int,
-        @Query("month") month: Int
+        @Query("month") month: Int,
     ): Response<MyStatsMonthResponse>
 
     @GET("/api/climbing-records/users/gyms/{gymId}/statistics/months")
     suspend fun getMyStatsTargetGymMonth(
         @Path("gymId") gymId: Long,
         @Query("year") year: Int,
-        @Query("month") month: Int
+        @Query("month") month: Int,
     ): Response<GetMyStatsTargetGymMonthResponse>
 
     @GET("/api/climbing-records/users/months/list")
     suspend fun getMyClimbedGymList(
         @Query("year") year: Int,
-        @Query("month") month: Int
+        @Query("month") month: Int,
     ): Response<List<ClimbedGym>>
 
     @GET("/api/gyms/{gymId}/review")
     suspend fun getGymReview(
         @Path("gymId") gymID: Long,
         @Query("page") page: Int,
-        @Query("size") size: Int
+        @Query("size") size: Int,
     ): Response<GetGymProfileReviewResponse>
 
     @POST("/api/gyms/{gymId}/review")
     suspend fun createGymReview(
         @Path("gymId") gymID: Long,
-        @Body params: CreateGymProfileReviewRequest
+        @Body params: CreateGymProfileReviewRequest,
     ): Response<ResponseBody>
 
     @PATCH("/api/gyms/{gymId}/review")
     suspend fun editGymReview(
         @Path("gymId") gymID: Long,
-        @Body params: CreateGymProfileReviewRequest
+        @Body params: CreateGymProfileReviewRequest,
     ): Response<ResponseBody>
 
     @GET("/api/climbing-records/gyms/{gymId}/rank/weeks/climbers/clear")
@@ -356,7 +350,7 @@ interface MainApi {
     suspend fun getGymListToFollow(
         @Query("gymname") gymname: String,
         @Query("page") page: Int,
-        @Query("size") size: Int
+        @Query("size") size: Int,
     ): Response<GetGymListToFollowResponse>
 
     @GET("/api/gyms/{gymId}/skill-distribution")
@@ -375,18 +369,17 @@ interface MainApi {
     ): Response<GymWeekStatsResponse>
 
     @GET("api/profile")
-    suspend fun getMyPageProfile(
-    ): Response<MyPageProfileResponse>
+    suspend fun getMyPageProfile(): Response<MyPageProfileResponse>
 
     @GET("/api/climbing-records/users/{userId}/statistics")
     suspend fun getClimberProfileStatistics(
-        @Path("userId") userId: Long
+        @Path("userId") userId: Long,
     ): Response<GetClimberProfileStatisticsResponse>
 
     @GET("/api/climbing-records/users/{userId}/gyms/{gymId}/statistics")
     suspend fun getClimberProfileTargetGymStatistics(
         @Path("userId") userId: Long,
-        @Path("gymId") gymId: Long
+        @Path("gymId") gymId: Long,
     ): Response<GetClimberProfileTargetGymStatisticsResponse>
 
     @GET("/api/climbing-records/users/{userId}/list")
@@ -399,41 +392,41 @@ interface MainApi {
         @Path("uploaderId") uploaderId: Long,
         @Query("page") page: Int,
         @Query("size") size: Int,
-        @Query("sortType") sortType: userShortsSortType
+        @Query("sortType") sortType: UserShortsSortType,
     ): Response<ShortsListResponse>
 
     @GET("/api/shorts/{shortsId}")
     suspend fun getShortsById(
-        @Path("shortsId") shortsId: Long
+        @Path("shortsId") shortsId: Long,
     ): Response<ShortsListResponse>
 
     @GET("/api/shorts/my-shorts")
     suspend fun getMyShorts(
         @Query("shortsVisibility") shortsVisibility: UserShortsVisibilityType,
         @Query("page") page: Int,
-        @Query("size") size: Int
+        @Query("size") size: Int,
     ): Response<ShortsListResponse>
 
     @GET("/api/shorts/user/liked")
     suspend fun getShortsLikedList(
         @Query("page") page: Int,
-        @Query("size") size: Int
+        @Query("size") size: Int,
     ): Response<ShortsListResponse>
 
     @GET("/api/shorts/user/bookmarked")
     suspend fun getShortsBookmarkedList(
         @Query("page") page: Int,
-        @Query("size") size: Int
+        @Query("size") size: Int,
     ): Response<ShortsListResponse>
 
     @GET("/api/home/homegyms/{userId}")
     suspend fun getUserHomeGyms(
-        @Path("userId") userId: Long
+        @Path("userId") userId: Long,
     ): Response<List<UserHomeGymSimpleResponse>>
 
     @GET("/api/profile/{userId}")
     suspend fun getUserInfo(
-        @Path("userId") userId: Long
+        @Path("userId") userId: Long,
     ): Response<GetUserInfoResponse>
 
     @GET("/boards")
@@ -441,17 +434,17 @@ interface MainApi {
 
     @GET("/boards/{boardId}")
     suspend fun getAnnouncementDetail(
-        @Path("boardId") boardId: Long
+        @Path("boardId") boardId: Long,
     ): Response<GetAnnouncementDetailResponse>
 
     @PATCH("/boards/{boardId}/like")
     suspend fun updateAnnouncementLike(
-        @Path("boardId") boardId: Long
+        @Path("boardId") boardId: Long,
     ): Response<ResponseBody>
 
     @PATCH("/boards/{boardId}/unlike")
     suspend fun updateAnnouncementUnlike(
-        @Path("boardId") boardId: Long
+        @Path("boardId") boardId: Long,
     ): Response<ResponseBody>
 
     @PATCH("/api/climber/homegym-privacy-setting")
@@ -466,27 +459,27 @@ interface MainApi {
     @Multipart
     @PATCH("/api/profile-image")
     suspend fun updateUserProfileImage(
-        @Part image: MultipartBody.Part
+        @Part image: MultipartBody.Part,
     ): Response<ResponseBody>
 
     @PATCH("/api/gyms/profile-image")
     suspend fun updateAdminProfileImage(
-        @Body params: ImgUrlRequest
+        @Body params: ImgUrlRequest,
     ): Response<ResponseBody>
 
     @PATCH("/api/gyms/name")
     suspend fun updateAdminName(
-        @Body params: PatchAdminNameRequest
+        @Body params: PatchAdminNameRequest,
     ): Response<ResponseBody>
 
     @PATCH("/api/gyms/background-image")
     suspend fun updateAdminBackgroundImage(
-        @Body params: ImgUrlRequest
+        @Body params: ImgUrlRequest,
     ): Response<ResponseBody>
 
     @PATCH("/api/profile-name")
     suspend fun updateUserName(
-        @Query("name") name: String
+        @Query("name") name: String,
     ): Response<ResponseBody>
 
     @GET("/api/users/notifications")
@@ -494,13 +487,13 @@ interface MainApi {
 
     @PATCH("/api/users/notifications")
     suspend fun updateNotification(
-        @Body params: NotificationUpdateRequest
+        @Body params: NotificationUpdateRequest,
     ): Response<ResponseBody>
 
     @GET("/api/shorts/user/comments")
     suspend fun getMyShortsComments(
         @Query("page") page: Int,
-        @Query("size") size: Int
+        @Query("size") size: Int,
     ): Response<GetMyShortsCommentsResponse>
 
     @GET("/api/manager/gym-id")
@@ -508,6 +501,6 @@ interface MainApi {
 
     @PATCH("/api/gyms/service")
     suspend fun updateGymService(
-        @Body params: GymServiceUpdateRequest
-    ) : Response<ResponseBody>
+        @Body params: GymServiceUpdateRequest,
+    ): Response<ResponseBody>
 }

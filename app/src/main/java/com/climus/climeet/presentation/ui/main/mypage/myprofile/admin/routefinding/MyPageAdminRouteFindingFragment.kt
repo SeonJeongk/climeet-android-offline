@@ -19,12 +19,12 @@ import com.climus.climeet.presentation.customview.selectdate.SelectDateBottomShe
 import com.climus.climeet.presentation.customview.selectdate.SelectDateBottomSheetViewModel
 import com.climus.climeet.presentation.ui.main.MainViewModel
 import com.climus.climeet.presentation.ui.main.global.gymprofile.route.GymProfileRouteViewModel
-import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.model.UiLevelItem
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.adapter.LevelColorAdapter
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.adapter.RouteFindingLevelAdapter
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.adapter.RouteFindingRouteAdapter
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.adapter.RouteFindingSectorAdapter
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.model.MyPageAdminRouteData
+import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.model.UiLevelItem
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.routefinding.bottomsheet.SetLevelBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.update
@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.update
 @AndroidEntryPoint
 class MyPageAdminRouteFindingFragment :
     BaseFragment<FragmentMyPageAdminRouteFindingBinding>(R.layout.fragment_my_page_admin_route_finding) {
-
     private val parentViewModel: MainViewModel by activityViewModels()
     private val dateViewModel: SelectDateBottomSheetViewModel by viewModels()
     private val routeViewModel: GymProfileRouteViewModel by activityViewModels()
@@ -42,7 +41,10 @@ class MyPageAdminRouteFindingFragment :
     private lateinit var sectorAdapter: RouteFindingSectorAdapter
     private lateinit var routeAdapter: RouteFindingRouteAdapter
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
@@ -81,7 +83,7 @@ class MyPageAdminRouteFindingFragment :
                             requireContext(),
                             dateViewModel,
                             MyPageAdminRouteData.selectedDate,
-                            MyPageAdminRouteData::setSelectedDate
+                            MyPageAdminRouteData::setSelectedDate,
                         ) { date ->
                             viewModel.setSelectedDate(date)
                             routeViewModel.setSelectedDate(date)
@@ -91,22 +93,22 @@ class MyPageAdminRouteFindingFragment :
                     MyPageAdminRouteFindingEvent.ShowSetLevel -> {
                         SetLevelBottomSheet(
                             requireContext(),
-                            viewModel
+                            viewModel,
                         ).show()
                     }
 
-                    MyPageAdminRouteFindingEvent.GoToGallery -> context?.let { itsContext ->
-                        parentViewModel.goToSetProfileImage(
-                            itsContext
+                    MyPageAdminRouteFindingEvent.GoToGallery ->
+                        context?.let { itsContext ->
+                            parentViewModel.goToSetProfileImage(itsContext)
+                        }
+
+                    is MyPageAdminRouteFindingEvent.ShowLayoutImg ->
+                        setImage(
+                            it.uri,
+                            binding.ivAddGymIamge,
                         )
-                    }
 
-                    is MyPageAdminRouteFindingEvent.ShowLayoutImg -> setImage(
-                        it.uri,
-                        binding.ivAddGymIamge
-                    )
-
-                    MyPageAdminRouteFindingEvent.GoToCreateRoute ->  {
+                    MyPageAdminRouteFindingEvent.GoToCreateRoute -> {
                         viewModel.updateIsReturningFromCreateRoute(true)
                         findNavController().toCreateRoute()
                     }
@@ -115,12 +117,13 @@ class MyPageAdminRouteFindingFragment :
                         binding.switchSectorFloor.isChecked = false
                     }
 
-                    is MyPageAdminRouteFindingEvent.UpdateRouteFindingData -> if (it.isSuccess) {
-                        showToastMessage(it.msg)
-                        findNavController().navigateUp()
-                    } else {
-                        showToastMessage(it.msg)
-                    }
+                    is MyPageAdminRouteFindingEvent.UpdateRouteFindingData ->
+                        if (it.isSuccess) {
+                            showToastMessage(it.msg)
+                            findNavController().navigateUp()
+                        } else {
+                            showToastMessage(it.msg)
+                        }
                 }
             }
         }
@@ -148,7 +151,6 @@ class MyPageAdminRouteFindingFragment :
                     setImage(curLayoutGymImg.toUri(), binding.ivAddGymIamge)
                     binding.tvImageExplain.visibility = View.GONE
                 }
-
             }
         }
         repeatOnStarted {
@@ -161,7 +163,9 @@ class MyPageAdminRouteFindingFragment :
         }
         repeatOnStarted {
             viewModel.selectedLayoutFloor.collect {
-                if (viewModel.uiState.value.layoutList[it - 1].gymImg == "") {
+                if (viewModel.uiState.value.layoutList[it - 1]
+                        .gymImg == ""
+                ) {
                     binding.tvImageExplain.visibility = View.VISIBLE
                 } else {
                     binding.tvImageExplain.visibility = View.GONE
@@ -189,10 +193,10 @@ class MyPageAdminRouteFindingFragment :
 
     private fun sectorClickListener() {
         binding.btnSectorComplete.setOnClickListener {
-            viewModel.selectedSector.update {
-                it.copy(
+            viewModel.selectedSector.update { sector ->
+                sector.copy(
                     sectorName = binding.etSectorName.text.toString(),
-                    sectorFloor = viewModel.selectedSectorFloor.value
+                    sectorFloor = viewModel.selectedSectorFloor.value,
                 )
             }
             val sector = viewModel.selectedSector.value
@@ -232,20 +236,19 @@ class MyPageAdminRouteFindingFragment :
     private fun changeSectorFloor() {
         with(binding) {
             switchSectorFloor.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked && !viewModel.isSecondFloorExist.value!!) {
+                if (isChecked && !(viewModel.isSecondFloorExist.value ?: false)) {
                     showCustomSnackbar("2층이 존재하지 않습니다.")
                     switchSectorFloor.isChecked = false
                 } else {
                     if (isChecked) {
                         viewModel.changeFloorSector(2)
-                        tvSwitchFirst.setTextColor(R.color.white)
-                        tvSwitchSecond.setTextColor(R.color.black)
+                        tvSwitchFirst.setTextColor(requireContext().getColor(R.color.white))
+                        tvSwitchSecond.setTextColor(requireContext().getColor(R.color.black))
                     } else {
                         viewModel.changeFloorSector(1)
-                        tvSwitchFirst.setTextColor(R.color.black)
-                        tvSwitchSecond.setTextColor(R.color.white)
+                        tvSwitchFirst.setTextColor(requireContext().getColor(R.color.black))
+                        tvSwitchSecond.setTextColor(requireContext().getColor(R.color.white))
                     }
-
                 }
             }
         }
@@ -262,8 +265,11 @@ class MyPageAdminRouteFindingFragment :
     }
 
     private fun setTvExplain() {
-        binding.tvExplain.text = "${viewModel.selectedLevel.value.colorName} 레벨은 이미 등록되어 있어요"
-        binding.tvExplain.setTextColor(resources.getColor(R.color.cm_red))
+        binding.tvExplain.text = getString(
+            R.string.route_finding_level_already_registered,
+            viewModel.selectedLevel.value.colorName,
+        )
+        binding.tvExplain.setTextColor(requireContext().getColor(R.color.cm_red))
     }
 
     private fun setRV() {
@@ -324,18 +330,19 @@ class MyPageAdminRouteFindingFragment :
         }
     }
 
-    private fun isCompetitionLevel(level: UiLevelItem) =
-        level.climeetLevel == "C"
+    private fun isCompetitionLevel(level: UiLevelItem) = level.climeetLevel == "C"
 
-    private fun isLevelNothing(level: UiLevelItem) =
-        level.colorName == "-" || level.climeetLevel == "레벨 설정"
+    private fun isLevelNothing(level: UiLevelItem) = level.colorName == "-" || level.climeetLevel == "레벨 설정"
 
-    private fun setImage(uri: Uri, ivIamge: AppCompatImageView) {
+    private fun setImage(
+        uri: Uri,
+        ivImage: AppCompatImageView,
+    ) {
         Glide.with(this)
             .load(uri)
             .apply(RequestOptions().dontTransform())
             .placeholder(R.drawable.ic_add_image_background)
-            .into(ivIamge)
+            .into(ivImage)
     }
 
     private fun showCustomSnackbar(message: String) {
@@ -346,8 +353,8 @@ class MyPageAdminRouteFindingFragment :
     }
 
     private fun NavController.toCreateRoute() {
-        val action =
-            MyPageAdminRouteFindingFragmentDirections.actionMyPageAdminRouteFindingFragmentToMyPageAdminSetRouteFragment()
+        val action = MyPageAdminRouteFindingFragmentDirections
+            .actionMyPageAdminRouteFindingFragmentToMyPageAdminSetRouteFragment()
         navigate(action)
     }
 }

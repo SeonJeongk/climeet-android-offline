@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 data class CalendarUiState(
     val recordList: List<ClimbingRecordData> = emptyList(),
-    val emptyResultState: Boolean = false
+    val emptyResultState: Boolean = false,
 )
 
 sealed class CalendarEvent {
@@ -32,17 +32,21 @@ sealed class CalendarEvent {
 
     data object NavigateToSelectDateBottomSheetFragment : CalendarEvent()
 
-    data class ShowToastMessage(val msg: String): CalendarEvent()
+    data class ShowToastMessage(
+        val msg: String,
+    ) : CalendarEvent()
 
-    data object NavigateToTimerMain: CalendarEvent()
+    data object NavigateToTimerMain : CalendarEvent()
 
-    data class ShowPermissionDialog(val msg: String): CalendarEvent()
+    data class ShowPermissionDialog(
+        val msg: String,
+    ) : CalendarEvent()
 }
 
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
     private val repository: MainRepository,
-    private val notificationManager: NotificationManagerCompat
+    private val notificationManager: NotificationManagerCompat,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CalendarUiState())
     val uiState: StateFlow<CalendarUiState> = _uiState.asStateFlow()
@@ -65,7 +69,10 @@ class CalendarViewModel @Inject constructor(
         setRecord(LocalDate.now())
     }
 
-    fun updateSelectedYearMonth(selectedYear: String, selectedMonth: String) {
+    fun updateSelectedYearMonth(
+        selectedYear: String,
+        selectedMonth: String,
+    ) {
         currentYear.value = selectedYear
         currentMonth.value = selectedMonth
     }
@@ -81,9 +88,9 @@ class CalendarViewModel @Inject constructor(
         setRecord(date)
     }
 
-    private suspend fun setGymProfile(gymId : Long): Pair<String, String> {
-        return repository.getGymProfile(gymId).let { result ->
-            when(result){
+    private suspend fun setGymProfile(gymId: Long): Pair<String, String> =
+        repository.getGymProfile(gymId).let { result ->
+            when (result) {
                 is BaseState.Success -> {
                     val gymName = result.body.gymName
                     val gymProfile = result.body.gymProfileImageUrl
@@ -95,19 +102,16 @@ class CalendarViewModel @Inject constructor(
                 }
             }
         }
-    }
 
     fun setRecord(date: LocalDate) {
         _uiState.update { state ->
-            state.copy(
-                emptyResultState = true
-            )
+            state.copy(emptyResultState = true)
         }
         curJob = viewModelScope.launch {
             repository.getSelectDateRecord(date.toString(), date.toString()).let { result ->
-                when(result){
+                when (result) {
                     is BaseState.Success -> {
-                        if(result.body.isNotEmpty()){
+                        if (result.body.isNotEmpty()) {
                             val dataDeferred = result.body.map { item ->
                                 async { setGymProfile(item.gymId) }
                             }
@@ -117,14 +121,14 @@ class CalendarViewModel @Inject constructor(
                                     recordList = result.body.zip(data) { item, gymProfile ->
                                         item.toClimbingRecordData(gymProfile.first, gymProfile.second)
                                     },
-                                    emptyResultState = false
+                                    emptyResultState = false,
                                 )
                             }
                         } else {
                             _uiState.update { state ->
                                 state.copy(
                                     recordList = emptyList(),
-                                    emptyResultState = true
+                                    emptyResultState = true,
                                 )
                             }
                         }
@@ -133,7 +137,7 @@ class CalendarViewModel @Inject constructor(
                         _uiState.update { state ->
                             state.copy(
                                 recordList = emptyList(),
-                                emptyResultState = true
+                                emptyResultState = true,
                             )
                         }
                         _event.emit(CalendarEvent.ShowToastMessage(result.msg))
@@ -144,8 +148,8 @@ class CalendarViewModel @Inject constructor(
     }
 
     fun navigateToCreateClimbingRecord() {
-        if(LocalDate.now().isBefore(selectedDate.value)){
-            viewModelScope.launch{
+        if (LocalDate.now().isBefore(selectedDate.value)) {
+            viewModelScope.launch {
                 _event.emit(CalendarEvent.ShowToastMessage("과거의 기록을 적어주세요!"))
             }
         } else {
@@ -175,5 +179,4 @@ class CalendarViewModel @Inject constructor(
             }
         }
     }
-
 }

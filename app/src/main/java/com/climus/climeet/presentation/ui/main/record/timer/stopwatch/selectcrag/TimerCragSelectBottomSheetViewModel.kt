@@ -1,7 +1,6 @@
 package com.climus.climeet.presentation.ui.main.record.timer.stopwatch.selectcrag
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,19 +27,24 @@ data class CragNameUiState(
     var searchList: List<SearchCragUiData> = emptyList(),
     val progressState: Boolean = false,
     val emptyResultState: Boolean = false,
-    val emptyTextState: Boolean = false
+    val emptyTextState: Boolean = false,
 )
 
-sealed class CragSelectEvent{
-    data class NavigateToBack(val id: Long, val name: String) : CragSelectEvent()
-    data class ShowToastMessage(val msg: String): CragSelectEvent()
+sealed class CragSelectEvent {
+    data class NavigateToBack(
+        val id: Long,
+        val name: String,
+    ) : CragSelectEvent()
+
+    data class ShowToastMessage(
+        val msg: String,
+    ) : CragSelectEvent()
 }
 
 @HiltViewModel
 class TimerCragSelectBottomSheetViewModel @Inject constructor(
-    private val repository: MainRepository
-): ViewModel() {
-
+    private val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(CragNameUiState())
     val uiState: StateFlow<CragNameUiState> = _uiState.asStateFlow()
 
@@ -75,7 +79,7 @@ class TimerCragSelectBottomSheetViewModel @Inject constructor(
                     state.copy(
                         searchList = emptyList(),
                         emptyResultState = false,
-                        emptyTextState = false
+                        emptyTextState = false,
                     )
                 }
             } else {
@@ -85,7 +89,7 @@ class TimerCragSelectBottomSheetViewModel @Inject constructor(
                     state.copy(
                         progressState = true,
                         emptyResultState = false,
-                        emptyTextState = false
+                        emptyTextState = false,
                     )
                 }
                 curJob = viewModelScope.launch {
@@ -98,10 +102,11 @@ class TimerCragSelectBottomSheetViewModel @Inject constructor(
                                         state.copy(
                                             searchList = result.body.result.map { item ->
                                                 item.toSearchCragUiData(
-                                                    it, ::navigateToBack
+                                                    it,
+                                                    ::navigateToBack,
                                                 )
                                             },
-                                            progressState = false
+                                            progressState = false,
                                         )
                                     }
                                 } else {
@@ -110,7 +115,7 @@ class TimerCragSelectBottomSheetViewModel @Inject constructor(
                                             searchList = emptyList(),
                                             progressState = false,
                                             emptyResultState = true,
-                                            emptyTextState = false
+                                            emptyTextState = false,
                                         )
                                     }
                                 }
@@ -121,7 +126,7 @@ class TimerCragSelectBottomSheetViewModel @Inject constructor(
                                     state.copy(
                                         progressState = false,
                                         emptyResultState = true,
-                                        emptyTextState = false
+                                        emptyTextState = false,
                                     )
                                 }
                                 _event.emit(CragSelectEvent.ShowToastMessage(result.msg))
@@ -140,16 +145,17 @@ class TimerCragSelectBottomSheetViewModel @Inject constructor(
                 searchList = emptyList(),
                 progressState = false,
                 emptyResultState = true,
-                emptyTextState = true
+                emptyTextState = true,
             )
         }
     }
 
-    fun navigateToBack(cragId: Long, cragName: String, cragImgUrl: String) {
+    fun navigateToBack(
+        cragId: Long,
+        cragName: String,
+    ) {
         viewModelScope.launch {
-            _event.emit(
-                CragSelectEvent.NavigateToBack(cragId, cragName)
-            )
+            _event.emit(CragSelectEvent.NavigateToBack(cragId, cragName))
         }
     }
 }

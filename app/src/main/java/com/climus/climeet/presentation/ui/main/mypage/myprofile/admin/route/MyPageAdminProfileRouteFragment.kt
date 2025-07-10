@@ -23,17 +23,19 @@ import com.climus.climeet.presentation.ui.main.shorts.player.ShortsOption
 import com.climus.climeet.presentation.ui.main.shorts.player.ShortsPlayerEvent
 import com.climus.climeet.presentation.ui.main.shorts.player.ShortsPlayerViewModel
 import com.climus.climeet.presentation.ui.toShortsPlayer
-import java.time.LocalDate
 
-class MyPageAdminProfileRouteFragment: BaseFragment<FragmentMypageAdminProfileRouteBinding>(R.layout.fragment_mypage_admin_profile_route) {
-
+class MyPageAdminProfileRouteFragment :
+    BaseFragment<FragmentMypageAdminProfileRouteBinding>(R.layout.fragment_mypage_admin_profile_route) {
     private val gymViewModel: GymProfileViewModel by activityViewModels()
     private val shortsViewModel: ShortsPlayerViewModel by activityViewModels()
     private val dateViewModel: SelectDateBottomSheetViewModel by activityViewModels()
     private val routeViewModel: GymProfileRouteViewModel by activityViewModels()
     private val parentViewModel: MyPageAdminMyProfileViewModel by activityViewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.svm = shortsViewModel
@@ -46,23 +48,28 @@ class MyPageAdminProfileRouteFragment: BaseFragment<FragmentMypageAdminProfileRo
         initShortsEventObserve()
         addOnScrollListener()
 
-        routeViewModel.selectedDate.observe(viewLifecycleOwner, Observer { date ->
-            routeViewModel.setDate()
-        })
+        routeViewModel.selectedDate.observe(
+            viewLifecycleOwner,
+            Observer { date ->
+                routeViewModel.setDate()
+            },
+        )
     }
 
     private fun setRouteTab() {
-        gymViewModel.gymId.observe(viewLifecycleOwner, Observer { id ->
+        gymViewModel.gymId.observe(
+            viewLifecycleOwner,
+            Observer { id ->
 
-            shortsViewModel.setCurFilter(id)
-            shortsViewModel.getShorts(ShortsOption.NEW_SORT)
+                shortsViewModel.setCurFilter(id)
+                shortsViewModel.getShorts(ShortsOption.NEW_SORT)
 
-            routeViewModel.setCragInfo(id, gymViewModel.uiState.value.gymName)
-        })
+                routeViewModel.setCragInfo(id, gymViewModel.uiState.value.gymName)
+            },
+        )
     }
 
     private fun addOnScrollListener() {
-
         binding.layoutScrollview.setOnScrollChangeListener { v, _, scrollY, _, _ ->
             if (scrollY == binding.layoutScrollview.getChildAt(0).measuredHeight - v.measuredHeight) {
                 shortsViewModel.getShorts(ShortsOption.NEXT_PAGE)
@@ -89,13 +96,13 @@ class MyPageAdminProfileRouteFragment: BaseFragment<FragmentMypageAdminProfileRo
                             requireContext(),
                             dateViewModel,
                             MyPageAdminRouteData.selectedDate,
-                            MyPageAdminRouteData::setSelectedDate
+                            MyPageAdminRouteData::setSelectedDate,
                         ) { date ->
                             routeViewModel.setSelectedDate(date)
                         }.show()
                     }
 
-                    is GymProfileRouteEvent.deleteFilter -> {
+                    is GymProfileRouteEvent.DeleteFilter -> {
                         shortsViewModel.gymProfileDelete.value = true
                         shortsViewModel.deleteFilter()
                     }
@@ -117,10 +124,11 @@ class MyPageAdminProfileRouteFragment: BaseFragment<FragmentMypageAdminProfileRo
             shortsViewModel.event.collect {
                 when (it) {
                     is ShortsPlayerEvent.ShowToastMessage -> showToastMessage(it.msg)
-                    is ShortsPlayerEvent.NavigateToShortsPlayer -> findNavController().toShortsPlayer(
-                        it.shortsId,
-                        it.position
-                    )
+                    is ShortsPlayerEvent.NavigateToShortsPlayer ->
+                        findNavController().toShortsPlayer(
+                            it.shortsId,
+                            it.position,
+                        )
                     else -> {}
                 }
             }

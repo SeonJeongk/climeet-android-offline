@@ -5,7 +5,6 @@ import android.graphics.BlendModeColorFilter
 import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
@@ -21,14 +20,16 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class GymProfileFragment : BaseFragment<FragmentGymProfileBinding>(R.layout.fragment_gym_profile) {
-
     private val viewModel: GymProfileViewModel by activityViewModels()
-    private var adapter : GymTabAdapter? = null
+    private var adapter: GymTabAdapter? = null
 
-    private val args : GymProfileFragmentArgs by navArgs()
+    private val args: GymProfileFragmentArgs by navArgs()
     private val gymId by lazy { args.gymId }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
@@ -54,41 +55,41 @@ class GymProfileFragment : BaseFragment<FragmentGymProfileBinding>(R.layout.frag
     }
 
     private fun initClickListener() {
-
         // 탭 indicator 색 바꾸기
-        binding.tbMenu.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    val colorFilter = BlendModeColorFilter(
-                        ContextCompat.getColor(requireContext(), R.color.cm_main),
-                        BlendMode.SRC_ATOP
-                    )
-                    tab?.icon?.colorFilter = colorFilter
-                } else {
-                    tab?.icon?.setColorFilter(
-                        ContextCompat.getColor(requireContext(), R.color.cm_main),
-                        PorterDuff.Mode.SRC_IN
-                    )
+        binding.tbMenu.addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab?) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        val colorFilter = BlendModeColorFilter(
+                            ContextCompat.getColor(requireContext(), R.color.cm_main),
+                            BlendMode.SRC_ATOP,
+                        )
+                        tab?.icon?.colorFilter = colorFilter
+                    } else {
+                        tab?.icon?.setColorFilter(
+                            ContextCompat.getColor(requireContext(), R.color.cm_main),
+                            PorterDuff.Mode.SRC_IN,
+                        )
+                    }
                 }
-            }
 
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    val colorFilter = BlendModeColorFilter(
-                        ContextCompat.getColor(requireContext(), R.color.cm_grey5),
-                        BlendMode.SRC_ATOP
-                    )
-                    tab?.icon?.colorFilter = colorFilter
-                } else {
-                    tab?.icon?.setColorFilter(
-                        ContextCompat.getColor(requireContext(), R.color.cm_grey5),
-                        PorterDuff.Mode.SRC_IN
-                    )
+                override fun onTabUnselected(tab: TabLayout.Tab?) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        val colorFilter = BlendModeColorFilter(
+                            ContextCompat.getColor(requireContext(), R.color.cm_grey5),
+                            BlendMode.SRC_ATOP,
+                        )
+                        tab?.icon?.colorFilter = colorFilter
+                    } else {
+                        tab?.icon?.setColorFilter(
+                            ContextCompat.getColor(requireContext(), R.color.cm_grey5),
+                            PorterDuff.Mode.SRC_IN,
+                        )
+                    }
                 }
-            }
 
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-            }
-        })
+                override fun onTabReselected(tab: TabLayout.Tab?) = Unit
+            },
+        )
     }
 }

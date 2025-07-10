@@ -6,5 +6,5 @@ data class GetGymRouteInfoRequest(
     val floor: Int? = null,
     val sectorId: Long? = null,
     val difficulty: Int? = null,
-    val timePoint: String? = null
+    val timePoint: String? = null,
 )

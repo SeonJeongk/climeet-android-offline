@@ -47,16 +47,22 @@ data class GymProfileSelectSectorUiState(
 
 sealed class GymProfileRouteEvent {
     data object ShowDatePicker : GymProfileRouteEvent()
-    data object deleteFilter : GymProfileRouteEvent()
-    data class ApplyFilter(val filter: SelectedFilter) : GymProfileRouteEvent()
-    data class ShowToastMessage(val msg: String) : GymProfileRouteEvent()
+
+    data object DeleteFilter : GymProfileRouteEvent()
+
+    data class ApplyFilter(
+        val filter: SelectedFilter,
+    ) : GymProfileRouteEvent()
+
+    data class ShowToastMessage(
+        val msg: String,
+    ) : GymProfileRouteEvent()
 }
 
 @HiltViewModel
 class GymProfileRouteViewModel @Inject constructor(
     private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(GymProfileSelectSectorUiState())
     val uiState: StateFlow<GymProfileSelectSectorUiState> = _uiState.asStateFlow()
 
@@ -66,17 +72,14 @@ class GymProfileRouteViewModel @Inject constructor(
     private val _isDataLoaded = MutableStateFlow(false)
     val isDataLoaded: StateFlow<Boolean> = _isDataLoaded.asStateFlow()
 
-
     private var sectorNameList = listOf<SectorNameUiData>()
     private var gymLevelList = listOf<GymLevelUiData>()
 
     private val initDate = LocalDate.now()
-    val datePickText =
-        MutableStateFlow("${initDate.year}년 ${initDate.monthValue}월 ${initDate.dayOfMonth}일")
+    val datePickText = MutableStateFlow("${initDate.year}년 ${initDate.monthValue}월 ${initDate.dayOfMonth}일")
     val selectedDate = MutableLiveData(initDate)
 
-    private val timePoint =
-        MutableStateFlow("${initDate.year}-${String.format("%02d", initDate.monthValue)}-${String.format("%02d", initDate.dayOfMonth)}")
+    private val timePoint = MutableStateFlow(initDate.toString())
 
     var cragId: Long = 0
     var cragName: String = ""
@@ -89,7 +92,10 @@ class GymProfileRouteViewModel @Inject constructor(
         selectedDate.value = date
     }
 
-    fun setCragInfo(id: Long, name: String) {
+    fun setCragInfo(
+        id: Long,
+        name: String,
+    ) {
         cragId = id
         cragName = name
         Log.d("gym_profile", "암장 루트탭에서 아이디 : $cragId, 이름 : $cragName")
@@ -97,15 +103,9 @@ class GymProfileRouteViewModel @Inject constructor(
     }
 
     fun setDate() {
-        val date = selectedDate.value
-        val year = date?.year
-        val month = date?.month?.value
-        val day = date?.dayOfMonth
-        datePickText.value = "${year}년 ${month}월 ${day}일"
-
-        val formattedMonth = month?.let { String.format("%02d", it) }
-        val formattedDay = day?.let { String.format("%02d", it) }
-        timePoint.value = "${year}-${formattedMonth}-${formattedDay}"
+        val date = selectedDate.value ?: return
+        datePickText.value = "${date.year}년 ${date.monthValue}월 ${date.dayOfMonth}일"
+        timePoint.value = date.toString()
 
         viewModelScope.launch(Dispatchers.Main) {
             // 선택된 날짜로 루트 정보 다시 불러오기
@@ -115,7 +115,6 @@ class GymProfileRouteViewModel @Inject constructor(
     }
 
     private fun getCragInfo(id: Long) {
-
         viewModelScope.launch {
             repository.getGymFilteringKeyTime(id, timePoint.value).let {
                 when (it) {
@@ -132,14 +131,14 @@ class GymProfileRouteViewModel @Inject constructor(
                             _uiState.update { state ->
                                 state.copy(
                                     isSingleFloor = true,
-                                    layoutImg = it.body.layoutImageUrl
+                                    layoutImg = it.body.layoutImageUrl,
                                 )
                             }
                         } else {
                             _uiState.update { state ->
                                 state.copy(
                                     isSingleFloor = false,
-                                    layoutImg = it.body.layoutImageUrl
+                                    layoutImg = it.body.layoutImageUrl,
                                 )
                             }
                         }
@@ -155,32 +154,35 @@ class GymProfileRouteViewModel @Inject constructor(
                     }
                 }
             }
-
         }
     }
 
     fun selectFloor(floor: Int) {
         _uiState.update { state ->
             state.copy(
-                secondFloorBtnState = if (floor == 2) FloorBtnState.FloorSelected else FloorBtnState.FloorUnSelected,
+                secondFloorBtnState = if (floor ==
+                    2
+                ) {
+                    FloorBtnState.FloorSelected
+                } else {
+                    FloorBtnState.FloorUnSelected
+                },
                 firstFloorBtnState = if (floor == 1) FloorBtnState.FloorSelected else FloorBtnState.FloorUnSelected,
                 curFloor = floor,
                 sectorNameList = sectorNameList.filter {
                     it.floor == floor
                 },
-                selectedRoute = RouteUiData {}
+                selectedRoute = RouteUiData {},
             )
         }
         setFloorInfo(floor)
     }
 
     private fun setFloorInfo(floor: Int) {
-
         viewModelScope.launch {
             repository.getGymRouteInfoList(cragId, GetGymRouteInfoRequest(0, 10, floor)).let {
                 when (it) {
                     is BaseState.Success -> {
-
                         _uiState.update { state ->
                             state.copy(
                                 sectorNameList = sectorNameList.filter { data -> data.floor == floor },
@@ -188,7 +190,7 @@ class GymProfileRouteViewModel @Inject constructor(
                                 routeList = it.body.result.map { data ->
                                     data.toRouteUiData(::selectRoute)
                                 },
-                                curFloor = 1
+                                curFloor = 1,
                             )
                         }
                     }
@@ -208,9 +210,14 @@ class GymProfileRouteViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             repository.getGymRouteInfoList(
-                cragId, GetGymRouteInfoRequest(
-                    0, 10, floor, sectorId, difficulty
-                )
+                cragId,
+                GetGymRouteInfoRequest(
+                    0,
+                    10,
+                    floor,
+                    sectorId,
+                    difficulty,
+                ),
             ).let {
                 when (it) {
                     is BaseState.Success -> {
@@ -218,7 +225,7 @@ class GymProfileRouteViewModel @Inject constructor(
                             state.copy(
                                 routeList = it.body.result.map { data ->
                                     data.toRouteUiData(::selectRoute)
-                                }
+                                },
                             )
                         }
                     }
@@ -227,58 +234,49 @@ class GymProfileRouteViewModel @Inject constructor(
                         _event.emit(GymProfileRouteEvent.ShowToastMessage(it.msg))
                     }
                 }
-
             }
         }
     }
 
     private fun selectSectorName(item: SectorNameUiData) {
-
         _uiState.update { state ->
             state.copy(
                 sectorNameList = state.sectorNameList.map {
-                    it.copy(
-                        isSelected = it.sectorId == item.sectorId
-                    )
+                    it.copy(isSelected = it.sectorId == item.sectorId)
                 },
                 selectedSector = item,
-                selectedRoute = RouteUiData {}
+                selectedRoute = RouteUiData {},
             )
         }
 
         getRouteList(
             uiState.value.curFloor,
             item.sectorId,
-            if (uiState.value.selectedLevel.difficulty != -1) uiState.value.selectedLevel.difficulty else null
+            if (uiState.value.selectedLevel.difficulty != -1) uiState.value.selectedLevel.difficulty else null,
         )
-
     }
 
     private fun selectGymLevel(item: GymLevelUiData) {
         _uiState.update { state ->
             state.copy(
                 gymLevelList = state.gymLevelList.map {
-                    it.copy(
-                        isSelected = it.difficulty == item.difficulty
-                    )
+                    it.copy(isSelected = it.difficulty == item.difficulty)
                 },
                 selectedLevel = item,
-                selectedRoute = RouteUiData {}
+                selectedRoute = RouteUiData {},
             )
         }
 
         getRouteList(
             uiState.value.curFloor,
             if (uiState.value.selectedSector.sectorId != -1L) uiState.value.selectedSector.sectorId else null,
-            item.difficulty
+            item.difficulty,
         )
     }
 
     private fun selectRoute(item: RouteUiData) {
         _uiState.update { state ->
-            state.copy(
-                selectedRoute = item
-            )
+            state.copy(selectedRoute = item)
         }
     }
 
@@ -290,26 +288,22 @@ class GymProfileRouteViewModel @Inject constructor(
             difficulty = uiState.value.selectedLevel.difficulty,
             sectorName = uiState.value.selectedRoute.sectorName.ifBlank { uiState.value.selectedSector.name },
             cragName = cragName,
-            gymLevelName = uiState.value.selectedRoute.gymLevelName.ifBlank { uiState.value.selectedLevel.levelName }
+            gymLevelName = uiState.value.selectedRoute.gymLevelName.ifBlank { uiState.value.selectedLevel.levelName },
         )
         viewModelScope.launch {
             _event.emit(
-                GymProfileRouteEvent.ApplyFilter(
-                    selectedFilter
-                )
+                GymProfileRouteEvent.ApplyFilter(selectedFilter),
             )
         }
     }
 
     fun clearSelectedRoute() {
         _uiState.update { state ->
-            state.copy(
-                selectedRoute = RouteUiData {}
-            )
+            state.copy(selectedRoute = RouteUiData {})
         }
 
         viewModelScope.launch {
-            _event.emit(GymProfileRouteEvent.deleteFilter)
+            _event.emit(GymProfileRouteEvent.DeleteFilter)
         }
     }
 

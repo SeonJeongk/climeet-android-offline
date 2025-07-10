@@ -15,14 +15,16 @@ import com.climus.climeet.presentation.ui.toShortsPlayer
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MyPageMyShortsLikeFragment() :
+class MyPageMyShortsLikeFragment :
     BaseFragment<FragmentMypageMyshortsLikeBinding>(R.layout.fragment_mypage_myshorts_like) {
-
     private val sharedViewModel: ShortsPlayerViewModel by activityViewModels()
 
     private var bottomScrollState = true
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         super.onViewCreated(view, savedInstanceState)
 
@@ -42,11 +44,9 @@ class MyPageMyShortsLikeFragment() :
     }
 
     private fun addOnScrollListener() {
-
         binding.layoutScroll.setOnScrollChangeListener { v, _, scrollY, _, _ ->
 
             if (scrollY > binding.layoutScroll.getChildAt(0).measuredHeight - v.measuredHeight) {
-
                 if (bottomScrollState) {
                     bottomScrollState = false
                     sharedViewModel.getLikedShorts(ShortsOption.NEXT_PAGE)
@@ -62,10 +62,11 @@ class MyPageMyShortsLikeFragment() :
             sharedViewModel.event.collect {
                 when (it) {
                     is ShortsPlayerEvent.ShowToastMessage -> showToastMessage(it.msg)
-                    is ShortsPlayerEvent.NavigateToShortsPlayer -> findNavController().toShortsPlayer(
-                        it.shortsId,
-                        it.position
-                    )
+                    is ShortsPlayerEvent.NavigateToShortsPlayer ->
+                        findNavController().toShortsPlayer(
+                            it.shortsId,
+                            it.position,
+                        )
 
                     else -> {}
                 }
@@ -84,5 +85,4 @@ class MyPageMyShortsLikeFragment() :
             }
         }
     }
-
 }

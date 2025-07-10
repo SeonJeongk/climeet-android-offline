@@ -25,7 +25,6 @@ sealed class MyPageClimberProfileEvent {
 class MyPageClimberProfileViewModel @Inject constructor(
     private val repository: MainRepository,
 ) : ViewModel() {
-
     // 공개 범위 관리
     private val _uiState = MutableStateFlow(MyPageClimberProfileUiState())
     val uiState: StateFlow<MyPageClimberProfileUiState> = _uiState.asStateFlow()
@@ -43,9 +42,7 @@ class MyPageClimberProfileViewModel @Inject constructor(
         getProfilePrivacy()
     }
 
-    fun getClimberId(): Long {
-        return climberId
-    }
+    fun getClimberId(): Long = climberId
 
     private fun getProfilePrivacy() {
         viewModelScope.launch {
@@ -56,17 +53,12 @@ class MyPageClimberProfileViewModel @Inject constructor(
                             state.copy(
                                 homeGymPublic = it.body.homeGymPublic,
                                 avgCompletionLevelPublic = it.body.averageCompletionLevelPublic,
-                                avgCompletionRatePublic = it.body.averageCompletionRatePublic
+                                avgCompletionRatePublic = it.body.averageCompletionRatePublic,
                             )
                         }
-                        Log.d(
-                            "mypage_climber",
-                            "받아온 공개 범위 : home = ${uiState.value.homeGymPublic}, avgComplete = ${uiState.value.avgCompletionRatePublic}, avgLevel = ${uiState.value.avgCompletionLevelPublic}"
-                        )
                     }
 
                     is BaseState.Error -> {
-
                     }
                 }
             }
@@ -74,13 +66,14 @@ class MyPageClimberProfileViewModel @Inject constructor(
     }
 
     // 정보탭 공개 범위 수정 반영
-    fun setPrivacyState(target: String, privacy: Boolean) {
+    fun setPrivacyState(
+        target: String,
+        privacy: Boolean,
+    ) {
         when (target) {
             "homeGym" -> {
                 _uiState.update { state ->
-                    state.copy(
-                        homeGymPublic = privacy
-                    )
+                    state.copy(homeGymPublic = privacy)
                 }
 
                 viewModelScope.launch {
@@ -91,7 +84,6 @@ class MyPageClimberProfileViewModel @Inject constructor(
                             }
 
                             is BaseState.Error -> {
-
                             }
                         }
                     }
@@ -100,9 +92,7 @@ class MyPageClimberProfileViewModel @Inject constructor(
 
             "avgComplete" -> {
                 _uiState.update { state ->
-                    state.copy(
-                        avgCompletionRatePublic = privacy
-                    )
+                    state.copy(avgCompletionRatePublic = privacy)
                 }
 
                 viewModelScope.launch {
@@ -113,7 +103,6 @@ class MyPageClimberProfileViewModel @Inject constructor(
                             }
 
                             is BaseState.Error -> {
-
                             }
                         }
                     }
@@ -122,9 +111,7 @@ class MyPageClimberProfileViewModel @Inject constructor(
 
             "avgCompleteLevel" -> {
                 _uiState.update { state ->
-                    state.copy(
-                        avgCompletionLevelPublic = privacy
-                    )
+                    state.copy(avgCompletionLevelPublic = privacy)
                 }
 
                 viewModelScope.launch {
@@ -135,7 +122,6 @@ class MyPageClimberProfileViewModel @Inject constructor(
                             }
 
                             is BaseState.Error -> {
-
                             }
                         }
                     }

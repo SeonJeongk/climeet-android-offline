@@ -14,14 +14,18 @@ import javax.inject.Inject
 
 sealed class MyPageAdminProfileEvent {
     data object NavigateToEditAdminProfile : MyPageAdminProfileEvent()
+
     data object NavigateToRouteFinding : MyPageAdminProfileEvent()
+
     data object NavigateToGymReviewFromMyPage : MyPageAdminProfileEvent()
+
     data object NavigateToEditService : MyPageAdminProfileEvent()
 }
 
 @HiltViewModel
-class MyPageAdminMyProfileViewModel @Inject constructor(val repository: MainRepository): ViewModel(){
-
+class MyPageAdminMyProfileViewModel @Inject constructor(
+    val repository: MainRepository,
+) : ViewModel() {
     private val _event = MutableSharedFlow<MyPageAdminProfileEvent>()
     val event: SharedFlow<MyPageAdminProfileEvent> = _event.asSharedFlow()
 
@@ -34,9 +38,7 @@ class MyPageAdminMyProfileViewModel @Inject constructor(val repository: MainRepo
         gymId = id
     }
 
-    fun getGymId(): Long {
-        return gymId
-    }
+    fun getGymId(): Long = gymId
 
     fun setSnackBarState(value: Boolean) {
         _showSnackbar.value = value
@@ -56,17 +58,13 @@ class MyPageAdminMyProfileViewModel @Inject constructor(val repository: MainRepo
 
     fun navigateToEditService() {
         viewModelScope.launch {
-            _event.emit(
-                MyPageAdminProfileEvent.NavigateToEditService
-            )
+            _event.emit(MyPageAdminProfileEvent.NavigateToEditService)
         }
     }
 
     fun navigateToReviewFromMyPage() {
         viewModelScope.launch {
-            _event.emit(
-                MyPageAdminProfileEvent.NavigateToGymReviewFromMyPage
-            )
+            _event.emit(MyPageAdminProfileEvent.NavigateToGymReviewFromMyPage)
         }
     }
 }

@@ -21,10 +21,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ClimberProfileInfoFragment @Inject constructor(private val userId: Long) :
-    BaseFragment<FragmentClimberProfileInfoBinding>(R.layout.fragment_climber_profile_info) {
-
-
+class ClimberProfileInfoFragment @Inject constructor(
+    private val userId: Long,
+) : BaseFragment<FragmentClimberProfileInfoBinding>(R.layout.fragment_climber_profile_info) {
     private val viewModel: ClimberProfileInfoViewModel by viewModels()
     private val parentViewModel: ClimberProfileViewModel by activityViewModels()
     private var adapter = SelectGymAdapter(0) {
@@ -34,7 +33,10 @@ class ClimberProfileInfoFragment @Inject constructor(private val userId: Long) :
     private var averageCompletionRatePublic = false
     private var averageCompletionLevelPublic = false
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) { // api
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) { // api
         super.onViewCreated(view, savedInstanceState)
 
         binding.rvHomeHomegym.adapter = HomeGymAdapter()
@@ -50,9 +52,8 @@ class ClimberProfileInfoFragment @Inject constructor(private val userId: Long) :
         repeatOnStarted {
             viewModel.event.collect {
                 when (it) {
-                    is ClimberProfileEvent.NavigateToGymProfile -> findNavController().toGymProfile(
-                        it.id
-                    )
+                    is ClimberProfileEvent.NavigateToGymProfile ->
+                        findNavController().toGymProfile(it.id)
                     is ClimberProfileEvent.ShowPopupWindow -> showPopupWindow()
                     is ClimberProfileEvent.ShowToastMessage -> showToastMessage(it.msg)
                 }
@@ -118,7 +119,7 @@ class ClimberProfileInfoFragment @Inject constructor(private val userId: Long) :
             view,
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
-            true
+            true,
         )
 
         recyclerView.layoutManager = LinearLayoutManager(context)

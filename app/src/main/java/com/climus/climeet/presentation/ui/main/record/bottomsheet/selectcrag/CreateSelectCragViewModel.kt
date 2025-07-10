@@ -25,19 +25,21 @@ data class CreateSelectCragUiState(
     val searchList: List<FollowCrag> = emptyList(),
     val progressState: Boolean = false,
     val emptyResultState: Boolean = false,
-    val emptyTextState: Boolean = true
+    val emptyTextState: Boolean = true,
 )
 
-sealed class CreateSelectCragEvent{
-    data object NavigateToBack: CreateSelectCragEvent()
+sealed class CreateSelectCragEvent {
+    data object NavigateToBack : CreateSelectCragEvent()
 
-    data class ShowToastMessage(val msg: String): CreateSelectCragEvent()
+    data class ShowToastMessage(
+        val msg: String,
+    ) : CreateSelectCragEvent()
 }
 
 @HiltViewModel
 class CreateSelectCragViewModel @Inject constructor(
-    private val repository: MainRepository
-): ViewModel() {
+    private val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(CreateSelectCragUiState())
     val uiState: StateFlow<CreateSelectCragUiState> = _uiState.asStateFlow()
 
@@ -56,16 +58,16 @@ class CreateSelectCragViewModel @Inject constructor(
         keyword.onEach {
             if (it.isBlank()) {
                 repository.getHomeGyms().let { result ->
-                    when(result){
+                    when (result) {
                         is BaseState.Success -> {
-                            if(result.body.isNotEmpty()){
+                            if (result.body.isNotEmpty()) {
                                 _uiState.update { state ->
                                     state.copy(
-                                        searchList = result.body.map{ item ->
+                                        searchList = result.body.map { item ->
                                             item.toFollowCrag(it)
                                         },
                                         emptyResultState = false,
-                                        emptyTextState = false
+                                        emptyTextState = false,
                                     )
                                 }
                             } else {
@@ -73,11 +75,10 @@ class CreateSelectCragViewModel @Inject constructor(
                                     state.copy(
                                         searchList = emptyList(),
                                         emptyResultState = false,
-                                        emptyTextState = false
+                                        emptyTextState = false,
                                     )
                                 }
                             }
-
                         }
                         is BaseState.Error -> {
                             _event.emit(CreateSelectCragEvent.ShowToastMessage("홈짐을 가져오지 못했습니다!"))
@@ -86,14 +87,12 @@ class CreateSelectCragViewModel @Inject constructor(
                                 state.copy(
                                     searchList = emptyList(),
                                     emptyResultState = false,
-                                    emptyTextState = false
+                                    emptyTextState = false,
                                 )
                             }
                         }
                     }
                 }
-
-
             } else {
                 curJob?.cancel()
 
@@ -101,7 +100,7 @@ class CreateSelectCragViewModel @Inject constructor(
                     state.copy(
                         progressState = true,
                         emptyResultState = false,
-                        emptyTextState = false
+                        emptyTextState = false,
                     )
                 }
 
@@ -116,7 +115,7 @@ class CreateSelectCragViewModel @Inject constructor(
                                             searchList = result.body.result.map { item ->
                                                 item.toFollowCrag(it)
                                             },
-                                            progressState = false
+                                            progressState = false,
                                         )
                                     }
                                 } else {
@@ -125,7 +124,7 @@ class CreateSelectCragViewModel @Inject constructor(
                                             searchList = emptyList(),
                                             progressState = false,
                                             emptyResultState = true,
-                                            emptyTextState = true
+                                            emptyTextState = true,
                                         )
                                     }
                                 }
@@ -136,7 +135,7 @@ class CreateSelectCragViewModel @Inject constructor(
                                     state.copy(
                                         progressState = false,
                                         emptyResultState = true,
-                                        emptyTextState = true
+                                        emptyTextState = true,
                                     )
                                 }
                                 _event.emit(CreateSelectCragEvent.ShowToastMessage(result.msg))
@@ -151,16 +150,13 @@ class CreateSelectCragViewModel @Inject constructor(
     fun deleteKeyword() {
         keyword.value = ""
         _uiState.update { state ->
-            state.copy(
-                searchList = emptyList()
-            )
+            state.copy(searchList = emptyList())
         }
     }
 
-    fun navigateToBack(){
+    fun navigateToBack() {
         viewModelScope.launch {
             _event.emit(CreateSelectCragEvent.NavigateToBack)
         }
     }
-
 }

@@ -20,22 +20,21 @@ import java.time.LocalTime
 
 @AndroidEntryPoint
 class SelectTimeBottomSheetFragment : BottomSheetDialogFragment() {
-
     private val parentViewModel: CreateClimbingRecordViewModel by activityViewModels()
     private val viewModel: SelectTimeBottomViewModel by viewModels()
-    private var _binding: FragmentSelectTimeBottomSheetBinding? = null
-    private val binding get() = _binding!!
+    private var viewBinding: FragmentSelectTimeBottomSheetBinding? = null
+    private val binding get() = checkNotNull(viewBinding) { "Binding is only available while the view exists" }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
-        _binding = DataBindingUtil.inflate(
+        viewBinding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_select_time_bottom_sheet,
             container,
-            false
+            false,
         )
         binding.vm = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
@@ -43,7 +42,10 @@ class SelectTimeBottomSheetFragment : BottomSheetDialogFragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         initEventObserve()
@@ -84,14 +86,14 @@ class SelectTimeBottomSheetFragment : BottomSheetDialogFragment() {
                 timepicker.setOnTimeChangedListener { _, hourOfDay, minute ->
                     viewModel.setStartTime(
                         hourOfDay,
-                        minute
+                        minute,
                     )
                 }
             } else {
                 timepicker.setOnTimeChangedListener { _, hourOfDay, minute ->
                     viewModel.setEndTime(
                         hourOfDay,
-                        minute
+                        minute,
                     )
                 }
             }
@@ -101,5 +103,4 @@ class SelectTimeBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
     }
-
 }

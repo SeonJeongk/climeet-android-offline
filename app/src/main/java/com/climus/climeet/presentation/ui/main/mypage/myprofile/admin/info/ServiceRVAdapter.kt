@@ -14,15 +14,18 @@ interface OnServiceClickListener {
 
 class ServiceRVAdapter(
     private val serviceList: List<ServiceUiData>,
-    private val onServiceClickListener: OnServiceClickListener
+    private val onServiceClickListener: OnServiceClickListener,
 ) : RecyclerView.Adapter<ServiceRVAdapter.ServiceViewHolder>() {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ServiceViewHolder =
+        ServiceViewHolder(ItemServiceBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ServiceViewHolder =
-        ServiceViewHolder(
-            ItemServiceBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        )
-
-    override fun onBindViewHolder(holder: ServiceViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ServiceViewHolder,
+        position: Int,
+    ) {
         holder.bind(serviceList[position])
         holder.binding.btnItem.setOnClickListener {
             onServiceClickListener.onServiceClick(position)
@@ -32,20 +35,20 @@ class ServiceRVAdapter(
     override fun getItemCount(): Int = serviceList.size
 
     class ServiceViewHolder(
-        val binding: ItemServiceBinding
+        val binding: ItemServiceBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(service: ServiceUiData) {
             binding.btnItem.text = service.title
             if (service.isSelected) {
                 binding.btnItem.background = ContextCompat.getDrawable(
                     binding.root.context,
-                    R.drawable.rect_mainfill_nostroke_5radius
+                    R.drawable.rect_mainfill_nostroke_5radius,
                 )
                 binding.btnItem.setTextColor(Color.BLACK)
             } else {
                 binding.btnItem.background = ContextCompat.getDrawable(
                     binding.root.context,
-                    R.drawable.rect_grey7fill_nostroke_5radius
+                    R.drawable.rect_grey7fill_nostroke_5radius,
                 )
                 binding.btnItem.setTextColor(Color.WHITE)
             }

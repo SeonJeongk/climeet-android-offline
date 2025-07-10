@@ -2,13 +2,13 @@ package com.climus.climeet.presentation.ui.main.home.viewpager.ranking
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -25,28 +25,27 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class TimeFragment : Fragment() {
-
-    private lateinit var binding : FragmentTimeBinding
+    private lateinit var binding: FragmentTimeBinding
     private val viewModel: TimeViewModel by viewModels()
 
-    private lateinit var profileImg1 : ImageView
-    private lateinit var profileImg2 : ImageView
-    private lateinit var profileImg3 : ImageView
+    private lateinit var profileImg1: ImageView
+    private lateinit var profileImg2: ImageView
+    private lateinit var profileImg3: ImageView
     lateinit var profileImgList: List<ImageView>
 
-    private lateinit var nickname1 : TextView
-    private lateinit var nickname2 : TextView
-    private lateinit var nickname3 : TextView
+    private lateinit var nickname1: TextView
+    private lateinit var nickname2: TextView
+    private lateinit var nickname3: TextView
     lateinit var nicknameList: List<TextView>
 
-    private lateinit var recordTime1 : TextView
-    private lateinit var recordTime2 : TextView
-    private lateinit var recordTime3 : TextView
+    private lateinit var recordTime1: TextView
+    private lateinit var recordTime2: TextView
+    private lateinit var recordTime3: TextView
     lateinit var recordTimeList: List<TextView>
 
-    private lateinit var rank1 : TextView
-    private lateinit var rank2 : TextView
-    private lateinit var rank3 : TextView
+    private lateinit var rank1: TextView
+    private lateinit var rank2: TextView
+    private lateinit var rank3: TextView
     lateinit var rankList: List<TextView>
 
     fun LifecycleOwner.repeatOnStarted(block: suspend CoroutineScope.() -> Unit) {
@@ -54,16 +53,21 @@ class TimeFragment : Fragment() {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED, block)
         }
     }
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_time, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) { // api
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) { // api
         super.onViewCreated(view, savedInstanceState)
         initView()
         viewModel.getClimberRankingOrderTime()
@@ -94,14 +98,14 @@ class TimeFragment : Fragment() {
 
     private fun initStateObserve() {
         repeatOnStarted {
-            viewModel?.let { vm ->
+            viewModel.let { vm ->
                 vm.uiState.collect { uiState ->
-                    uiState.rankingList?.let { rankingList ->
+                    uiState.rankingList.let { rankingList ->
                         Log.d("TimeFragment", rankingList.toString())
                         val iterationCount = minOf(rankingList.size, 3)
 
                         rankingList.take(iterationCount).forEachIndexed { i, bestTimeClimberSimpleResponse ->
-                            if(bestTimeClimberSimpleResponse.profileImageUrl != null) {
+                            if (bestTimeClimberSimpleResponse.profileImageUrl != null) {
                                 Glide.with(binding.root)
                                     .load(bestTimeClimberSimpleResponse.profileImageUrl)
                                     .into(profileImgList[i])
@@ -120,7 +124,7 @@ class TimeFragment : Fragment() {
         }
     }
 
-    private fun navigateToClimberProfile(userId : Long) {
+    private fun navigateToClimberProfile(userId: Long) {
         val action = MainNavDirections.globalActionToClimerProfileFragment(userId)
         findNavController().navigate(action)
     }

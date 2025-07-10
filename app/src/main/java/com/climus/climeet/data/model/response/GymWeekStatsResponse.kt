@@ -1,7 +1,7 @@
 package com.climus.climeet.data.model.response
 
 data class GymWeekStatsResponse(
-    val difficulty: List<DifficultyItems>
+    val difficulty: List<DifficultyItems>,
 )
 
 data class DifficultyItems(
@@ -9,5 +9,5 @@ data class DifficultyItems(
     val gymDifficultyName: String,
     val gymDifficultyColor: String,
     val count: Int,
-    val difficulty: Int
+    val difficulty: Int,
 )

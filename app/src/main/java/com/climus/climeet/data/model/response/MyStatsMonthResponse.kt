@@ -4,5 +4,5 @@ data class MyStatsMonthResponse(
     val time: String,
     val totalCompletedCount: Int,
     val attemptRouteCount: Int,
-    val difficulty: Map<String, Int>
+    val difficulty: Map<String, Int>,
 )

@@ -34,7 +34,10 @@ class CalendarFragment : BaseFragment<FragmentCalendarBinding>(R.layout.fragment
     private val viewModel: CalendarViewModel by activityViewModels()
     private var calendarAdapter: CalendarAdapter? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
@@ -44,7 +47,6 @@ class CalendarFragment : BaseFragment<FragmentCalendarBinding>(R.layout.fragment
         initStateObserve()
         initDateObserve()
         customCalendar()
-
     }
 
     override fun onResume() {
@@ -66,17 +68,16 @@ class CalendarFragment : BaseFragment<FragmentCalendarBinding>(R.layout.fragment
         }
     }
 
-    private fun initDateObserve(){
+    private fun initDateObserve() {
         repeatOnStarted {
             viewModel.selectedDate.collect { date ->
                 val yearMonth = YearMonth.of(date.year, date.monthValue)
                 binding.calendarView.dayBinder = null
                 setupDayBinder()
-                binding.calendarView.scrollToMonth(yearMonth)  // 새로 선택된 날짜가 있는 월로 이동
+                binding.calendarView.scrollToMonth(yearMonth) // 새로 선택된 날짜가 있는 월로 이동
             }
         }
     }
-
 
     private fun initEventObserve() {
         repeatOnStarted {
@@ -88,7 +89,7 @@ class CalendarFragment : BaseFragment<FragmentCalendarBinding>(R.layout.fragment
                             requireContext(),
                             dateViewModel,
                             CreateRecordData.selectedDate,
-                            CreateRecordData::setSelectedDate
+                            CreateRecordData::setSelectedDate,
                         ) { date ->
                             viewModel.setSelectedDate(date)
                         }.show()
@@ -103,8 +104,7 @@ class CalendarFragment : BaseFragment<FragmentCalendarBinding>(R.layout.fragment
     }
 
     private fun NavController.toCreateClimbingRecord() {
-        val action =
-            RecordFragmentDirections.actionRecordFragmentToCreateClimbingRecordFragment()
+        val action = RecordFragmentDirections.actionRecordFragmentToCreateClimbingRecordFragment()
         navigate(action)
     }
 
@@ -112,7 +112,7 @@ class CalendarFragment : BaseFragment<FragmentCalendarBinding>(R.layout.fragment
         binding.calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
             override fun bind(
                 container: DayViewContainer,
-                data: CalendarDay
+                data: CalendarDay,
             ) {
                 container.textView.text = data.date.dayOfMonth.toString()
             }
@@ -124,7 +124,6 @@ class CalendarFragment : BaseFragment<FragmentCalendarBinding>(R.layout.fragment
         setDayOfWeekTitles()
         setupDayBinder()
         setupMonthScrollListener()
-
     }
 
     private fun setupCalendarView() {
@@ -150,7 +149,11 @@ class CalendarFragment : BaseFragment<FragmentCalendarBinding>(R.layout.fragment
     private fun setupDayBinder() {
         binding.calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
             override fun create(view: View) = DayViewContainer(view, viewModel, recordViewModel)
-            override fun bind(container: DayViewContainer, data: CalendarDay) {
+
+            override fun bind(
+                container: DayViewContainer,
+                data: CalendarDay,
+            ) {
                 container.textView.text = data.date.dayOfMonth.toString()
                 container.day = data
                 if (data.position == DayPosition.MonthDate) {
@@ -188,7 +191,7 @@ class CalendarFragment : BaseFragment<FragmentCalendarBinding>(R.layout.fragment
             // 월이 변경될 때마다 텍스트 뷰를 업데이트
             viewModel.updateSelectedYearMonth(
                 month.yearMonth.year.toString(),
-                month.yearMonth.month.value.toString()
+                month.yearMonth.month.value.toString(),
             )
         }
     }
@@ -197,5 +200,4 @@ class CalendarFragment : BaseFragment<FragmentCalendarBinding>(R.layout.fragment
         val action = RecordFragmentDirections.actionRecordFragmentToTimerMainFragment()
         navigate(action)
     }
-
 }

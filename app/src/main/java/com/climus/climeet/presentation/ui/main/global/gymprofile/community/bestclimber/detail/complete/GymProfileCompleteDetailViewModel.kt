@@ -16,12 +16,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class GymProfileCompleteDetailUiState(
-    val rankingList: List<GymCompleteBestClimberResponse> = emptyList()
+    val rankingList: List<GymCompleteBestClimberResponse> = emptyList(),
 )
 
 @HiltViewModel
-class GymProfileCompleteDetailViewModel @Inject constructor(private val repository: MainRepository): ViewModel() {
-
+class GymProfileCompleteDetailViewModel @Inject constructor(
+    private val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(GymProfileCompleteDetailUiState())
     val uiState: StateFlow<GymProfileCompleteDetailUiState> = _uiState.asStateFlow()
 
@@ -30,12 +31,10 @@ class GymProfileCompleteDetailViewModel @Inject constructor(private val reposito
     fun getClimberRankingOrderClearCount() {
         viewModelScope.launch {
             repository.getGymClimberRankingOrderClearCount(gymId).let {
-                when(it) {
+                when (it) {
                     is BaseState.Success -> {
                         _uiState.update { state ->
-                            state.copy(
-                                rankingList = it.body
-                            )
+                            state.copy(rankingList = it.body)
                         }
                     }
                     is BaseState.Error -> {

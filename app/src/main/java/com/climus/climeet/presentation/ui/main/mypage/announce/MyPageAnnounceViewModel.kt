@@ -20,17 +20,23 @@ import java.util.Locale
 import javax.inject.Inject
 
 data class AnnounceUiData(
-    val announceList : List<AnnouncementUiData> = emptyList()
+    val announceList: List<AnnouncementUiData> = emptyList(),
 )
 
 sealed class MyPageAnnounceEvent {
-    data class NavigateToAnnounceDetail(val boardId: Long) : MyPageAnnounceEvent()
-    data class ShowToastMessage(val msg: String) : MyPageAnnounceEvent()
+    data class NavigateToAnnounceDetail(
+        val boardId: Long,
+    ) : MyPageAnnounceEvent()
+
+    data class ShowToastMessage(
+        val msg: String,
+    ) : MyPageAnnounceEvent()
 }
 
 @HiltViewModel
-class MyPageAnnounceViewModel @Inject constructor(val repository: MainRepository) : ViewModel() {
-
+class MyPageAnnounceViewModel @Inject constructor(
+    val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(AnnounceUiData())
     val uiState: StateFlow<AnnounceUiData> = _uiState.asStateFlow()
 
@@ -44,13 +50,11 @@ class MyPageAnnounceViewModel @Inject constructor(val repository: MainRepository
                     is BaseState.Success -> {
                         val announcements = it.body.map { response ->
                             response.toAnnouncementUiData().copy(
-                                createdAt = formatDate(response.createdAt)
+                                createdAt = formatDate(response.createdAt),
                             )
                         }
                         _uiState.update { state ->
-                            state.copy(
-                                announceList = announcements
-                            )
+                            state.copy(announceList = announcements)
                         }
                     }
 

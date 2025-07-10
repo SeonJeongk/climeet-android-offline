@@ -15,12 +15,10 @@ import com.climus.climeet.presentation.ui.main.global.gymprofile.info.GymProfile
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.MyPageAdminMyProfileFragmentArgs
 import dagger.hilt.android.AndroidEntryPoint
 
-
 @AndroidEntryPoint
 class MyPageAdminProfileEditServiceFragment :
     BaseFragment<FragmentMypageAdminProfileEditServiceBinding>(R.layout.fragment_mypage_admin_profile_edit_service),
     OnServiceClickListener {
-
     val sharedViewModel: GymProfileInfoViewModel by activityViewModels()
     val viewModel: MyPageAdminProfileEditServiceViewModel by viewModels()
 
@@ -40,7 +38,10 @@ class MyPageAdminProfileEditServiceFragment :
         ServiceUiData(8, "운동복 대여"),
     )
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
@@ -60,7 +61,7 @@ class MyPageAdminProfileEditServiceFragment :
     }
 
     private fun updateServiceListSelectedState() {
-        val gymServiceList = sharedViewModel.uiState.value.gymServiceList ?: return
+        val gymServiceList = sharedViewModel.uiState.value.gymServiceList
         for (service in serviceList) {
             if (gymServiceList.any { it.name.replace("_", " ") == service.title }) {
                 service.isSelected = true
@@ -88,10 +89,8 @@ class MyPageAdminProfileEditServiceFragment :
     }
 
     private fun NavController.toMyPageAdminProfile() {
-        val action =
-            MyPageAdminProfileEditServiceFragmentDirections.actionMyPageAdminProfileEditServiceFragmentToMyPageAdminMyProfileFragment(
-                gymId
-            )
+        val action = MyPageAdminProfileEditServiceFragmentDirections
+            .actionMyPageAdminProfileEditServiceFragmentToMyPageAdminMyProfileFragment(gymId)
         navigate(action)
     }
 }

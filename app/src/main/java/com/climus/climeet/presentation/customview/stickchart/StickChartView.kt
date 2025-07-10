@@ -18,13 +18,13 @@ import com.github.mikephil.charting.renderer.XAxisRenderer
 import com.github.mikephil.charting.utils.MPPointF
 import com.github.mikephil.charting.utils.Transformer
 import com.github.mikephil.charting.utils.ViewPortHandler
+import java.util.Locale
 
 class StickChartView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : BarChart(context, attrs, defStyleAttr) {
-
     private val density = context.resources.displayMetrics.density
 
     init {
@@ -89,8 +89,8 @@ class StickChartView @JvmOverloads constructor(
                 mViewPortHandler,
                 mXAxis,
                 getTransformer(YAxis.AxisDependency.LEFT),
-                data
-            )
+                data,
+            ),
         )
         this.extraBottomOffset = 10f
         this.data = barData
@@ -102,28 +102,34 @@ class StickChartView @JvmOverloads constructor(
             if (value <= 0.01f) {
                 return "0%"
             }
-            return String.format("%.0f%%", value * 100)
+            return String.format(Locale.getDefault(), "%.0f%%", value * 100)
         }
     }
 
-    inner class XAxisFormatter(data: List<StickChartUiData>) : ValueFormatter() {
+    inner class XAxisFormatter(
+        data: List<StickChartUiData>,
+    ) : ValueFormatter() {
         private val name = data.map {
             it.levelName
         }
 
-        override fun getAxisLabel(value: Float, axis: AxisBase?): String {
-            return name.getOrNull(value.toInt()) ?: value.toString()
-        }
+        override fun getAxisLabel(
+            value: Float,
+            axis: AxisBase?,
+        ): String = name.getOrNull(value.toInt()) ?: value.toString()
     }
 
     inner class CustomXAxisRenderer(
         viewPortHandler: ViewPortHandler,
         xAxis: XAxis,
         trans: Transformer,
-        private val data: List<StickChartUiData>
+        private val data: List<StickChartUiData>,
     ) : XAxisRenderer(viewPortHandler, xAxis, trans) {
-
-        override fun drawLabels(canvas: Canvas, pos: Float, anchor: MPPointF) {
+        override fun drawLabels(
+            canvas: Canvas,
+            pos: Float,
+            anchor: MPPointF,
+        ) {
             val paint = mAxisLabelPaint
             val valueFormatter = mXAxis.valueFormatter
             val positions = getTransformedPositions()
@@ -135,8 +141,8 @@ class StickChartView @JvmOverloads constructor(
                     val index = i / 2
                     if (index >= data.size) continue // Prevent out-of-bounds access
                     val label = valueFormatter.getAxisLabel(mXAxis.mEntries.getOrNull(index) ?: 0f, mXAxis)
-                    paint.color = Color.parseColor(data[index].levelStringColor)
-                    drawLabel(canvas, label, x, pos, anchor, paint)
+                    paint.color = data[index].levelStringColor.toColorInt()
+                    drawLabel(canvas, label, x, pos, paint)
                 }
             }
         }
@@ -146,8 +152,7 @@ class StickChartView @JvmOverloads constructor(
             label: String,
             x: Float,
             y: Float,
-            anchor: MPPointF,
-            paint: Paint
+            paint: Paint,
         ) {
             paint.textAlign = Paint.Align.CENTER
             canvas.drawText(label, x, y, paint)

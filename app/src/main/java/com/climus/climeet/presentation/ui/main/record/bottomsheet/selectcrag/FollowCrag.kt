@@ -9,22 +9,24 @@ data class FollowCrag(
     val name: String = "",
     val keyword: String = "",
     var followers: Int = 0,
-    var isFollowing: Boolean = false
+    var isFollowing: Boolean = false,
 )
 
-fun SearchAvailableGymItem.toFollowCrag(keyword: String) = FollowCrag(
-    id = id,
-    imgUrl = profileImageUrl,
-    followers = follower,
-    name = name,
-    keyword = keyword,
-)
+fun SearchAvailableGymItem.toFollowCrag(keyword: String) =
+    FollowCrag(
+        id = id,
+        imgUrl = profileImageUrl,
+        followers = follower,
+        name = name,
+        keyword = keyword,
+    )
 
-fun UserHomeGymSimpleResponse.toFollowCrag(keyword: String) = FollowCrag(
-    id = gymId,
-    imgUrl = gymProfileUrl,
-    name = gymName,
-    keyword = keyword,
-    followers = 0,
-    isFollowing = true
-)
+fun UserHomeGymSimpleResponse.toFollowCrag(keyword: String) =
+    FollowCrag(
+        id = gymId,
+        imgUrl = gymProfileUrl,
+        name = gymName,
+        keyword = keyword,
+        followers = 0,
+        isFollowing = true,
+    )

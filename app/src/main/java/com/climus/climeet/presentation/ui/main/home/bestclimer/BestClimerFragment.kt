@@ -3,7 +3,6 @@ package com.climus.climeet.presentation.ui.main.home.bestclimer
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.findNavController
-import com.climus.climeet.MainNavDirections
 import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentBestClimerBinding
 import com.climus.climeet.presentation.base.BaseFragment
@@ -12,8 +11,10 @@ import com.climus.climeet.presentation.ui.toSearchProfile
 import com.google.android.material.tabs.TabLayoutMediator
 
 class BestClimerFragment : BaseFragment<FragmentBestClimerBinding>(R.layout.fragment_best_climer) {
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         setupBestClimer()
@@ -38,5 +39,4 @@ class BestClimerFragment : BaseFragment<FragmentBestClimerBinding>(R.layout.frag
             tab.text = tabMenu[position]
         }.attach()
     }
-
 }

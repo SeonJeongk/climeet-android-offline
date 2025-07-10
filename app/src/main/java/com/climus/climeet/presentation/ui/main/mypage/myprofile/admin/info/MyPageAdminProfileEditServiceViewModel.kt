@@ -18,19 +18,22 @@ import javax.inject.Inject
 
 sealed class EditAdminServiceEvent {
     data object NavigateToBack : EditAdminServiceEvent()
+
     data object NavigateToProfile : EditAdminServiceEvent()
-    data class ShowToastMessage(val msg: String) : EditAdminServiceEvent()
+
+    data class ShowToastMessage(
+        val msg: String,
+    ) : EditAdminServiceEvent()
 }
 
 @HiltViewModel
-class MyPageAdminProfileEditServiceViewModel @Inject constructor(val repository: MainRepository) :
-    ViewModel() {
-
+class MyPageAdminProfileEditServiceViewModel @Inject constructor(
+    val repository: MainRepository,
+) : ViewModel() {
     private val _event = MutableSharedFlow<EditAdminServiceEvent>()
     val event: SharedFlow<EditAdminServiceEvent> = _event.asSharedFlow()
 
-    private val _serviceList =
-        MutableLiveData<List<ServiceUiData>>(emptyList())
+    private val _serviceList = MutableLiveData<List<ServiceUiData>>(emptyList())
     val serviceList: LiveData<List<ServiceUiData>> = _serviceList
 
     private var initialServiceList: List<ServiceUiData> = emptyList()
@@ -52,8 +55,7 @@ class MyPageAdminProfileEditServiceViewModel @Inject constructor(val repository:
 
     // 선택된 서비스 관리
     fun toggleServiceSelection(position: Int) {
-        _serviceList.value?.get(position)?.isSelected =
-            _serviceList.value?.get(position)?.isSelected != true
+        _serviceList.value?.get(position)?.isSelected = _serviceList.value?.get(position)?.isSelected != true
 
         _serviceList.value = _serviceList.value // 변경 반영
 
@@ -61,10 +63,9 @@ class MyPageAdminProfileEditServiceViewModel @Inject constructor(val repository:
     }
 
     private fun updateGymService() {
-        val selectedServiceTitles =
-            _serviceList.value?.filter { it.isSelected }
-                ?.map { it.title.replace(" ", "_") } // 공백을 언더바로 대체
-                ?: emptyList()
+        val selectedServiceTitles = _serviceList.value?.filter { it.isSelected }
+            ?.map { it.title.replace(" ", "_") } // 공백을 언더바로 대체
+            .orEmpty()
 
         val request = GymServiceUpdateRequest(serviceList = selectedServiceTitles)
 
@@ -95,5 +96,4 @@ class MyPageAdminProfileEditServiceViewModel @Inject constructor(val repository:
             _event.emit(EditAdminServiceEvent.NavigateToProfile)
         }
     }
-
 }

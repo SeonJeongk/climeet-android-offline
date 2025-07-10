@@ -1,6 +1,5 @@
 package com.climus.climeet.presentation.ui.main.mypage.follow.viewpager.adapter
 
-import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,13 +11,15 @@ import com.climus.climeet.presentation.ui.main.mypage.follow.model.FollowingUiDa
 import com.climus.climeet.presentation.ui.main.mypage.follow.viewpager.FollowingViewModel
 
 class FollowingGymRVAdapter(
-    private val followingGymList: MutableList<FollowingUiData>,
-    private val viewModel: FollowingViewModel
+    private val followingGymList: List<FollowingUiData>,
+    private val viewModel: FollowingViewModel,
 ) : RecyclerView.Adapter<FollowingGymViewHolder>() {
+    private val followStatus = mutableMapOf<Int, Boolean>()
 
-    private val followStatus =  mutableMapOf<Int, Boolean>()
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FollowingGymViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): FollowingGymViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemMypageFollowingCragBinding.inflate(inflater, parent, false)
         return FollowingGymViewHolder(binding, viewModel)
@@ -63,11 +64,9 @@ class FollowingGymRVAdapter(
 
 class FollowingGymViewHolder(
     val binding: ItemMypageFollowingCragBinding,
-    val viewModel: FollowingViewModel
-) :
-    RecyclerView.ViewHolder(binding.root) {
+    val viewModel: FollowingViewModel,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(data: FollowingUiData) {
-
         if (data.profileImageUrl != null) {
             Glide.with(binding.root.context)
                 .load(data.profileImageUrl)
@@ -79,7 +78,7 @@ class FollowingGymViewHolder(
         binding.tvFollower.text = data.followerCount.toString()
         binding.tvFollowing.text = data.followingCount.toString()
 
-        binding.root.setOnClickListener{
+        binding.root.setOnClickListener {
             viewModel.navigateToProfile(data.userId)
         }
     }

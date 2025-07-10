@@ -1,7 +1,6 @@
 package com.climus.climeet.presentation.ui.main.global.climerprofile.viewpager
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -19,17 +18,18 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ClimberProfileShortsFragment @Inject constructor(
-    private val userId: Long
-) :
-    BaseFragment<FragmentClimberShortsBinding>(R.layout.fragment_climber_shorts) {
-
+    private val userId: Long,
+) : BaseFragment<FragmentClimberShortsBinding>(R.layout.fragment_climber_shorts) {
     private val sharedViewModel: ShortsPlayerViewModel by activityViewModels()
     private val parentViewModel: ClimberProfileViewModel by activityViewModels()
 
     private var bottomScrollState = true
     private var shortsPrivacy = false
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.svm = sharedViewModel
@@ -43,11 +43,9 @@ class ClimberProfileShortsFragment @Inject constructor(
     }
 
     private fun addOnScrollListener() {
-
         binding.layoutScroll.setOnScrollChangeListener { v, _, scrollY, _, _ ->
 
             if (scrollY > binding.layoutScroll.getChildAt(0).measuredHeight - v.measuredHeight) {
-
                 if (bottomScrollState) {
                     bottomScrollState = false
                     sharedViewModel.getUserShorts(ShortsOption.NEXT_PAGE, userId)
@@ -63,10 +61,11 @@ class ClimberProfileShortsFragment @Inject constructor(
             sharedViewModel.event.collect {
                 when (it) {
                     is ShortsPlayerEvent.ShowToastMessage -> showToastMessage(it.msg)
-                    is ShortsPlayerEvent.NavigateToShortsPlayer -> findNavController().toShortsPlayer(
-                        it.shortsId,
-                        it.position
-                    )
+                    is ShortsPlayerEvent.NavigateToShortsPlayer ->
+                        findNavController().toShortsPlayer(
+                            it.shortsId,
+                            it.position,
+                        )
 
                     else -> {}
                 }
@@ -77,7 +76,7 @@ class ClimberProfileShortsFragment @Inject constructor(
     private fun initStateObserve() {
         repeatOnStarted {
             sharedViewModel.uiState.collect {
-                if(shortsPrivacy) {
+                if (shortsPrivacy) {
                     if (it.shortsThumbnailList.isEmpty()) {
                         binding.layoutNoItem.visibility = View.VISIBLE
                     } else {
@@ -94,7 +93,7 @@ class ClimberProfileShortsFragment @Inject constructor(
         repeatOnStarted {
             parentViewModel.climberPrivacySetting.collect {
                 shortsPrivacy = it.shortsPublic
-                if(parentViewModel.climberPrivacySetting.value.shortsPublic) {
+                if (parentViewModel.climberPrivacySetting.value.shortsPublic) {
                     binding.layoutPrivacy.visibility = View.GONE
                     binding.btnFilterToggle.visibility = View.VISIBLE
                     sharedViewModel.getUserShorts(ShortsOption.NEW_SORT, userId)
@@ -105,5 +104,4 @@ class ClimberProfileShortsFragment @Inject constructor(
             }
         }
     }
-
 }

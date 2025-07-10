@@ -8,9 +8,11 @@ import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentMypageSendopinionBinding
 import com.climus.climeet.presentation.base.BaseFragment
 
-class MyPageSendOpinionFragment: BaseFragment<FragmentMypageSendopinionBinding>(R.layout.fragment_mypage_sendopinion) {
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+class MyPageSendOpinionFragment : BaseFragment<FragmentMypageSendopinionBinding>(R.layout.fragment_mypage_sendopinion) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         initClickListener()

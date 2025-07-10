@@ -11,5 +11,5 @@ data class GetAnnouncementDetailResponse(
     val content: String,
     val likeCount: Int,
     val imageList: List<String>?,
-    val likeStatus: Boolean
+    val likeStatus: Boolean,
 )

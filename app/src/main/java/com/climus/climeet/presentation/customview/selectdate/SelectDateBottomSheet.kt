@@ -3,7 +3,6 @@ package com.climus.climeet.presentation.customview.selectdate
 import android.content.Context
 import android.widget.Toast
 import com.climus.climeet.databinding.FragmentSelectDateBottomSheetBinding
-import com.climus.climeet.presentation.ui.main.record.model.CreateRecordData
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,11 +15,11 @@ class SelectDateBottomSheet(
     private val viewModel: SelectDateBottomSheetViewModel,
     private var curDate: LocalDate,
     private var changeDate: (LocalDate) -> Unit,
-    private val setSelectedDate: (LocalDate) -> Unit
+    private val setSelectedDate: (LocalDate) -> Unit,
 ) : BottomSheetDialog(context) {
-
     private lateinit var binding: FragmentSelectDateBottomSheetBinding
-    init{
+
+    init {
         setOnShowListener {
             initView()
         }
@@ -41,11 +40,11 @@ class SelectDateBottomSheet(
             val date = LocalDate.of(
                 binding.datepicker.year,
                 binding.datepicker.month + 1,
-                binding.datepicker.dayOfMonth
+                binding.datepicker.dayOfMonth,
             )
-            if(date.isAfter(LocalDate.now())) {
+            if (date.isAfter(LocalDate.now())) {
                 Toast.makeText(context, "미래의 날짜는 선택할 수 없습니다!", Toast.LENGTH_SHORT).show()
-            }else{
+            } else {
                 setDate(date)
             }
         }

@@ -8,44 +8,44 @@ import androidx.recyclerview.widget.RecyclerView
 import com.climus.climeet.databinding.ItemCreateRouteSectorBinding
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.model.UiSectorItem
 
-class CreateRouteSectorAdapter : ListAdapter<UiSectorItem, CreateRouteSectorViewHolder>(
-    diffCallback
-) {
+class CreateRouteSectorAdapter : ListAdapter<UiSectorItem, CreateRouteSectorViewHolder>(diffCallback) {
     companion object {
-
         val diffCallback = object : DiffUtil.ItemCallback<UiSectorItem>() {
             override fun areItemsTheSame(
                 oldItem: UiSectorItem,
-                newItem: UiSectorItem
-            ): Boolean {
-                return oldItem.sectorName == newItem.sectorName
-            }
+                newItem: UiSectorItem,
+            ): Boolean = oldItem.sectorName == newItem.sectorName
 
             override fun areContentsTheSame(
                 oldItem: UiSectorItem,
-                newItem: UiSectorItem
-            ): Boolean {
-                return oldItem == newItem
-            }
+                newItem: UiSectorItem,
+            ): Boolean = oldItem == newItem
         }
     }
 
-    override fun onBindViewHolder(holder: CreateRouteSectorViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: CreateRouteSectorViewHolder,
+        position: Int,
+    ) {
         holder.bind(getItem(position))
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CreateRouteSectorViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): CreateRouteSectorViewHolder =
         CreateRouteSectorViewHolder(
             ItemCreateRouteSectorBinding.inflate(
                 LayoutInflater.from(parent.context),
-                parent, false
-            )
+                parent,
+                false,
+            ),
         )
 }
 
-class CreateRouteSectorViewHolder(private val binding: ItemCreateRouteSectorBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-
+class CreateRouteSectorViewHolder(
+    private val binding: ItemCreateRouteSectorBinding,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: UiSectorItem) {
         binding.item = item
         binding.root.setOnClickListener {

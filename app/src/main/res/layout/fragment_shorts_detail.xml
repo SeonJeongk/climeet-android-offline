@@ -145,7 +145,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginBottom="16dp"
             android:onClick="@{() -> vm.navigateToProfileDetail()}"
-            android:src="@drawable/test"
+            android:src="@drawable/img_profile"
             app:layout_constraintBottom_toTopOf="@id/tv_description"
             app:layout_constraintStart_toStartOf="parent" />
 

@@ -13,46 +13,49 @@ data class GetRouteFindingData(
     val difficultyList: List<DifficultyItem>? = emptyList(),
     val layoutList: List<LayoutItem>? = emptyList(),
     val sectorList: List<RouteFindingSectorItem>? = emptyList(),
-    val routeList: List<RouteFindingRouteItem>? = emptyList()
+    val routeList: List<RouteFindingRouteItem>? = emptyList(),
 ) {
     data class DifficultyItem(
         val climeetDifficultyName: String,
         val gymDifficultyName: String,
         val difficulty: Int,
-        val gymDifficultyColor: String
+        val gymDifficultyColor: String,
     ) {
-        fun toUiLevelItem(setLevelListener: (String, String) -> Unit) = UiLevelItem(
-            colorName = gymDifficultyName,
-            colorHex = gymDifficultyColor,
-            climeetLevel = climeetDifficultyName,
-            setLevelListener
-        )
+        fun toUiLevelItem(setLevelListener: (String, String) -> Unit) =
+            UiLevelItem(
+                colorName = gymDifficultyName,
+                colorHex = gymDifficultyColor,
+                climeetLevel = climeetDifficultyName,
+                setLevelListener,
+            )
     }
 
     data class LayoutItem(
         val id: Int,
         val imgUrl: String,
-        val floor: Int
+        val floor: Int,
     ) {
-        fun toUiLayoutItem() = UiLayoutItem(
-            floor = floor,
-            gymImg = imgUrl
-        )
+        fun toUiLayoutItem() =
+            UiLayoutItem(
+                floor = floor,
+                gymImg = imgUrl,
+            )
     }
 
     data class RouteFindingSectorItem(
         val sectorId: Int,
         val name: String,
         val floor: Int,
-        val imgUrl: String
+        val imgUrl: String,
     ) {
-        fun toUiSectorItem(setSectorListener: (String, String) -> Unit) = UiSectorItem(
-            sectorName = name,
-            sectorFloor = floor,
-            sectorImg = imgUrl,
-            isSelected = false,
-            setSectorListener = setSectorListener
-        )
+        fun toUiSectorItem(setSectorListener: (String, String) -> Unit) =
+            UiSectorItem(
+                sectorName = name,
+                sectorFloor = floor,
+                sectorImg = imgUrl,
+                isSelected = false,
+                setSectorListener = setSectorListener,
+            )
     }
 
     data class RouteFindingRouteItem(
@@ -64,16 +67,15 @@ data class GetRouteFindingData(
         val gymDifficultyName: String,
         val gymDifficultyColor: String,
         val routeImageUrl: String,
-        val holdColor: String
+        val holdColor: String,
     ) {
-        fun toUiRouteChipData() = UiRouteChipData(
-            sectorName = sectorName,
-            gymLevelName = gymDifficultyName,
-            gymLevelColor = gymDifficultyColor,
-            routeImg = routeImageUrl,
-            holdImg = Constants.holdColor[holdColor]?.let { it }.run { 2131231155 },
-        )
+        fun toUiRouteChipData() =
+            UiRouteChipData(
+                sectorName = sectorName,
+                gymLevelName = gymDifficultyName,
+                gymLevelColor = gymDifficultyColor,
+                routeImg = routeImageUrl,
+                holdImg = Constants.holdColor[holdColor]?.let { it }.run { 2131231155 },
+            )
     }
 }
-
-

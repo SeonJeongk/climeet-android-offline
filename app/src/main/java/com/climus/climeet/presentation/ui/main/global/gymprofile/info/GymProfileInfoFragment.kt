@@ -19,9 +19,7 @@ import com.climus.climeet.presentation.ui.main.global.gymprofile.model.GymReview
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class GymProfileInfoFragment :
-    BaseFragment<FragmentGymProfileInfoBinding>(R.layout.fragment_gym_profile_info) {
-
+class GymProfileInfoFragment : BaseFragment<FragmentGymProfileInfoBinding>(R.layout.fragment_gym_profile_info) {
     val parentViewModel: GymProfileViewModel by activityViewModels()
     val viewModel: GymProfileInfoViewModel by activityViewModels()
 
@@ -30,7 +28,10 @@ class GymProfileInfoFragment :
     private var priceAdapter: GymPriceAdapter? = null
     private var reviewAdapter: GymReviewAdapter? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.parentVM = parentViewModel
@@ -44,10 +45,13 @@ class GymProfileInfoFragment :
 
     private fun setGymInfo() {
         // 암장 id, 이름 설정
-        parentViewModel.gymId.observe(viewLifecycleOwner, Observer { id ->
-            viewModel.setCragId(id)
-            viewModel.getGymTabInfo()
-        })
+        parentViewModel.gymId.observe(
+            viewLifecycleOwner,
+            Observer { id ->
+                viewModel.setCragId(id)
+                viewModel.getGymTabInfo()
+            },
+        )
     }
 
     private fun setAdapters() {
@@ -65,19 +69,18 @@ class GymProfileInfoFragment :
     private fun initStateObserve() {
         repeatOnStarted {
             viewModel.uiState.collect {
-
                 val combinedReviewList = mutableListOf<GymReview>()
 
                 // 내 리뷰가 있을 경우, 리스트의 첫 번째 요소로 추가
-                it.myGymReview?.let {
+                it.myGymReview?.let { review ->
                     combinedReviewList.add(
                         GymReview(
-                            profileImageUrl = it.profileImageUrl,
-                            profileName = it.profileName,
-                            rating = it.rating,
-                            content = it.content,
-                            updatedAt = it.updatedAt
-                        )
+                            profileImageUrl = review.profileImageUrl,
+                            profileName = review.profileName,
+                            rating = review.rating,
+                            content = review.content,
+                            updatedAt = review.updatedAt,
+                        ),
                     )
                 }
 
@@ -89,38 +92,38 @@ class GymProfileInfoFragment :
                             profileName = review.profileName,
                             rating = review.rating,
                             content = review.content,
-                            updatedAt = review.updatedAt
-                        )
+                            updatedAt = review.updatedAt,
+                        ),
                     )
                 }
 
                 // 서비스
-                if(it.gymServiceList?.isEmpty() == true) {
+                if (it.gymServiceList.isEmpty()) {
                     binding.rvService.visibility = View.GONE
                     binding.tvServiceError.visibility = View.VISIBLE
                 } else {
                     binding.rvService.visibility = View.VISIBLE
                     binding.tvServiceError.visibility = View.GONE
-                    serviceAdapter?.setList(it.gymServiceList!!)
+                    serviceAdapter?.setList(it.gymServiceList)
                 }
 
                 // 영업 시간
-                if(it.gymBusinessHours?.isNotEmpty() == true) {
-                    timeAdapter?.setList(it.gymBusinessHours!!)
+                if (it.gymBusinessHours.isNotEmpty()) {
+                    timeAdapter?.setList(it.gymBusinessHours)
                 }
 
                 // 요금 정보
-                if(it.gymPriceList?.isEmpty() == true) {
+                if (it.gymPriceList.isEmpty()) {
                     binding.rvPrice.visibility = View.GONE
                     binding.tvPriceError.visibility = View.VISIBLE
                 } else {
                     binding.rvPrice.visibility = View.VISIBLE
                     binding.tvPriceError.visibility = View.GONE
-                    priceAdapter?.setList(it.gymPriceList!!)
+                    priceAdapter?.setList(it.gymPriceList)
                 }
 
                 // 리뷰
-                if(it.reviewNum == 0){
+                if (it.reviewNum == 0) {
                     // 리뷰가 0개일 때
                     binding.rvReview.visibility = View.GONE
                     binding.layoutEmptyReview.visibility = View.VISIBLE
@@ -131,7 +134,7 @@ class GymProfileInfoFragment :
                     reviewAdapter?.setList(combinedReviewList)
                 }
 
-                if(it.myGymReview == null){
+                if (it.myGymReview == null) {
                     binding.btnCreateReview.text = "리뷰 남기기"
                 } else {
                     binding.btnCreateReview.text = "리뷰 수정하기"
@@ -144,15 +147,16 @@ class GymProfileInfoFragment :
         repeatOnStarted {
             viewModel.event.collect {
                 when (it) {
-                    is GymProfileInfoEvent.NavigateToGymReviewBottomSheetFragment -> findNavController().toGymReviewBottomSheetFragment()
+                    is GymProfileInfoEvent.NavigateToGymReviewBottomSheetFragment ->
+                        findNavController()
+                            .toGymReviewBottomSheetFragment()
                 }
             }
         }
     }
 
     private fun NavController.toGymReviewBottomSheetFragment() {
-        val action =
-            GymProfileFragmentDirections.actionGymProfileFragmentToGymReviewBottomSheetFragment2()
+        val action = GymProfileFragmentDirections.actionGymProfileFragmentToGymReviewBottomSheetFragment2()
         navigate(action)
     }
 }

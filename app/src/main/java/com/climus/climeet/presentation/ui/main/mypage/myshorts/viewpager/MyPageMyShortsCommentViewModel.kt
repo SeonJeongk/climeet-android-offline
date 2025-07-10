@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.repository.MainRepository
 import com.climus.climeet.presentation.ui.main.mypage.myshorts.model.MyPageShortsCommentUiData
-import com.climus.climeet.presentation.ui.main.shorts.player.ShortsPlayerEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,14 +22,19 @@ data class ShortsCommentUiData(
 )
 
 sealed class MyPageMyShortsCommentEvent {
-    data class NavigateToShortsPlayer(val shortsId: Long) : MyPageMyShortsCommentEvent()
-    data class ShowToastMessage(val msg: String) : MyPageMyShortsCommentEvent()
+    data class NavigateToShortsPlayer(
+        val shortsId: Long,
+    ) : MyPageMyShortsCommentEvent()
+
+    data class ShowToastMessage(
+        val msg: String,
+    ) : MyPageMyShortsCommentEvent()
 }
 
 @HiltViewModel
-class MyPageMyShortsCommentViewModel @Inject constructor(val repository: MainRepository) :
-    ViewModel() {
-
+class MyPageMyShortsCommentViewModel @Inject constructor(
+    val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(ShortsCommentUiData())
     val uiState: StateFlow<ShortsCommentUiData> = _uiState.asStateFlow()
 
@@ -52,13 +56,11 @@ class MyPageMyShortsCommentViewModel @Inject constructor(val repository: MainRep
                                 shortsId = comment.shortsId,
                                 content = comment.content,
                                 profileImage = comment.profileImageUrl,
-                                createdAt = comment.createdDate
+                                createdAt = comment.createdDate,
                             )
                         }
                         _uiState.update { currentUiState ->
-                            ShortsCommentUiData(
-                                commentList = currentUiState.commentList + comments
-                            )
+                            ShortsCommentUiData(commentList = currentUiState.commentList + comments)
                         }
                         currentPage = it.body.page
                         hasNextPage = it.body.hasNext

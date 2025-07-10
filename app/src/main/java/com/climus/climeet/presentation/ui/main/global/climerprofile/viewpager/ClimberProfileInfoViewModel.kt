@@ -27,19 +27,25 @@ data class ClimberProfileInfoUiState(
     val chartUiList: List<StickChartUiData> = emptyList(),
     val gymList: List<SelectGymData> = emptyList(),
     val averageDoneProgress: Int = 0,
-    val percent: String = ""
+    val percent: String = "",
 )
 
 sealed class ClimberProfileEvent {
-    data class NavigateToGymProfile(val id: Long) : ClimberProfileEvent()
+    data class NavigateToGymProfile(
+        val id: Long,
+    ) : ClimberProfileEvent()
+
     data object ShowPopupWindow : ClimberProfileEvent()
-    data class ShowToastMessage(val msg: String) : ClimberProfileEvent()
+
+    data class ShowToastMessage(
+        val msg: String,
+    ) : ClimberProfileEvent()
 }
 
 @HiltViewModel
-class ClimberProfileInfoViewModel @Inject constructor(private val repository: MainRepository) :
-    ViewModel() {
-
+class ClimberProfileInfoViewModel @Inject constructor(
+    private val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(ClimberProfileInfoUiState())
     val uiState: StateFlow<ClimberProfileInfoUiState> = _uiState.asStateFlow()
 
@@ -52,7 +58,6 @@ class ClimberProfileInfoViewModel @Inject constructor(private val repository: Ma
     private var userId: Long = 0
 
     var selectedGymName = MutableStateFlow("클밋 기준")
-
 
     fun setUserId(id: Long) {
         userId = id
@@ -67,11 +72,10 @@ class ClimberProfileInfoViewModel @Inject constructor(private val repository: Ma
                         is BaseState.Success -> {
                             _uiState.update { state ->
                                 state.copy(
-                                    gymList = listOf(
-                                        SelectGymData(0, "클밋 기준", ::onGymClicked)
-                                    ) + result.body.map {
-                                        it.toSelectGymData(::onGymClicked)
-                                    }
+                                    gymList = listOf(SelectGymData(0, "클밋 기준", ::onGymClicked)) +
+                                        result.body.map {
+                                            it.toSelectGymData(::onGymClicked)
+                                        },
                                 )
                             }
                         }
@@ -79,9 +83,7 @@ class ClimberProfileInfoViewModel @Inject constructor(private val repository: Ma
                         is BaseState.Error -> {
                             _uiState.update { state ->
                                 state.copy(
-                                    gymList = listOf(
-                                        SelectGymData(0, "클밋 기준", ::onGymClicked)
-                                    )
+                                    gymList = listOf(SelectGymData(0, "클밋 기준", ::onGymClicked)),
                                 )
                             }
                             _event.emit(ClimberProfileEvent.ShowToastMessage("암장을 불러오지 못했습니다!"))
@@ -117,16 +119,14 @@ class ClimberProfileInfoViewModel @Inject constructor(private val repository: Ma
             repository.getClimberProfileStatistics(userId).let {
                 when (it) {
                     is BaseState.Success -> {
-
                         val total = it.body.totalCompletedCount ?: run { 0 }
                         val attempt = it.body.attemptRouteCount ?: run { 1 }
 
-                        val percent =
-                            (total.toFloat() / attempt * 100).roundToInt()
+                        val percent = (total.toFloat() / attempt * 100).roundToInt()
                         _uiState.update { state ->
                             state.copy(
                                 averageDoneProgress = percent,
-                                percent = "$percent%"
+                                percent = "$percent%",
                             )
                         }
 
@@ -160,23 +160,19 @@ class ClimberProfileInfoViewModel @Inject constructor(private val repository: Ma
                                     levelName = data.key,
                                     // todo 레벨에 대응되는 색상 hex 값
                                     levelHex = Constants.climeetColor[data.key],
-                                    levelStringColor = "#FFFFFF"
-                                )
+                                    levelStringColor = "#FFFFFF",
+                                ),
                             )
                         }
 
                         _uiState.update { state ->
-                            state.copy(
-                                chartUiList = list
-                            )
+                            state.copy(chartUiList = list)
                         }
                     }
 
                     is BaseState.Error -> {
                         _uiState.update { state ->
-                            state.copy(
-                                chartUiList = emptyList()
-                            )
+                            state.copy(chartUiList = emptyList())
                         }
                     }
                 }
@@ -191,16 +187,15 @@ class ClimberProfileInfoViewModel @Inject constructor(private val repository: Ma
                     when (result) {
                         is BaseState.Success -> {
                             val body = result.body
-                            val total = result.body.totalCompletedCount ?: run { 0 }
-                            val attempt = result.body.attemptRouteCount ?: run { 1 }
+                            val total = body.totalCompletedCount
+                            val attempt = body.attemptRouteCount
 
-                            val percent =
-                                (total.toFloat() / attempt * 100).roundToInt()
+                            val percent = (total.toFloat() / attempt * 100).roundToInt()
 
                             _uiState.update { state ->
                                 state.copy(
                                     averageDoneProgress = percent,
-                                    percent = "$percent%"
+                                    percent = "$percent%",
                                 )
                             }
 
@@ -217,7 +212,8 @@ class ClimberProfileInfoViewModel @Inject constructor(private val repository: Ma
                                 val percent = if (it.count == 0) {
                                     0
                                 } else {
-                                    ((it.count.toFloat() / body.totalCompletedCount.toFloat()) * 100).roundToInt()
+                                    ((it.count.toFloat() / body.totalCompletedCount.toFloat()) * 100)
+                                        .roundToInt()
                                 }
 
                                 list.add(
@@ -226,31 +222,25 @@ class ClimberProfileInfoViewModel @Inject constructor(private val repository: Ma
                                         percent = if (percent == 0) 0f else (it.count.toFloat() / maxPercent) * 1f,
                                         levelName = it.gymDifficultyName,
                                         levelHex = it.gymDifficultyColor,
-                                        levelStringColor = "#FFFFFF"
-                                    )
+                                        levelStringColor = "#FFFFFF",
+                                    ),
                                 )
                             }
 
                             _uiState.update { state ->
-                                state.copy(
-                                    chartUiList = list
-                                )
+                                state.copy(chartUiList = list)
                             }
-
                         }
 
                         is BaseState.Error -> {
                             _uiState.update { state ->
-                                state.copy(
-                                    chartUiList = emptyList()
-                                )
+                                state.copy(chartUiList = emptyList())
                             }
                         }
                     }
                 }
         }
     }
-
 
     fun getUserHomeGyms() {
         viewModelScope.launch {
@@ -261,13 +251,12 @@ class ClimberProfileInfoViewModel @Inject constructor(private val repository: Ma
                             state.copy(
                                 homeGymList = it.body.map { data ->
                                     data.toProfileHomeGymUiData(::navigateToGymProfile)
-                                }
+                                },
                             )
                         }
                     }
 
                     is BaseState.Error -> {
-
                     }
                 }
             }
@@ -285,5 +274,4 @@ class ClimberProfileInfoViewModel @Inject constructor(private val repository: Ma
             _event.emit(ClimberProfileEvent.NavigateToGymProfile(id))
         }
     }
-
 }

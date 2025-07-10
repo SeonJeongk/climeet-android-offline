@@ -2,20 +2,15 @@ package com.climus.climeet.data.model.response
 
 import com.google.gson.annotations.SerializedName
 
-data class UserHomeGymDetailResponse (
-
+data class UserHomeGymDetailResponse(
     @SerializedName("gymId")
-    val gymId : Long,
-
+    val gymId: Long,
     @SerializedName("gymProfileUrl")
-    val gymProfileUrl : String,
-
+    val gymProfileUrl: String,
     @SerializedName("gymName")
-    val gymName : String,
-
+    val gymName: String,
     @SerializedName("routeSimpleInfos")
-    val routeSimpleInfos : List<RouteSimpleInfo>
-
+    val routeSimpleInfos: List<RouteSimpleInfo>,
 )
 
 data class RouteSimpleInfo(
@@ -25,6 +20,6 @@ data class RouteSimpleInfo(
     val sectorId: Long,
     val sectorName: String,
     val holdColor: String,
-    val gymDifficultyName : String,
-    val gymDifficultyColor : String,
+    val gymDifficultyName: String,
+    val gymDifficultyColor: String,
 )

@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import com.climus.climeet.presentation.util.Constants.TAG
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -30,23 +31,24 @@ internal fun generateFileName(): String {
 }
 
 // 절대경로 변환
-private fun getRealPathFromUri(uri: Uri, context: Context): String? {
-    return try {
-        var filePath: String? = null
+private fun getRealPathFromUri(
+    uri: Uri,
+    context: Context,
+): String? =
+    try {
         val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = context.contentResolver.query(uri, projection, null, null, null)
-        cursor?.let {
-            if (it.moveToFirst()) {
-                val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-                filePath = it.getString(columnIndex)
+        context.contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                cursor.getString(columnIndex)
+            } else {
+                null
             }
-            it.close()
         }
-        filePath
     } catch (e: Exception) {
+        Log.w(TAG, "이미지 경로 조회에 실패했습니다", e)
         null
     }
-}
 
 // 프로필 이미지 수정용
 internal fun Uri.toMultiPartImage(context: Context): MultipartBody.Part? {
@@ -60,42 +62,48 @@ internal fun Uri.toMultiPartImage(context: Context): MultipartBody.Part? {
     }
 }
 
-fun Uri.toVideoThumbnail(context: Context): MultipartBody.Part? {
-    return try {
+fun Uri.toVideoThumbnail(context: Context): MultipartBody.Part? =
+    try {
         val mediaMetadataRetriever = MediaMetadataRetriever()
-        mediaMetadataRetriever.setDataSource(context, this)
-        mediaMetadataRetriever.frameAtTime?.toMultiPart(context)
-    } catch (ex: Exception) {
+        try {
+            mediaMetadataRetriever.setDataSource(context, this)
+            mediaMetadataRetriever.frameAtTime?.toMultiPart(context)
+        } finally {
+            mediaMetadataRetriever.release()
+        }
+    } catch (e: Exception) {
+        Log.w(TAG, "동영상 처리에 실패했습니다", e)
         null
     }
-}
 
-fun Bitmap.toMultiPart(context: Context): MultipartBody.Part? {
-    return try {
+fun Bitmap.toMultiPart(context: Context): MultipartBody.Part? =
+    try {
         val filesDir = context.filesDir
         val imageFile = File(filesDir, "image.jpg")
-        val os = FileOutputStream(imageFile)
-        compress(Bitmap.CompressFormat.JPEG, 100, os)
+        FileOutputStream(imageFile).use { outputStream ->
+            compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        }
         val requestFile = imageFile.asRequestBody("image/jpg".toMediaTypeOrNull())
         MultipartBody.Part.createFormData("file", imageFile.name, requestFile)
     } catch (e: Exception) {
+        Log.w(TAG, "이미지 파일 저장에 실패했습니다", e)
         null
     }
-}
 
 // 프로필 이미지 수정용
-fun Bitmap.toMultiPartImage(context: Context): MultipartBody.Part? {
-    return try {
+fun Bitmap.toMultiPartImage(context: Context): MultipartBody.Part? =
+    try {
         val filesDir = context.filesDir
         val imageFile = File(filesDir, "image.jpg")
-        val os = FileOutputStream(imageFile)
-        compress(Bitmap.CompressFormat.JPEG, 100, os)
+        FileOutputStream(imageFile).use { outputStream ->
+            compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        }
         val requestFile = imageFile.asRequestBody("image/jpg".toMediaTypeOrNull())
         MultipartBody.Part.createFormData("image", imageFile.name, requestFile)
     } catch (e: Exception) {
+        Log.w(TAG, "프로필 이미지 파일 저장에 실패했습니다", e)
         null
     }
-}
 
 // 프로필 이미지 수정용
 fun Bitmap.saveCameraImage(context: Context): Uri? {
@@ -103,10 +111,10 @@ fun Bitmap.saveCameraImage(context: Context): Uri? {
     val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
     val file = File(storageDir, filename)
     return try {
-        val outputStream = FileOutputStream(file)
-        this.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-        outputStream.flush()
-        outputStream.close()
+        FileOutputStream(file).use { outputStream ->
+            compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            outputStream.flush()
+        }
         Log.d("saveCameraImage", "카메라 이미지 저장: ${file.absolutePath}")
         Uri.fromFile(file)
     } catch (e: IOException) {

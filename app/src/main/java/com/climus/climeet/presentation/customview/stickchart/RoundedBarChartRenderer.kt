@@ -12,12 +12,15 @@ import com.github.mikephil.charting.utils.ViewPortHandler
 class RoundedBarChartRenderer(
     chart: BarChart,
     animator: ChartAnimator,
-    viewPortHandler: ViewPortHandler
+    viewPortHandler: ViewPortHandler,
 ) : BarChartRenderer(chart, animator, viewPortHandler) {
-
     private val mBarShadowRectBuffer = RectF()
 
-    override fun drawDataSet(c: Canvas, dataSet: IBarDataSet, index: Int) {
+    override fun drawDataSet(
+        c: Canvas,
+        dataSet: IBarDataSet,
+        index: Int,
+    ) {
         val trans = mChart.getTransformer(dataSet.axisDependency)
 
         mBarBorderPaint.color = dataSet.barBorderColor
@@ -57,10 +60,16 @@ class RoundedBarChartRenderer(
             mBarShadowRectBuffer.bottom = bottom
 
             val path = Path()
-            val radii = floatArrayOf(radius, radius,
-                radius, radius,
-                0f, 0f,
-                0f, 0f)
+            val radii = floatArrayOf(
+                radius,
+                radius,
+                radius,
+                radius,
+                0f,
+                0f,
+                0f,
+                0f,
+            )
             path.addRoundRect(mBarShadowRectBuffer, radii, Path.Direction.CW)
 
             c.drawPath(path, mRenderPaint)

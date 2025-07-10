@@ -15,35 +15,30 @@ import com.climus.climeet.R
 import com.climus.climeet.app.App
 import com.climus.climeet.databinding.FragmentProfileReviewBottomSheetBinding
 import com.climus.climeet.presentation.ui.main.global.gymprofile.GymProfileViewModel
-import com.climus.climeet.presentation.ui.main.global.selectsector.SelectSectorBottomSheetEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class GymReviewBottomSheetFragment : BottomSheetDialogFragment() {
-
     private val mainViewModel: GymProfileViewModel by activityViewModels()
     private val infoViewModel: GymProfileInfoViewModel by activityViewModels()
     private val viewModel: GymReviewBottomSheetFragmentViewModel by viewModels()
-    private var _binding: FragmentProfileReviewBottomSheetBinding? = null
-    private val binding get() = _binding!!
+    private var viewBinding: FragmentProfileReviewBottomSheetBinding? = null
+    private val binding get() = checkNotNull(viewBinding) { "Binding is only available while the view exists" }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
-        _binding = DataBindingUtil.inflate(
+        viewBinding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_profile_review_bottom_sheet,
             container,
-            false
+            false,
         )
 
         binding.vm = viewModel
@@ -53,7 +48,10 @@ class GymReviewBottomSheetFragment : BottomSheetDialogFragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.getGymId()
@@ -70,16 +68,17 @@ class GymReviewBottomSheetFragment : BottomSheetDialogFragment() {
         return dialog
     }
 
-    private fun setupRatio(bottomSheetDialog: BottomSheetDialog){
-        val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as View
+    private fun setupRatio(bottomSheetDialog: BottomSheetDialog) {
+        val bottomSheet =
+            bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as View
         val behavior = BottomSheetBehavior.from(bottomSheet)
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    private fun initEventObserve(){
+    private fun initEventObserve() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.event.collect{
-                when(it){
+            viewModel.event.collect {
+                when (it) {
                     is GymReviewBottomSheetEvent.CreateReview -> createReview()
                     is GymReviewBottomSheetEvent.ShowToastMessage -> showToastMessage(it.msg)
                 }
@@ -90,14 +89,17 @@ class GymReviewBottomSheetFragment : BottomSheetDialogFragment() {
     private fun initEditReview() {
         viewLifecycleOwner.lifecycleScope.launch {
             infoViewModel.uiState.collect {
-                if(it.myGymReview != null){
-                   setView(it.myGymReview.rating, (it.myGymReview.content))
+                if (it.myGymReview != null) {
+                    setView(it.myGymReview.rating, (it.myGymReview.content))
                 }
             }
         }
     }
 
-    private fun setView(rating: Float, content: String){
+    private fun setView(
+        rating: Float,
+        content: String,
+    ) {
         // 작성한 리뷰 보여줌
         viewModel.reviewRating.value = rating
         viewModel.reviewText.value = content
@@ -108,7 +110,7 @@ class GymReviewBottomSheetFragment : BottomSheetDialogFragment() {
         toast.show()
     }
 
-    private fun createReview(){
+    private fun createReview() {
         if (infoViewModel.uiState.value.myGymReview != null) {
             viewModel.editReview()
             infoViewModel.getReviewInfo()

@@ -13,11 +13,13 @@ import com.climus.climeet.R
 
 class NoticePopup(
     private val anchorView: View,
-    private val message: String
+    private val message: String,
 ) {
-
     companion object {
-        fun make(anchorView: View, message: String) = NoticePopup(anchorView, message)
+        fun make(
+            anchorView: View,
+            message: String,
+        ) = NoticePopup(anchorView, message)
     }
 
     private val context = anchorView.context
@@ -26,7 +28,7 @@ class NoticePopup(
     private val popupWindow = PopupWindow(
         popupView,
         LinearLayout.LayoutParams.WRAP_CONTENT,
-        LinearLayout.LayoutParams.WRAP_CONTENT
+        LinearLayout.LayoutParams.WRAP_CONTENT,
     )
 
     private val handler = Handler(Looper.getMainLooper())
@@ -54,7 +56,7 @@ class NoticePopup(
             anchorView,
             Gravity.NO_GRAVITY,
             x,
-            y
+            y,
         )
 
         // 3초가 지나면 자동으로 사라진다

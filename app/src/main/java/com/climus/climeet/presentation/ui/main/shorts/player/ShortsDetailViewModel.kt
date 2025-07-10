@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.repository.MainRepository
+import com.climus.climeet.presentation.ui.main.shorts.model.ShortsUiData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,24 +23,31 @@ data class ShortsDetailUiState(
     val favoriteCount: Int = 0,
     val isWholeText: Boolean = false,
     val singleLineText: String = "",
-    val wholeText: String = ""
+    val wholeText: String = "",
 )
 
 sealed class ShortsDetailEvent {
-    data class ShowToastMessage(val msg: String) : ShortsDetailEvent()
+    data class ShowToastMessage(
+        val msg: String,
+    ) : ShortsDetailEvent()
+
     data object ShowCommentDialog : ShortsDetailEvent()
+
     data object ShowShareDialog : ShortsDetailEvent()
+
     data object NavigateToProfileDetail : ShortsDetailEvent()
+
     data object NavigateToRouteShorts : ShortsDetailEvent()
-    data class PatchFavorite(val state: Boolean) : ShortsDetailEvent()
-    data class PatchBookMark(val state: Boolean) : ShortsDetailEvent()
+
+    data class PatchFavorite(
+        val state: Boolean,
+    ) : ShortsDetailEvent()
 }
 
 @HiltViewModel
 class ShortsDetailViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(ShortsDetailUiState())
     val uiState: StateFlow<ShortsDetailUiState> = _uiState.asStateFlow()
 
@@ -48,32 +56,29 @@ class ShortsDetailViewModel @Inject constructor(
 
     private var shortsId = -1L
 
-    fun setInitData(
-        shortsId: Long,
-        bookMarkState: Boolean,
-        bookMarkCount: Int,
-        favoriteState: Boolean,
-        favoriteCount: Int,
-        description: String
-    ) {
-        this.shortsId = shortsId
+    fun setInitData(data: ShortsUiData) {
+        this.shortsId = data.shortsId
         _uiState.update { state ->
             state.copy(
-                isBookMarked = bookMarkState,
-                bookMarkCount = bookMarkCount,
-                isFavorite = favoriteState,
-                favoriteCount = favoriteCount,
-                singleLineText = if (description.length > 18) description.substring(0..17) + " ..." else description,
-                wholeText = description
+                isBookMarked = data.isBookMarked,
+                bookMarkCount = data.bookMarkCount,
+                isFavorite = data.isLiked,
+                favoriteCount = data.likeCount,
+                singleLineText = if (data.description.length >
+                    18
+                ) {
+                    data.description.substring(0..17) + " ..."
+                } else {
+                    data.description
+                },
+                wholeText = data.description,
             )
         }
     }
 
     fun changeDescriptionState() {
         _uiState.update { state ->
-            state.copy(
-                isWholeText = !uiState.value.isWholeText
-            )
+            state.copy(isWholeText = !uiState.value.isWholeText)
         }
     }
 
@@ -85,7 +90,12 @@ class ShortsDetailViewModel @Inject constructor(
                         _uiState.update { state ->
                             state.copy(
                                 isFavorite = !uiState.value.isFavorite,
-                                favoriteCount = if (uiState.value.isFavorite) uiState.value.favoriteCount - 1 else uiState.value.favoriteCount + 1
+                                favoriteCount = if (uiState.value.isFavorite) {
+                                    uiState.value.favoriteCount - 1
+                                } else {
+                                    uiState.value.favoriteCount +
+                                        1
+                                },
                             )
                         }
 
@@ -108,11 +118,14 @@ class ShortsDetailViewModel @Inject constructor(
                         _uiState.update { state ->
                             state.copy(
                                 isBookMarked = !uiState.value.isBookMarked,
-                                bookMarkCount = if (uiState.value.isBookMarked) uiState.value.bookMarkCount - 1 else uiState.value.bookMarkCount + 1
+                                bookMarkCount = if (uiState.value.isBookMarked) {
+                                    uiState.value.bookMarkCount - 1
+                                } else {
+                                    uiState.value.bookMarkCount +
+                                        1
+                                },
                             )
                         }
-
-                        _event.emit(ShortsDetailEvent.PatchBookMark(uiState.value.isBookMarked))
                     }
 
                     is BaseState.Error -> {
@@ -146,6 +159,4 @@ class ShortsDetailViewModel @Inject constructor(
             _event.emit(ShortsDetailEvent.NavigateToProfileDetail)
         }
     }
-
-
 }

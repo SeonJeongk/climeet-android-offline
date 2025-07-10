@@ -17,17 +17,17 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.climus.climeet.presentation.customview.CustomSnackBar
 import com.climus.climeet.presentation.customview.LoadingDialog
 import com.climus.climeet.presentation.customview.PermissionSnackBar
-import com.climus.climeet.presentation.customview.CustomSnackBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 abstract class BaseFragment<B : ViewDataBinding>(
-    @LayoutRes private val layoutRes: Int
+    @LayoutRes private val layoutRes: Int,
 ) : Fragment() {
-    private var _binding: B? = null
-    protected val binding get() = _binding!!
+    private var viewBinding: B? = null
+    protected val binding get() = checkNotNull(viewBinding) { "Binding is only available while the view exists" }
 
     private lateinit var loadingDialog: LoadingDialog
     private var loadingState = false
@@ -35,9 +35,9 @@ abstract class BaseFragment<B : ViewDataBinding>(
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
-        _binding = DataBindingUtil.inflate(inflater, layoutRes, container, false)
+        viewBinding = DataBindingUtil.inflate(inflater, layoutRes, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
@@ -73,12 +73,12 @@ abstract class BaseFragment<B : ViewDataBinding>(
         if (loadingState) {
             loadingDialog.dismiss()
         }
-        _binding = null
+        viewBinding = null
     }
 
     fun showPermissionSnackBar(
         view: View,
-        message: String
+        message: String,
     ) {
         val snackBar = PermissionSnackBar.make(view) {
             val intent = Intent().apply {
@@ -91,10 +91,12 @@ abstract class BaseFragment<B : ViewDataBinding>(
         snackBar.show()
     }
 
-    fun showCustomSnackBar(view: View, message: String) {
+    fun showCustomSnackBar(
+        view: View,
+        message: String,
+    ) {
         val snackBar = CustomSnackBar(view)
         snackBar.setText(message)
         snackBar.show()
     }
-
 }

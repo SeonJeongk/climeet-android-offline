@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.climus.climeet.data.model.BaseState
-import com.climus.climeet.data.model.response.BestClearClimberSimpleResponse
 import com.climus.climeet.data.model.response.BestLevelCimberSimpleResponse
 import com.climus.climeet.data.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,23 +15,23 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class LevelUiState(
-    val rankingList: List<BestLevelCimberSimpleResponse> = emptyList()
+    val rankingList: List<BestLevelCimberSimpleResponse> = emptyList(),
 )
 
 @HiltViewModel
-class LevelViewModel @Inject constructor(private val repository: MainRepository): ViewModel() {
+class LevelViewModel @Inject constructor(
+    private val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(LevelUiState())
     val uiState: StateFlow<LevelUiState> = _uiState.asStateFlow()
 
     fun getClimberRankingOrderLevel() {
         viewModelScope.launch {
             repository.findClimberRankingOrderLevel().let {
-                when(it) {
+                when (it) {
                     is BaseState.Success -> {
                         _uiState.update { state ->
-                            state.copy(
-                                rankingList = it.body
-                            )
+                            state.copy(rankingList = it.body)
                         }
                     }
                     is BaseState.Error -> {

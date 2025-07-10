@@ -10,44 +10,44 @@ import com.climus.climeet.R
 import com.climus.climeet.databinding.ItemSectorNameBinding
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.SectorNameUiData
 
-class SectorNameAdapter :
-    ListAdapter<SectorNameUiData, SectorNameViewHolder>(diffCallback) {
-
+class SectorNameAdapter : ListAdapter<SectorNameUiData, SectorNameViewHolder>(diffCallback) {
     companion object {
         val diffCallback = object : DiffUtil.ItemCallback<SectorNameUiData>() {
             override fun areItemsTheSame(
                 oldItem: SectorNameUiData,
-                newItem: SectorNameUiData
-            ): Boolean {
-                return oldItem.name == newItem.name
-            }
+                newItem: SectorNameUiData,
+            ): Boolean = oldItem.name == newItem.name
 
             override fun areContentsTheSame(
                 oldItem: SectorNameUiData,
-                newItem: SectorNameUiData
-            ): Boolean {
-                return oldItem == newItem
-            }
+                newItem: SectorNameUiData,
+            ): Boolean = oldItem == newItem
         }
     }
 
-    override fun onBindViewHolder(holder: SectorNameViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: SectorNameViewHolder,
+        position: Int,
+    ) {
         holder.bind(getItem(position))
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SectorNameViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): SectorNameViewHolder =
         SectorNameViewHolder(
             ItemSectorNameBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
-                false
-            )
+                false,
+            ),
         )
 }
 
-class SectorNameViewHolder(private val binding: ItemSectorNameBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-
+class SectorNameViewHolder(
+    private val binding: ItemSectorNameBinding,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: SectorNameUiData) {
         binding.item = item
         binding.root.setOnClickListener {
@@ -58,16 +58,16 @@ class SectorNameViewHolder(private val binding: ItemSectorNameBinding) :
             binding.chipText.setTextColor(
                 ContextCompat.getColor(
                     binding.chipText.context,
-                    R.color.black
-                )
+                    R.color.black,
+                ),
             )
         } else {
             binding.chipText.setChipBackgroundColorResource(R.color.cm_silver2)
             binding.chipText.setTextColor(
                 ContextCompat.getColor(
                     binding.chipText.context,
-                    R.color.white
-                )
+                    R.color.white,
+                ),
             )
         }
     }

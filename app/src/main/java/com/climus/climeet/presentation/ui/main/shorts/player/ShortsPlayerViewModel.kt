@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.climus.climeet.app.App.Companion.sharedPreferences
 import com.climus.climeet.data.model.BaseState
-import com.climus.climeet.data.model.response.userShortsSortType
+import com.climus.climeet.data.model.response.UserShortsSortType
 import com.climus.climeet.data.model.response.UserShortsVisibilityType
 import com.climus.climeet.data.repository.MainRepository
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.SelectedFilter
@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 data class ShortsPlayerUiState(
     val updatedFollowList: List<UpdatedFollowUiData> = emptyList(),
     val shortsList: List<ShortsUiData> = emptyList(),
@@ -35,30 +34,42 @@ data class ShortsPlayerUiState(
     val sortType: SortType = SortType.POPULAR,
     val curFilter: SelectedFilter = SelectedFilter(),
     val page: Int = 0,
-    val hasNext: Boolean = true
+    val hasNext: Boolean = true,
 )
 
 sealed class ShortsPlayerEvent {
-    data class ShowToastMessage(val msg: String) : ShortsPlayerEvent()
-    data class NavigateToShortsPlayer(val shortsId: Long, val position: Int) : ShortsPlayerEvent()
+    data class ShowToastMessage(
+        val msg: String,
+    ) : ShortsPlayerEvent()
+
+    data class NavigateToShortsPlayer(
+        val shortsId: Long,
+        val position: Int,
+    ) : ShortsPlayerEvent()
+
     data object NavigateToAddFollow : ShortsPlayerEvent()
-    data class NavigateToUserProfile(val userId: Long) : ShortsPlayerEvent()
-    data class NavigateToGymProfile(val gymId: Long) : ShortsPlayerEvent()
+
+    data class NavigateToUserProfile(
+        val userId: Long,
+    ) : ShortsPlayerEvent()
+
+    data class NavigateToGymProfile(
+        val gymId: Long,
+    ) : ShortsPlayerEvent()
 }
 
 @HiltViewModel
 class ShortsPlayerViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(ShortsPlayerUiState())
     val uiState: StateFlow<ShortsPlayerUiState> = _uiState.asStateFlow()
 
     private val _event = MutableSharedFlow<ShortsPlayerEvent>()
     val event: SharedFlow<ShortsPlayerEvent> = _event.asSharedFlow()
 
-    private val _userSortType = MutableStateFlow(userShortsSortType.POPULAR)
-    val userSortType: StateFlow<userShortsSortType> = _userSortType
+    private val _userSortType = MutableStateFlow(UserShortsSortType.POPULAR)
+    val userSortType: StateFlow<UserShortsSortType> = _userSortType
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -76,27 +87,25 @@ class ShortsPlayerViewModel @Inject constructor(
         _uiState.update { ShortsPlayerUiState() }
     }
 
-
     fun getUpdatedFollow() {
-
         viewModelScope.launch {
             repository.getShortsUpdatedFollow().let {
                 when (it) {
                     is BaseState.Success -> {
-
                         _uiState.update { state ->
                             state.copy(
                                 updatedFollowList = it.body.map { data ->
                                     data.toUpdatedFollowUiData(
                                         ITEM,
                                         ::navigateToFollowerPage,
-                                        ::navigateToAddFollow
+                                        ::navigateToAddFollow,
                                     )
-                                } + UpdatedFollowUiData(
-                                    viewType = GOTO_FOLLOW,
-                                    onClickListener = ::navigateToFollowerPage,
-                                    navigateToAddFollow = ::navigateToAddFollow
-                                )
+                                } +
+                                    UpdatedFollowUiData(
+                                        viewType = GOTO_FOLLOW,
+                                        onClickListener = ::navigateToFollowerPage,
+                                        navigateToAddFollow = ::navigateToAddFollow,
+                                    ),
                             )
                         }
                     }
@@ -112,31 +121,13 @@ class ShortsPlayerViewModel @Inject constructor(
     fun setCurFilter(gymId: Long) {
         _uiState.update { state ->
             state.copy(
-                curFilter = SelectedFilter(
-                    cragId = gymId
-                )
+                curFilter = SelectedFilter(cragId = gymId),
             )
         }
     }
 
     fun getShorts(option: ShortsOption) {
-
-        val filterMap = hashMapOf<String, Long>()
-
-        uiState.value.curFilter.let {
-            if (it.cragId != -1L) {
-                filterMap["gymId"] = it.cragId
-            }
-
-            if (it.sectorId != -1L) {
-                filterMap["sectorId"] = it.sectorId
-            }
-
-            if (it.routeId != -1L) {
-                filterMap["routeId"] = it.routeId
-            }
-        }
-
+        val filterMap = currentFilterMap()
 
         viewModelScope.launch {
             if (uiState.value.hasNext) {
@@ -153,11 +144,8 @@ class ShortsPlayerViewModel @Inject constructor(
                 result.let {
                     when (it) {
                         is BaseState.Success -> {
-
                             val shortsThumbnailUiData = it.body.result.map { data ->
-                                data.toShortsThumbnailUiData(
-                                    ::navigateToShortsPlayer
-                                )
+                                data.toShortsThumbnailUiData(::navigateToShortsPlayer)
                             }
 
                             val shortsUiData = it.body.result.map { data ->
@@ -168,8 +156,21 @@ class ShortsPlayerViewModel @Inject constructor(
                                 state.copy(
                                     page = uiState.value.page + 1,
                                     hasNext = it.body.hasNext,
-                                    shortsThumbnailList = if (option == ShortsOption.NEXT_PAGE) uiState.value.shortsThumbnailList + shortsThumbnailUiData else shortsThumbnailUiData,
-                                    shortsList = if (option == ShortsOption.NEXT_PAGE) uiState.value.shortsList + shortsUiData else shortsUiData
+                                    shortsThumbnailList = if (option ==
+                                        ShortsOption.NEXT_PAGE
+                                    ) {
+                                        uiState.value.shortsThumbnailList +
+                                            shortsThumbnailUiData
+                                    } else {
+                                        shortsThumbnailUiData
+                                    },
+                                    shortsList = if (option ==
+                                        ShortsOption.NEXT_PAGE
+                                    ) {
+                                        uiState.value.shortsList + shortsUiData
+                                    } else {
+                                        shortsUiData
+                                    },
                                 )
                             }
                         }
@@ -183,17 +184,32 @@ class ShortsPlayerViewModel @Inject constructor(
         }
     }
 
-    fun getShortsById(shortsId: Long) {
+    private fun currentFilterMap(): HashMap<String, Long> {
+        val filterMap = hashMapOf<String, Long>()
 
+        uiState.value.curFilter.let {
+            if (it.cragId != -1L) {
+                filterMap["gymId"] = it.cragId
+            }
+
+            if (it.sectorId != -1L) {
+                filterMap["sectorId"] = it.sectorId
+            }
+
+            if (it.routeId != -1L) {
+                filterMap["routeId"] = it.routeId
+            }
+        }
+        return filterMap
+    }
+
+    fun getShortsById(shortsId: Long) {
         viewModelScope.launch {
             repository.getShortsById(shortsId).let {
                 when (it) {
                     is BaseState.Success -> {
-
                         val shortsThumbnailUiData = it.body.result.map { data ->
-                            data.toShortsThumbnailUiData(
-                                ::navigateToShortsPlayer
-                            )
+                            data.toShortsThumbnailUiData(::navigateToShortsPlayer)
                         }
 
                         val shortsUiData = it.body.result.map { data ->
@@ -205,7 +221,7 @@ class ShortsPlayerViewModel @Inject constructor(
                                 page = uiState.value.page + 1,
                                 hasNext = false,
                                 shortsThumbnailList = shortsThumbnailUiData,
-                                shortsList = shortsUiData
+                                shortsList = shortsUiData,
                             )
                         }
 
@@ -220,19 +236,17 @@ class ShortsPlayerViewModel @Inject constructor(
         }
     }
 
-    fun getMyShorts(option: ShortsOption, type: UserShortsVisibilityType) {
-
+    fun getMyShorts(
+        option: ShortsOption,
+        type: UserShortsVisibilityType,
+    ) {
         viewModelScope.launch {
             if (uiState.value.hasNext) {
-
                 repository.getMyShorts(type, uiState.value.page, 10).let {
                     when (it) {
                         is BaseState.Success -> {
-
                             val shortsThumbnailUiData = it.body.result.map { data ->
-                                data.toShortsThumbnailUiData(
-                                    ::navigateToShortsPlayer
-                                )
+                                data.toShortsThumbnailUiData(::navigateToShortsPlayer)
                             }
 
                             val shortsUiData = it.body.result.map { data ->
@@ -243,8 +257,21 @@ class ShortsPlayerViewModel @Inject constructor(
                                 state.copy(
                                     page = uiState.value.page + 1,
                                     hasNext = it.body.hasNext,
-                                    shortsThumbnailList = if (option == ShortsOption.NEXT_PAGE) uiState.value.shortsThumbnailList + shortsThumbnailUiData else shortsThumbnailUiData,
-                                    shortsList = if (option == ShortsOption.NEXT_PAGE) uiState.value.shortsList + shortsUiData else shortsUiData
+                                    shortsThumbnailList = if (option ==
+                                        ShortsOption.NEXT_PAGE
+                                    ) {
+                                        uiState.value.shortsThumbnailList +
+                                            shortsThumbnailUiData
+                                    } else {
+                                        shortsThumbnailUiData
+                                    },
+                                    shortsList = if (option ==
+                                        ShortsOption.NEXT_PAGE
+                                    ) {
+                                        uiState.value.shortsList + shortsUiData
+                                    } else {
+                                        shortsUiData
+                                    },
                                 )
                             }
                         }
@@ -258,17 +285,17 @@ class ShortsPlayerViewModel @Inject constructor(
         }
     }
 
-    fun getUserShorts(option: ShortsOption, userId: Long) {
+    fun getUserShorts(
+        option: ShortsOption,
+        userId: Long,
+    ) {
         this.userId = userId.toInt()
         viewModelScope.launch {
             if (uiState.value.hasNext) {
                 when (val result = repository.getUserShorts(userId, uiState.value.page, 10, userSortType.value)) {
                     is BaseState.Success -> {
-
                         val shortsThumbnailUiData = result.body.result.map { data ->
-                            data.toShortsThumbnailUiData(
-                                ::navigateToShortsPlayer
-                            )
+                            data.toShortsThumbnailUiData(::navigateToShortsPlayer)
                         }
 
                         val shortsUiData = result.body.result.map { data ->
@@ -279,8 +306,20 @@ class ShortsPlayerViewModel @Inject constructor(
                             state.copy(
                                 page = uiState.value.page + 1,
                                 hasNext = result.body.hasNext,
-                                shortsThumbnailList = if (option == ShortsOption.NEXT_PAGE) uiState.value.shortsThumbnailList + shortsThumbnailUiData else shortsThumbnailUiData,
-                                shortsList = if (option == ShortsOption.NEXT_PAGE) uiState.value.shortsList + shortsUiData else shortsUiData
+                                shortsThumbnailList = if (option ==
+                                    ShortsOption.NEXT_PAGE
+                                ) {
+                                    uiState.value.shortsThumbnailList + shortsThumbnailUiData
+                                } else {
+                                    shortsThumbnailUiData
+                                },
+                                shortsList = if (option ==
+                                    ShortsOption.NEXT_PAGE
+                                ) {
+                                    uiState.value.shortsList + shortsUiData
+                                } else {
+                                    shortsUiData
+                                },
                             )
                         }
                     }
@@ -290,12 +329,10 @@ class ShortsPlayerViewModel @Inject constructor(
                     }
                 }
             }
-
         }
     }
 
     fun getLikedShorts(option: ShortsOption) {
-
         viewModelScope.launch {
             _isLoading.value = true
 
@@ -303,11 +340,8 @@ class ShortsPlayerViewModel @Inject constructor(
                 repository.getShortsLikedList(uiState.value.page, 10).let {
                     when (it) {
                         is BaseState.Success -> {
-
                             val shortsThumbnailUiData = it.body.result.map { data ->
-                                data.toShortsThumbnailUiData(
-                                    ::navigateToShortsPlayer
-                                )
+                                data.toShortsThumbnailUiData(::navigateToShortsPlayer)
                             }
 
                             val shortsUiData = it.body.result.map { data ->
@@ -318,8 +352,21 @@ class ShortsPlayerViewModel @Inject constructor(
                                 state.copy(
                                     page = uiState.value.page + 1,
                                     hasNext = it.body.hasNext,
-                                    shortsThumbnailList = if (option == ShortsOption.NEXT_PAGE) uiState.value.shortsThumbnailList + shortsThumbnailUiData else shortsThumbnailUiData,
-                                    shortsList = if (option == ShortsOption.NEXT_PAGE) uiState.value.shortsList + shortsUiData else shortsUiData
+                                    shortsThumbnailList = if (option ==
+                                        ShortsOption.NEXT_PAGE
+                                    ) {
+                                        uiState.value.shortsThumbnailList +
+                                            shortsThumbnailUiData
+                                    } else {
+                                        shortsThumbnailUiData
+                                    },
+                                    shortsList = if (option ==
+                                        ShortsOption.NEXT_PAGE
+                                    ) {
+                                        uiState.value.shortsList + shortsUiData
+                                    } else {
+                                        shortsUiData
+                                    },
                                 )
                             }
                         }
@@ -335,7 +382,6 @@ class ShortsPlayerViewModel @Inject constructor(
     }
 
     fun getBookmarkedShorts(option: ShortsOption) {
-
         viewModelScope.launch {
             _isLoading.value = true
 
@@ -343,11 +389,8 @@ class ShortsPlayerViewModel @Inject constructor(
                 repository.getShortsBookmarkedList(uiState.value.page, 10).let {
                     when (it) {
                         is BaseState.Success -> {
-
                             val shortsThumbnailUiData = it.body.result.map { data ->
-                                data.toShortsThumbnailUiData(
-                                    ::navigateToShortsPlayer
-                                )
+                                data.toShortsThumbnailUiData(::navigateToShortsPlayer)
                             }
 
                             val shortsUiData = it.body.result.map { data ->
@@ -358,8 +401,21 @@ class ShortsPlayerViewModel @Inject constructor(
                                 state.copy(
                                     page = uiState.value.page + 1,
                                     hasNext = it.body.hasNext,
-                                    shortsThumbnailList = if (option == ShortsOption.NEXT_PAGE) uiState.value.shortsThumbnailList + shortsThumbnailUiData else shortsThumbnailUiData,
-                                    shortsList = if (option == ShortsOption.NEXT_PAGE) uiState.value.shortsList + shortsUiData else shortsUiData
+                                    shortsThumbnailList = if (option ==
+                                        ShortsOption.NEXT_PAGE
+                                    ) {
+                                        uiState.value.shortsThumbnailList +
+                                            shortsThumbnailUiData
+                                    } else {
+                                        shortsThumbnailUiData
+                                    },
+                                    shortsList = if (option ==
+                                        ShortsOption.NEXT_PAGE
+                                    ) {
+                                        uiState.value.shortsList + shortsUiData
+                                    } else {
+                                        shortsUiData
+                                    },
                                 )
                             }
                         }
@@ -381,7 +437,7 @@ class ShortsPlayerViewModel @Inject constructor(
                     state.copy(
                         hasNext = true,
                         page = 0,
-                        sortType = SortType.RECENT
+                        sortType = SortType.RECENT,
                     )
                 }
                 getShorts(ShortsOption.NEW_SORT)
@@ -392,7 +448,7 @@ class ShortsPlayerViewModel @Inject constructor(
                     state.copy(
                         hasNext = true,
                         page = 0,
-                        sortType = SortType.POPULAR
+                        sortType = SortType.POPULAR,
                     )
                 }
                 getShorts(ShortsOption.NEW_SORT)
@@ -407,10 +463,10 @@ class ShortsPlayerViewModel @Inject constructor(
                     state.copy(
                         hasNext = true,
                         page = 0,
-                        sortType = SortType.RECENT
+                        sortType = SortType.RECENT,
                     )
                 }
-                _userSortType.update { userShortsSortType.LATEST }
+                _userSortType.update { UserShortsSortType.LATEST }
                 getUserShorts(ShortsOption.NEW_SORT, userId.toLong())
             }
 
@@ -419,10 +475,10 @@ class ShortsPlayerViewModel @Inject constructor(
                     state.copy(
                         hasNext = true,
                         page = 0,
-                        sortType = SortType.POPULAR
+                        sortType = SortType.POPULAR,
                     )
                 }
-                _userSortType.update { userShortsSortType.POPULAR }
+                _userSortType.update { UserShortsSortType.POPULAR }
                 getUserShorts(ShortsOption.NEW_SORT, userId.toLong())
             }
         }
@@ -433,12 +489,11 @@ class ShortsPlayerViewModel @Inject constructor(
             state.copy(
                 page = 0,
                 hasNext = true,
-                curFilter = sectorInfo
+                curFilter = sectorInfo,
             )
         }
         Log.d(TAG, sectorInfo.sectorName)
         Log.d(TAG, sectorInfo.gymLevelName)
-
 
         getShorts(ShortsOption.NEW_SORT)
     }
@@ -448,7 +503,7 @@ class ShortsPlayerViewModel @Inject constructor(
             state.copy(
                 page = 0,
                 hasNext = true,
-                curFilter = SelectedFilter()
+                curFilter = SelectedFilter(),
             )
         }
 
@@ -461,14 +516,20 @@ class ShortsPlayerViewModel @Inject constructor(
         getShorts(ShortsOption.NEW_SORT)
     }
 
-
-    private fun navigateToShortsPlayer(id: Long, position: Int) {
+    private fun navigateToShortsPlayer(
+        id: Long,
+        position: Int,
+    ) {
         viewModelScope.launch {
             _event.emit(ShortsPlayerEvent.NavigateToShortsPlayer(id, position))
         }
     }
 
-    private fun navigateToFollowerPage(userId: Long, gymId: Long, isGym: Boolean) {
+    private fun navigateToFollowerPage(
+        userId: Long,
+        gymId: Long,
+        isGym: Boolean,
+    ) {
         viewModelScope.launch {
             if (isGym) {
                 _event.emit(ShortsPlayerEvent.NavigateToGymProfile(gymId))
@@ -484,7 +545,10 @@ class ShortsPlayerViewModel @Inject constructor(
         }
     }
 
-    fun patchFavorite(shortsId: Long, likeState: Boolean) {
+    fun patchFavorite(
+        shortsId: Long,
+        likeState: Boolean,
+    ) {
         Log.d(TAG, "$shortsId   $likeState")
 
 //        _uiState.update { state ->
@@ -503,7 +567,10 @@ class ShortsPlayerViewModel @Inject constructor(
 //        }
     }
 
-    fun patchBookMark(shortsId: Long, bookMarkState: Boolean) {
+//    fun patchBookMark(
+//        shortsId: Long,
+//        bookMarkState: Boolean,
+//    ) {
 //        _uiState.update { state ->
 //            state.copy(
 //                shortsList = uiState.value.shortsList.map {
@@ -518,15 +585,17 @@ class ShortsPlayerViewModel @Inject constructor(
 //                }
 //            )
 //        }
-    }
+//    }
 }
 
-enum class ShortsOption() {
+enum class ShortsOption {
     NEXT_PAGE,
-    NEW_SORT
+    NEW_SORT,
 }
 
-enum class SortType(val text: String) {
+enum class SortType(
+    val text: String,
+) {
     POPULAR("인기순"),
-    RECENT("최신순")
+    RECENT("최신순"),
 }

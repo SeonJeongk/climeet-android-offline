@@ -8,7 +8,6 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.View
-import android.widget.Button
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
@@ -19,33 +18,30 @@ import com.climus.climeet.presentation.ui.InputState
 import java.lang.Math.round
 
 @BindingAdapter("keyword", "searchResult")
-fun bindSearchResult(tv: TextView, keyword: String?, searchResult: String?) {
-
-    keyword?.let {
-        searchResult?.let {
-            if (keyword.isNotBlank()) {
-                val sIndex = searchResult.indexOf(keyword)
-                if (sIndex != -1) {
-                    val spannable = SpannableString(searchResult)
-                        .apply {
-                            setSpan(
-                                ForegroundColorSpan(tv.context.getColor(R.color.cm_main)),
-                                sIndex,
-                                sIndex + keyword.length,
-                                Spannable.SPAN_EXCLUSIVE_INCLUSIVE
-                            )
-                        }
-                    tv.text = spannable
-                }
-            }
-        }
+fun bindSearchResult(
+    tv: TextView,
+    keyword: String?,
+    searchResult: String?,
+) {
+    if (keyword.isNullOrBlank() || searchResult == null) return
+    val sIndex = searchResult.indexOf(keyword)
+    if (sIndex != -1) {
+        val spannable = SpannableString(searchResult)
+        spannable.setSpan(
+            ForegroundColorSpan(tv.context.getColor(R.color.cm_main)),
+            sIndex,
+            sIndex + keyword.length,
+            Spannable.SPAN_EXCLUSIVE_INCLUSIVE,
+        )
+        tv.text = spannable
     }
-
-
 }
 
 @BindingAdapter("helperMessage")
-fun bindHelperMessage(tv: TextView, state: InputState) {
+fun bindHelperMessage(
+    tv: TextView,
+    state: InputState,
+) {
     when (state) {
         is InputState.Empty ->
             tv.visibility = View.INVISIBLE
@@ -65,14 +61,20 @@ fun bindHelperMessage(tv: TextView, state: InputState) {
 }
 
 @BindingAdapter("textHexColor")
-fun bindTextHexColor(tv: TextView, hexColor: String) {
+fun bindTextHexColor(
+    tv: TextView,
+    hexColor: String,
+) {
     if (hexColor.isNotBlank()) {
         tv.setTextColor(hexColor.toColorInt())
     }
 }
 
 @BindingAdapter("selectedColor")
-fun bindSelectedColor(tv: TextView, state: Boolean) {
+fun bindSelectedColor(
+    tv: TextView,
+    state: Boolean,
+) {
     if (state) {
         tv.setTextColor(ContextCompat.getColor(tv.context, R.color.cm_main))
     } else {
@@ -81,12 +83,18 @@ fun bindSelectedColor(tv: TextView, state: Boolean) {
 }
 
 @BindingAdapter("compressProgress")
-fun bindCompressProgress(tv: TextView, progress: Int) {
+fun bindCompressProgress(
+    tv: TextView,
+    progress: Int,
+) {
     tv.text = "$progress%"
 }
 
 @BindingAdapter("socialCount")
-fun bindSocialCount(tv: TextView, count: Int) {
+fun bindSocialCount(
+    tv: TextView,
+    count: Int,
+) {
     if (count < 1000) {
         tv.text = count.toString()
     } else if (count < 1000000) {
@@ -107,7 +115,10 @@ fun TextView.bindTextFromFloat(value: Float) {
 }
 
 @BindingAdapter("selectTimeColor")
-fun selectTimeColor(tv: TextView, state: Boolean) {
+fun selectTimeColor(
+    tv: TextView,
+    state: Boolean,
+) {
     if (state) {
         tv.setTextColor(ContextCompat.getColor(tv.context, R.color.cm_lightgrey2))
     } else {
@@ -116,7 +127,10 @@ fun selectTimeColor(tv: TextView, state: Boolean) {
 }
 
 @BindingAdapter("followState")
-fun setFollowState(tv: TextView, isFollowing: Boolean) {
+fun setFollowState(
+    tv: TextView,
+    isFollowing: Boolean,
+) {
     if (isFollowing) {
         tv.setBackgroundResource(R.drawable.btn_follow)
         tv.setTextColor(Color.WHITE)
@@ -129,7 +143,10 @@ fun setFollowState(tv: TextView, isFollowing: Boolean) {
 }
 
 @BindingAdapter("followLive")
-fun setFollowLive(tv: TextView, isFollowing: LiveData<Boolean>?) {
+fun setFollowLive(
+    tv: TextView,
+    isFollowing: LiveData<Boolean>?,
+) {
     isFollowing?.let { liveData ->
         liveData.observeForever { isFollower ->
             if (isFollower) {
@@ -146,7 +163,10 @@ fun setFollowLive(tv: TextView, isFollowing: LiveData<Boolean>?) {
 }
 
 @BindingAdapter("dynamicOvalBackground")
-fun setDynamicOvalBackground(view: TextView, color: String) {
+fun setDynamicOvalBackground(
+    view: TextView,
+    color: String,
+) {
     val shapeDrawable = ShapeDrawable(OvalShape()).apply {
         paint.color = Color.parseColor(color)
         intrinsicWidth = 54.dpToPx(view.context)
@@ -155,6 +175,4 @@ fun setDynamicOvalBackground(view: TextView, color: String) {
     view.background = shapeDrawable
 }
 
-fun Int.dpToPx(context: Context): Int {
-    return (this * context.resources.displayMetrics.density).toInt()
-}
+fun Int.dpToPx(context: Context): Int = (this * context.resources.displayMetrics.density).toInt()

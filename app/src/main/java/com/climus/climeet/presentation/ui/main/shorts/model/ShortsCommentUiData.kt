@@ -14,12 +14,10 @@ data class ShortsCommentUiData(
     val parentCommentId: Long = -1,
     val childCommentCount: Int = 0,
     val createDate: String = "",
-    val changeLikeStatus: (Long, Int, LikeStatus,Boolean, Boolean) -> Unit,
+    val changeLikeStatus: (Long, LikeStatus, Boolean, Boolean) -> Unit,
     val showMoreComment: (Long, Int, Int, Int) -> Unit,
     val addSubComment: (Long, Int, String) -> Unit,
     val remainSubCommentCount: Int = -1,
     val isLastSubComment: Boolean = false,
     val subCommentPage: Int = 0,
 )
-
-

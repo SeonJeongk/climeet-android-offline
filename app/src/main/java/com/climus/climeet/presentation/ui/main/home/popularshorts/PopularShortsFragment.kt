@@ -6,7 +6,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.climus.climeet.MainNavDirections
 import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentPopularShortsBinding
 import com.climus.climeet.presentation.base.BaseFragment
@@ -20,24 +19,23 @@ import com.climus.climeet.presentation.ui.toShortsPlayer
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class PopularShortsFragment :
-    BaseFragment<FragmentPopularShortsBinding>(R.layout.fragment_popular_shorts) {
-
+class PopularShortsFragment : BaseFragment<FragmentPopularShortsBinding>(R.layout.fragment_popular_shorts) {
     private val sharedViewModel: ShortsPlayerViewModel by activityViewModels()
     private var recyclerShorts: List<ShortsThumbnailUiData> = emptyList()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         sharedViewModel.initViewModel()
         sharedViewModel.getShorts(ShortsOption.NEW_SORT)
         initEventObserve()
         setupOnClickListener()
-
     }
 
     private fun initEventObserve() {
-
         repeatOnStarted {
             sharedViewModel.uiState.collect {
                 if (it.shortsThumbnailList.isNotEmpty()) {
@@ -51,10 +49,11 @@ class PopularShortsFragment :
             sharedViewModel.event.collect {
                 when (it) {
                     is ShortsPlayerEvent.ShowToastMessage -> showToastMessage(it.msg)
-                    is ShortsPlayerEvent.NavigateToShortsPlayer -> findNavController().toShortsPlayer(
-                        it.shortsId,
-                        it.position
-                    )
+                    is ShortsPlayerEvent.NavigateToShortsPlayer ->
+                        findNavController().toShortsPlayer(
+                            it.shortsId,
+                            it.position,
+                        )
                     else -> {}
                 }
             }
@@ -76,10 +75,12 @@ class PopularShortsFragment :
         setupRecyclerView(binding.rvPopularShorts, popularShortsAllRVAdapter)
     }
 
-    private fun setupRecyclerView(recyclerView: RecyclerView, adapter: RecyclerView.Adapter<*>) {
+    private fun setupRecyclerView(
+        recyclerView: RecyclerView,
+        adapter: RecyclerView.Adapter<*>,
+    ) {
         recyclerView.adapter = adapter
         val spanCount = 3
         recyclerView.layoutManager = GridLayoutManager(requireActivity(), spanCount)
     }
-
 }

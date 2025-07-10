@@ -27,20 +27,26 @@ data class MyPageUiState(
 
 sealed class MyPageEvent {
     data object NavigateToAlarm : MyPageEvent()
+
     data object NavigateToAnnounce : MyPageEvent()
+
     data object NavigateToFollow : MyPageEvent()
+
     data object NavigateToClimerMyProfile : MyPageEvent()
+
     data object NavigateToMyShorts : MyPageEvent()
+
     data object NavigateToPolicy : MyPageEvent()
+
     data object NavigateToSendOpinion : MyPageEvent()
+
     data object NavigateToReview : MyPageEvent()
 }
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(MyPageUiState())
     val uiState: StateFlow<MyPageUiState> = _uiState.asStateFlow()
 
@@ -52,7 +58,6 @@ class MyPageViewModel @Inject constructor(
             repository.getMyPageProfile().let {
                 when (it) {
                     is BaseState.Success -> {
-
                         val profileInfo = it.body
 
                         _uiState.update { state ->
@@ -62,7 +67,7 @@ class MyPageViewModel @Inject constructor(
                                 profileImgUrl = profileInfo.profileImgUrl,
                                 followerCount = profileInfo.followerCount,
                                 followingCount = profileInfo.followingCount,
-                                isManager = profileInfo.isManager
+                                isManager = profileInfo.isManager,
                             )
                         }
                     }
@@ -123,5 +128,4 @@ class MyPageViewModel @Inject constructor(
             _event.emit(MyPageEvent.NavigateToReview)
         }
     }
-
 }

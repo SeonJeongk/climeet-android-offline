@@ -24,7 +24,6 @@ import kotlinx.coroutines.launch
 abstract class BaseActivity<B : ViewDataBinding>(
     private val inflate: (LayoutInflater) -> B,
 ) : AppCompatActivity() {
-
     protected lateinit var binding: B
     private lateinit var loadingDialog: LoadingDialog
     private var loadingState = false
@@ -47,15 +46,13 @@ abstract class BaseActivity<B : ViewDataBinding>(
     fun showPermissionDialog(
         type: Permission,
         confirmBtnClickListener: (Permission) -> Unit,
-        refuseBtnClickListener: () -> Unit
+        refuseBtnClickListener: () -> Unit,
     ) {
         permissionDialog = PermissionDialog(this, type, confirmBtnClickListener, refuseBtnClickListener)
         permissionDialog.show()
     }
 
-    fun showPermissionSnackBar(
-        view: View,
-    ) {
+    fun showPermissionSnackBar(view: View) {
         PermissionSnackBar.make(view) {
             val intent = Intent().apply {
                 action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS

@@ -8,13 +8,15 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-sealed class UploadBottomSheetEvent{
-    data object DismissDialog: UploadBottomSheetEvent()
-    data class ApplyFilter(val selectedFilter: SelectedFilter): UploadBottomSheetEvent()
+sealed class UploadBottomSheetEvent {
+    data object DismissDialog : UploadBottomSheetEvent()
+
+    data class ApplyFilter(
+        val selectedFilter: SelectedFilter,
+    ) : UploadBottomSheetEvent()
 }
 
 class UploadBottomSheetViewModel : ViewModel() {
-
     private val _event = MutableSharedFlow<UploadBottomSheetEvent>()
     val event: SharedFlow<UploadBottomSheetEvent> = _event.asSharedFlow()
 
@@ -24,7 +26,7 @@ class UploadBottomSheetViewModel : ViewModel() {
         }
     }
 
-    fun dismissDialog(){
+    fun dismissDialog() {
         viewModelScope.launch {
             _event.emit(UploadBottomSheetEvent.DismissDialog)
         }

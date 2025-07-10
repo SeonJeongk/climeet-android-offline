@@ -12,7 +12,7 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object NotificationModule {
     @Provides
-    fun provideNotificationManagerCompat(@ApplicationContext context: Context): NotificationManagerCompat {
-        return NotificationManagerCompat.from(context)
-    }
+    fun provideNotificationManagerCompat(
+        @ApplicationContext context: Context,
+    ): NotificationManagerCompat = NotificationManagerCompat.from(context)
 }

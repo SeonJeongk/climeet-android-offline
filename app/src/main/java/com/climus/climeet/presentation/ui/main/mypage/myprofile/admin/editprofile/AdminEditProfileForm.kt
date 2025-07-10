@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 object AdminEditProfileForm {
-
     private lateinit var backgroundImg: String
     private lateinit var profileImg: String
 
@@ -38,17 +37,11 @@ object AdminEditProfileForm {
         nameUpdated = state
     }
 
-    fun getProfileImagePath(): String {
-        return profileImg
-    }
+    fun getProfileImagePath(): String = profileImg
 
-    fun getBackgroundPath(): String {
-        return backgroundImg
-    }
+    fun getBackgroundPath(): String = backgroundImg
 
-    fun getNameUpdatedState(): Boolean {
-        return nameUpdated
-    }
+    fun getNameUpdatedState(): Boolean = nameUpdated
 
     fun resetState() {
         _profileUriState.value = ""

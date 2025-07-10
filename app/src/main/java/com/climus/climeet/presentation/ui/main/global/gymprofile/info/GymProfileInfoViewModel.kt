@@ -28,9 +28,9 @@ data class GymProfileTabInfoUiState(
     val location: String? = "암장 정보가 비어있어요",
     val tel: String? = "암장 정보가 비어있어요",
     val startTime: String = "휴무",
-    val gymBusinessHours: List<GymBusinessHour>? = emptyList(),
-    val gymServiceList: List<GymService>? = emptyList(),
-    val gymPriceList: List<GymPrice>? = emptyList(),
+    val gymBusinessHours: List<GymBusinessHour> = emptyList(),
+    val gymServiceList: List<GymService> = emptyList(),
+    val gymPriceList: List<GymPrice> = emptyList(),
     val averageRating: Float = 0f,
     val reviewNum: Int = 0,
     val myGymReview: Review? = null,
@@ -38,7 +38,7 @@ data class GymProfileTabInfoUiState(
     val isTimeVisible: Boolean = false,
     val isTimeErrorVisible: Boolean = false,
     val isRvTimeVisible: Boolean = false,
-    val isIvToggleVisible: Boolean = false
+    val isIvToggleVisible: Boolean = false,
 )
 
 sealed class GymProfileInfoEvent {
@@ -47,9 +47,8 @@ sealed class GymProfileInfoEvent {
 
 @HiltViewModel
 class GymProfileInfoViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(GymProfileTabInfoUiState())
     val uiState: StateFlow<GymProfileTabInfoUiState> = _uiState.asStateFlow()
 
@@ -77,7 +76,7 @@ class GymProfileInfoViewModel @Inject constructor(
                                 getCompleteBusinessHours(hours).map {
                                     GymBusinessHour(
                                         it.key,
-                                        it.value
+                                        it.value,
                                     )
                                 }
                             } ?: state.gymBusinessHours,
@@ -86,10 +85,10 @@ class GymProfileInfoViewModel @Inject constructor(
                             gymPriceList = result.body.priceList?.map { GymPrice(it.key, it.value) }
                                 ?: state.gymPriceList,
                             startTime = setTodayOpeningTime(state.gymBusinessHours),
-                            isTimeVisible = state.gymBusinessHours.isNullOrEmpty().not(),
-                            isTimeErrorVisible = state.gymBusinessHours.isNullOrEmpty(),
+                            isTimeVisible = state.gymBusinessHours.isNotEmpty(),
+                            isTimeErrorVisible = state.gymBusinessHours.isEmpty(),
                             isRvTimeVisible = false,
-                            isIvToggleVisible = false
+                            isIvToggleVisible = false,
                         )
                     }
                 }
@@ -100,20 +99,17 @@ class GymProfileInfoViewModel @Inject constructor(
                 }
             }
             _uiState.update { state ->
-                state.copy(
-                    startTime = setTodayOpeningTime(state.gymBusinessHours)
-                )
+                state.copy(startTime = setTodayOpeningTime(state.gymBusinessHours))
             }
         }
 
         getReviewInfo()
     }
 
-
     fun getReviewInfo() {
         viewModelScope.launch {
             delay(500)
-            repository.getGymReview(gymId, 0, 15).let { it ->
+            repository.getGymReview(gymId, 0, 15).let {
                 when (it) {
                     is BaseState.Success -> {
                         // 성공
@@ -122,7 +118,7 @@ class GymProfileInfoViewModel @Inject constructor(
                                 reviewNum = it.body.result.summary.reviewCount,
                                 averageRating = it.body.result.summary.averageRating,
                                 myGymReview = it.body.result.summary.myReview ?: null,
-                                gymReviewList = it.body.result.reviewList ?: state.gymReviewList
+                                gymReviewList = it.body.result.reviewList ?: state.gymReviewList,
                             )
                         }
                     }
@@ -144,7 +140,7 @@ class GymProfileInfoViewModel @Inject constructor(
             "수" to listOf("휴무"),
             "목" to listOf("휴무"),
             "금" to listOf("휴무"),
-            "토" to listOf("휴무")
+            "토" to listOf("휴무"),
         )
 
         businessHours.forEach { (day, hours) ->
@@ -154,11 +150,14 @@ class GymProfileInfoViewModel @Inject constructor(
         return completeHours
     }
 
-    private fun setTodayOpeningTime(gymBusinessHours: List<GymBusinessHour>?): String {
+    private fun setTodayOpeningTime(gymBusinessHours: List<GymBusinessHour>): String {
         val today = getCurrentDayOfWeek()
-        val todayBusinessHour = gymBusinessHours?.find { it.day == today }
+        val todayBusinessHour = gymBusinessHours.find { it.day == today }
 
-        return if (todayBusinessHour != null && todayBusinessHour.hours.isNotEmpty() && todayBusinessHour.hours[0] != "휴무") {
+        return if (todayBusinessHour != null &&
+            todayBusinessHour.hours.isNotEmpty() &&
+            todayBusinessHour.hours[0] != "휴무"
+        ) {
             "${todayBusinessHour.hours[0]}에 영업 시작"
         } else {
             "휴무"
@@ -176,7 +175,7 @@ class GymProfileInfoViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 isRvTimeVisible = !state.isRvTimeVisible,
-                isIvToggleVisible = !state.isIvToggleVisible
+                isIvToggleVisible = !state.isIvToggleVisible,
             )
         }
     }
@@ -185,16 +184,14 @@ class GymProfileInfoViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 isRvTimeVisible = false,
-                isIvToggleVisible = false
+                isIvToggleVisible = false,
             )
         }
     }
 
     fun navigateToGymReviewBottomSheetFragment() {
         viewModelScope.launch {
-            _event.emit(
-                GymProfileInfoEvent.NavigateToGymReviewBottomSheetFragment
-            )
+            _event.emit(GymProfileInfoEvent.NavigateToGymReviewBottomSheetFragment)
         }
     }
 }

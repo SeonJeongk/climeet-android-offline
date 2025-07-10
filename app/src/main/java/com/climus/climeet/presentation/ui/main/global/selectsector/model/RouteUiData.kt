@@ -15,5 +15,5 @@ data class RouteUiData(
     var challengeNum: Int = 1,
     var clearBtnState: Boolean = false,
     val holdImg: Int = R.drawable.ic_white_hold,
-    val onClickListener: (RouteUiData) -> Unit
+    val onClickListener: (RouteUiData) -> Unit,
 )

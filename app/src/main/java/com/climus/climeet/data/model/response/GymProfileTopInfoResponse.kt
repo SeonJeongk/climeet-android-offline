@@ -1,6 +1,6 @@
 package com.climus.climeet.data.model.response
 
-data class GymProfileTopInfoResponse (
+data class GymProfileTopInfoResponse(
     val gymId: Long,
     val gymProfileImageUrl: String,
     val gymBackGroundImageUrl: String,
@@ -9,5 +9,5 @@ data class GymProfileTopInfoResponse (
     val followingCount: Int,
     val averageRating: Float,
     val reviewCount: Int,
-    val isFollower: Boolean
+    val isFollower: Boolean,
 )

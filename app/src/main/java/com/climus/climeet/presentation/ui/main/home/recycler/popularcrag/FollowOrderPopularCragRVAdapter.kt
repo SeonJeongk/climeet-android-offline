@@ -8,17 +8,26 @@ import com.climus.climeet.data.model.response.BestFollowGymSimpleResponse
 import com.climus.climeet.databinding.ItemPopularCragsBinding
 import kotlin.math.min
 
-class FollowOrderPopularCragRVAdapter (private val cragList: List<BestFollowGymSimpleResponse>,
-    private val onClickListener: (Long) -> Unit) : RecyclerView.Adapter<FollowOrderPopularCragRVAdapter.ViewHolder>(){
+class FollowOrderPopularCragRVAdapter(
+    private val cragList: List<BestFollowGymSimpleResponse>,
+    private val onClickListener: (Long) -> Unit,
+) : RecyclerView.Adapter<FollowOrderPopularCragRVAdapter.ViewHolder>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): FollowOrderPopularCragRVAdapter.ViewHolder {
-        val binding: ItemPopularCragsBinding = ItemPopularCragsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding: ItemPopularCragsBinding = ItemPopularCragsBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false,
+        )
         return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: FollowOrderPopularCragRVAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: FollowOrderPopularCragRVAdapter.ViewHolder,
+        position: Int,
+    ) {
         holder.bind(cragList[position])
     }
 
@@ -27,12 +36,14 @@ class FollowOrderPopularCragRVAdapter (private val cragList: List<BestFollowGymS
         return min(cragList.size, 10)
     }
 
-    inner class ViewHolder(val binding: ItemPopularCragsBinding): RecyclerView.ViewHolder(binding.root){
+    inner class ViewHolder(
+        val binding: ItemPopularCragsBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(crag: BestFollowGymSimpleResponse) {
             binding.root.setOnClickListener {
                 onClickListener(crag.gymId)
             }
-            if(crag.profileImageUrl != null) {
+            if (crag.profileImageUrl != null) {
                 Glide.with(binding.root.context)
                     .load(crag.profileImageUrl)
                     .into(binding.ivPopularCragProfile)

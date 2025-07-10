@@ -5,5 +5,4 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class MyPageAdminProfileCommunityViewModel @Inject constructor() : ViewModel() {
-}
+class MyPageAdminProfileCommunityViewModel @Inject constructor() : ViewModel()

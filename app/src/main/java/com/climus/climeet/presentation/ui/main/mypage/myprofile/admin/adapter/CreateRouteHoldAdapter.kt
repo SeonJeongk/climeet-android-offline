@@ -8,26 +8,30 @@ import com.climus.climeet.databinding.ItemCreateRouteHoldBinding
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.model.UiHoldItem
 import com.climus.climeet.presentation.util.DefaultDiffUtil
 
-class CreateRouteHoldAdapter : ListAdapter<UiHoldItem, CreateRouteHoldViewHolder>(
-    DefaultDiffUtil<UiHoldItem>()
-) {
-
-    override fun onBindViewHolder(holder: CreateRouteHoldViewHolder, position: Int) {
+class CreateRouteHoldAdapter : ListAdapter<UiHoldItem, CreateRouteHoldViewHolder>(DefaultDiffUtil<UiHoldItem>()) {
+    override fun onBindViewHolder(
+        holder: CreateRouteHoldViewHolder,
+        position: Int,
+    ) {
         holder.bind(getItem(position))
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CreateRouteHoldViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): CreateRouteHoldViewHolder =
         CreateRouteHoldViewHolder(
             ItemCreateRouteHoldBinding.inflate(
                 LayoutInflater.from(parent.context),
-                parent, false
-            )
+                parent,
+                false,
+            ),
         )
 }
 
-class CreateRouteHoldViewHolder(private val binding: ItemCreateRouteHoldBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-
+class CreateRouteHoldViewHolder(
+    private val binding: ItemCreateRouteHoldBinding,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: UiHoldItem) {
         binding.ivHold.setImageResource(item.holdImage)
         binding.ivHold.setOnClickListener {

@@ -13,13 +13,14 @@ import com.climus.climeet.presentation.ui.main.mypage.follow.viewpager.FollowerV
 
 class FollowerClimberRVAdapter(
     private val followerClimberList: List<FollowUiData>,
-    private val viewModel: FollowerViewModel
-) :
-    RecyclerView.Adapter<FollowerClimberViewHolder>() {
-
+    private val viewModel: FollowerViewModel,
+) : RecyclerView.Adapter<FollowerClimberViewHolder>() {
     private val followStatus = SparseBooleanArray()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FollowerClimberViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): FollowerClimberViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemMypageFollowerUserBinding.inflate(inflater, parent, false)
         return FollowerClimberViewHolder(binding, viewModel)
@@ -63,14 +64,12 @@ class FollowerClimberRVAdapter(
     }
 
     override fun getItemCount(): Int = followerClimberList.size
-
 }
 
 class FollowerClimberViewHolder(
     val binding: ItemMypageFollowerUserBinding,
-    val viewModel: FollowerViewModel
-) :
-    RecyclerView.ViewHolder(binding.root) {
+    val viewModel: FollowerViewModel,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(data: FollowUiData) {
         if (data.profileImageUrl != null) {
             Glide.with(binding.root.context)
@@ -83,7 +82,7 @@ class FollowerClimberViewHolder(
         binding.tvFollower.text = data.followerCount.toString()
         binding.tvFollowing.text = data.followingCount.toString()
 
-        binding.root.setOnClickListener{
+        binding.root.setOnClickListener {
             viewModel.navigateToProfile(data.userId)
         }
     }

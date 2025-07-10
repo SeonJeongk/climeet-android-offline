@@ -11,20 +11,25 @@ import com.climus.climeet.presentation.util.DefaultDiffUtil
 
 class UpdatedFollowAdapter :
     ListAdapter<UpdatedFollowUiData, RecyclerView.ViewHolder>(DefaultDiffUtil<UpdatedFollowUiData>()) {
-
     companion object {
         const val ITEM = 0
         const val GOTO_FOLLOW = 1
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+    ) {
         when (holder) {
             is UpdatedFollowViewHolder -> holder.bind(getItem(position))
             is NavigateToAddFollowViewHolder -> holder.bind(getItem(position))
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RecyclerView.ViewHolder =
 
         when (viewType) {
             ITEM -> {
@@ -32,14 +37,14 @@ class UpdatedFollowAdapter :
                     ItemUpdatedFollowBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
-                        false
-                    )
+                        false,
+                    ),
                 )
             }
 
             GOTO_FOLLOW -> {
                 NavigateToAddFollowViewHolder(
-                    ItemAddFollowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                    ItemAddFollowBinding.inflate(LayoutInflater.from(parent.context), parent, false),
                 )
             }
 
@@ -48,8 +53,8 @@ class UpdatedFollowAdapter :
                     ItemUpdatedFollowBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
-                        false
-                    )
+                        false,
+                    ),
                 )
             }
         }
@@ -60,15 +65,14 @@ class UpdatedFollowAdapter :
     }
 }
 
-class UpdatedFollowViewHolder(private val binding: ItemUpdatedFollowBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-
+class UpdatedFollowViewHolder(
+    private val binding: ItemUpdatedFollowBinding,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: UpdatedFollowUiData) {
-
         binding.root.setOnClickListener {
             item.onClickListener(item.userId, item.gymId, item.isGym)
         }
-        if(item.name.length > 6){
+        if (item.name.length > 6) {
             binding.tvNick.text = item.name.substring(0..6) + "\n" + item.name.substring(7)
         } else {
             binding.tvNick.text = item.name
@@ -77,11 +81,10 @@ class UpdatedFollowViewHolder(private val binding: ItemUpdatedFollowBinding) :
     }
 }
 
-class NavigateToAddFollowViewHolder(private val binding: ItemAddFollowBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-
+class NavigateToAddFollowViewHolder(
+    private val binding: ItemAddFollowBinding,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: UpdatedFollowUiData) {
-
         binding.root.setOnClickListener {
             item.navigateToAddFollow()
         }

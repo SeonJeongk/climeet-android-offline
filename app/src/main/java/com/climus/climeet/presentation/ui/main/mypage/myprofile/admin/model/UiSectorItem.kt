@@ -7,11 +7,12 @@ data class UiSectorItem(
     val sectorImg: String = "",
     val sectorFloor: Int = 1,
     var isSelected: Boolean = false,
-    val setSectorListener: (String, String) -> Unit
+    val setSectorListener: (String, String) -> Unit,
 ) {
-    fun toSectorRequestItem() = UpdateGymRouteVersionRequest.NewData.SectorRequestItem(
-        name = sectorName,
-        floor = sectorFloor,
-        imgUrl = sectorImg
-    )
+    fun toSectorRequestItem() =
+        UpdateGymRouteVersionRequest.NewData.SectorRequestItem(
+            name = sectorName,
+            floor = sectorFloor,
+            imgUrl = sectorImg,
+        )
 }

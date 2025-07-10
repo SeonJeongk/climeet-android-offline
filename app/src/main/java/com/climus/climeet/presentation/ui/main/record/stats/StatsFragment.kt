@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
-import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,10 +18,12 @@ import dagger.hilt.android.AndroidEntryPoint
 class StatsFragment : BaseFragment<FragmentStatsBinding>(R.layout.fragment_stats) {
     private val viewModel: StatsViewModel by activityViewModels()
     private var adapter = SelectGymAdapter(0) {
-
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
@@ -55,7 +56,7 @@ class StatsFragment : BaseFragment<FragmentStatsBinding>(R.layout.fragment_stats
         viewModel.selectedDate.value?.let {
             SelectYearMonthBottomSheet(
                 requireContext(),
-                it
+                it,
             ) { date ->
                 viewModel.setSelectedDate(date)
             }.show()
@@ -70,7 +71,7 @@ class StatsFragment : BaseFragment<FragmentStatsBinding>(R.layout.fragment_stats
             view,
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
-            true
+            true,
         )
 
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -89,6 +90,4 @@ class StatsFragment : BaseFragment<FragmentStatsBinding>(R.layout.fragment_stats
 
         popupWindow.showAsDropDown(binding.layoutToggle, 0, 10)
     }
-
-
 }

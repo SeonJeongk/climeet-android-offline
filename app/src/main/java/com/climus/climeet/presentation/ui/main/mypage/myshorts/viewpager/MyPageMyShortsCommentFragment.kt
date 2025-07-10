@@ -17,13 +17,15 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MyPageMyShortsCommentFragment :
     BaseFragment<FragmentMypageMyshortsCommentBinding>(R.layout.fragment_mypage_myshorts_comment) {
-
     private val sharedViewModel: ShortsPlayerViewModel by activityViewModels()
     private val viewModel: MyPageMyShortsCommentViewModel by viewModels()
 
     private lateinit var adapter: MyPageShortsCommentRVAdapter
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = MyPageShortsCommentRVAdapter(viewModel)
@@ -41,14 +43,20 @@ class MyPageMyShortsCommentFragment :
     }
 
     private fun initRecyclerView() {
-        binding.rvComments.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (!recyclerView.canScrollVertically(1)) {
-                    viewModel.getComment(viewModel.currentPage + 1)
+        binding.rvComments.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(
+                    recyclerView: RecyclerView,
+                    dx: Int,
+                    dy: Int,
+                ) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (!recyclerView.canScrollVertically(1)) {
+                        viewModel.getComment(viewModel.currentPage + 1)
+                    }
                 }
-            }
-        })
+            },
+        )
     }
 
     private fun initEventObserve() {

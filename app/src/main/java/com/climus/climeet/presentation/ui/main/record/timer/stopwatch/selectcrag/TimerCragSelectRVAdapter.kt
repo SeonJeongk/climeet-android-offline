@@ -11,20 +11,27 @@ import com.climus.climeet.presentation.ui.main.record.timer.setrecord.SetTimerCl
 
 class TimerCragSelectRVAdapter(
     private val viewModel: TimerCragSelectBottomSheetViewModel,
-    private val routeVM: SetTimerClimbingRecordViewModel
+    private val routeVM: SetTimerClimbingRecordViewModel,
 ) : RecyclerView.Adapter<TimerCragSelectRVAdapter.CragSelectViewHolder>() {
-
     private var searchList: List<SearchCragUiData> = emptyList()
     private var keyword: String = ""
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CragSelectViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): CragSelectViewHolder =
         CragSelectViewHolder(
             ItemCragSearchTimerBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
+                LayoutInflater.from(parent.context),
+                parent,
+                false,
+            ),
         )
 
-    override fun onBindViewHolder(holder: CragSelectViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: CragSelectViewHolder,
+        position: Int,
+    ) {
         val cragData = searchList[position]
         holder.bind(cragData, keyword)
 
@@ -40,20 +47,27 @@ class TimerCragSelectRVAdapter(
     override fun getItemCount(): Int = searchList.size
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setList(list: List<SearchCragUiData>, keyword: String) {
+    fun setList(
+        list: List<SearchCragUiData>,
+        keyword: String,
+    ) {
         searchList = list
         this.keyword = keyword
         notifyDataSetChanged()
     }
 
-    class CragSelectViewHolder(val binding: ItemCragSearchTimerBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        fun bind(data: SearchCragUiData, keyword: String) {
+    class CragSelectViewHolder(
+        val binding: ItemCragSearchTimerBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(
+            data: SearchCragUiData,
+            keyword: String,
+        ) {
             binding.keyword = keyword
             binding.data = data
 
             binding.btnSelect.setOnClickListener {
-                data.onClickListener(data.id, data.name, data.imgUrl)
+                data.onClickListener(data.id, data.name)
             }
         }
     }

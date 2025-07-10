@@ -2,13 +2,13 @@ package com.climus.climeet.presentation.ui.main.home.bestclimer.viewpager
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -18,8 +18,6 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.climus.climeet.MainNavDirections
 import com.climus.climeet.R
-import com.climus.climeet.databinding.FragmentCompleteDetailBinding
-import com.climus.climeet.databinding.FragmentLevelBinding
 import com.climus.climeet.databinding.FragmentLevelDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -27,46 +25,45 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LevelDetailFragment : Fragment() {
-
-    private lateinit var binding : FragmentLevelDetailBinding
+    private lateinit var binding: FragmentLevelDetailBinding
     private val viewModel: LevelDetailViewModel by viewModels()
 
-    private lateinit var profileImg1 : ImageView
-    private lateinit var profileImg2 : ImageView
-    private lateinit var profileImg3 : ImageView
-    private lateinit var profileImg4 : ImageView
-    private lateinit var profileImg5 : ImageView
-    private lateinit var profileImg6 : ImageView
-    private lateinit var profileImg7 : ImageView
-    private lateinit var profileImg8 : ImageView
-    private lateinit var profileImg9 : ImageView
+    private lateinit var profileImg1: ImageView
+    private lateinit var profileImg2: ImageView
+    private lateinit var profileImg3: ImageView
+    private lateinit var profileImg4: ImageView
+    private lateinit var profileImg5: ImageView
+    private lateinit var profileImg6: ImageView
+    private lateinit var profileImg7: ImageView
+    private lateinit var profileImg8: ImageView
+    private lateinit var profileImg9: ImageView
     lateinit var profileImgList: List<ImageView>
 
-    private lateinit var nickname1 : TextView
-    private lateinit var nickname2 : TextView
-    private lateinit var nickname3 : TextView
-    private lateinit var nickname4 : TextView
-    private lateinit var nickname5 : TextView
-    private lateinit var nickname6 : TextView
-    private lateinit var nickname7 : TextView
-    private lateinit var nickname8 : TextView
-    private lateinit var nickname9 : TextView
+    private lateinit var nickname1: TextView
+    private lateinit var nickname2: TextView
+    private lateinit var nickname3: TextView
+    private lateinit var nickname4: TextView
+    private lateinit var nickname5: TextView
+    private lateinit var nickname6: TextView
+    private lateinit var nickname7: TextView
+    private lateinit var nickname8: TextView
+    private lateinit var nickname9: TextView
     lateinit var nicknameList: List<TextView>
 
-    private lateinit var level1 : TextView
-    private lateinit var level2 : TextView
-    private lateinit var level3 : TextView
-    private lateinit var level4 : TextView
-    private lateinit var level5 : TextView
-    private lateinit var level6 : TextView
-    private lateinit var level7 : TextView
-    private lateinit var level8 : TextView
-    private lateinit var level9 : TextView
+    private lateinit var level1: TextView
+    private lateinit var level2: TextView
+    private lateinit var level3: TextView
+    private lateinit var level4: TextView
+    private lateinit var level5: TextView
+    private lateinit var level6: TextView
+    private lateinit var level7: TextView
+    private lateinit var level8: TextView
+    private lateinit var level9: TextView
     lateinit var levelList: List<TextView>
 
-    private lateinit var rank1 : TextView
-    private lateinit var rank2 : TextView
-    private lateinit var rank3 : TextView
+    private lateinit var rank1: TextView
+    private lateinit var rank2: TextView
+    private lateinit var rank3: TextView
     lateinit var rankList: List<TextView>
 
     fun LifecycleOwner.repeatOnStarted(block: suspend CoroutineScope.() -> Unit) {
@@ -76,22 +73,25 @@ class LevelDetailFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_level_detail, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) { // api
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) { // api
         super.onViewCreated(view, savedInstanceState)
         initView()
         viewModel.getClimberRankingOrderLevel()
         initStateObserve()
-
     }
 
-    private fun initView() {
+    private fun initProfileImages() {
         profileImg1 = binding.ivLevelRanking1
         profileImg2 = binding.ivLevelRanking2
         profileImg3 = binding.ivLevelRanking3
@@ -102,8 +102,20 @@ class LevelDetailFragment : Fragment() {
         profileImg8 = binding.ivLevelRanking8
         profileImg9 = binding.ivLevelRanking9
         profileImgList = listOf(
-            profileImg1, profileImg2, profileImg3, profileImg4, profileImg5, profileImg6, profileImg7, profileImg8, profileImg9
+            profileImg1,
+            profileImg2,
+            profileImg3,
+            profileImg4,
+            profileImg5,
+            profileImg6,
+            profileImg7,
+            profileImg8,
+            profileImg9,
         )
+    }
+
+    private fun initView() {
+        initProfileImages()
 
         nickname1 = binding.tvLevelRanking1Nickname
         nickname2 = binding.tvLevelRanking2Nickname
@@ -115,7 +127,15 @@ class LevelDetailFragment : Fragment() {
         nickname8 = binding.tvLevelRanking8Nickname
         nickname9 = binding.tvLevelRanking9Nickname
         nicknameList = listOf(
-            nickname1, nickname2, nickname3, nickname4, nickname5, nickname6, nickname7, nickname8, nickname9
+            nickname1,
+            nickname2,
+            nickname3,
+            nickname4,
+            nickname5,
+            nickname6,
+            nickname7,
+            nickname8,
+            nickname9,
         )
 
         level1 = binding.tvLevelRanking1
@@ -128,7 +148,15 @@ class LevelDetailFragment : Fragment() {
         level8 = binding.tvLevelRanking8
         level9 = binding.tvLevelRanking9
         levelList = listOf(
-            level1, level2, level3, level4, level5, level6, level7, level8, level9
+            level1,
+            level2,
+            level3,
+            level4,
+            level5,
+            level6,
+            level7,
+            level8,
+            level9,
         )
 
         rank1 = binding.tvLevelRankingNumber1
@@ -139,14 +167,14 @@ class LevelDetailFragment : Fragment() {
 
     private fun initStateObserve() {
         repeatOnStarted {
-            viewModel?.let { vm ->
+            viewModel.let { vm ->
                 vm.uiState.collect { uiState ->
-                    uiState.rankingList?.let { rankingList ->
+                    uiState.rankingList.let { rankingList ->
                         Log.d("LevelDetail", rankingList.toString())
                         val iterationCount = minOf(rankingList.size, 9)
 
                         rankingList.take(iterationCount).forEachIndexed { i, bestLevelClimberResponse ->
-                            if(bestLevelClimberResponse.profileImageUrl != null) {
+                            if (bestLevelClimberResponse.profileImageUrl != null) {
                                 Glide.with(binding.root)
                                     .load(bestLevelClimberResponse.profileImageUrl)
                                     .into(profileImgList[i])
@@ -154,7 +182,7 @@ class LevelDetailFragment : Fragment() {
                                     navigateToClimberProfile(bestLevelClimberResponse.userId)
                                 }
                             }
-                            if(i < 3) {
+                            if (i < 3) {
                                 rankList[i].text = bestLevelClimberResponse.ranking.toString()
                                 rankList[i].visibility = View.VISIBLE
                             }
@@ -171,9 +199,8 @@ class LevelDetailFragment : Fragment() {
         }
     }
 
-    private fun navigateToClimberProfile(userId : Long) {
+    private fun navigateToClimberProfile(userId: Long) {
         val action = MainNavDirections.globalActionToClimerProfileFragment(userId)
         findNavController().navigate(action)
     }
-
 }

@@ -6,15 +6,13 @@ import com.climus.climeet.presentation.ui.main.record.timer.setrecord.SetTimerCl
 import com.climus.climeet.presentation.ui.main.record.timer.stopwatch.TimerFragment
 
 class TimerMainAdapter(
-    fragment: Fragment
+    fragment: Fragment,
 ) : FragmentStateAdapter(fragment) {
-
     override fun getItemCount(): Int = 2
 
-    override fun createFragment(position: Int): Fragment {
-        return when (position) {
+    override fun createFragment(position: Int): Fragment =
+        when (position) {
             0 -> TimerFragment()
             else -> SetTimerClimbingRecordFragment()
         }
-    }
 }

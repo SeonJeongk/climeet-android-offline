@@ -23,9 +23,8 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ShortsBottomSheetFragment : BottomSheetDialogFragment() {
-
-    private var _binding: FragmentShortsBottomSheetBinding? = null
-    private val binding get() = _binding!!
+    private var viewBinding: FragmentShortsBottomSheetBinding? = null
+    private val binding get() = checkNotNull(viewBinding) { "Binding is only available while the view exists" }
 
     private val viewModel: ShortsBottomSheetViewModel by activityViewModels()
     private val parentViewModel: ShortsPlayerViewModel by activityViewModels()
@@ -39,13 +38,13 @@ class ShortsBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
-        _binding = DataBindingUtil.inflate(
+        viewBinding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_shorts_bottom_sheet,
             container,
-            false
+            false,
         )
         return binding.root
     }
@@ -59,13 +58,16 @@ class ShortsBottomSheetFragment : BottomSheetDialogFragment() {
         return dialog
     }
 
-    private fun setupRatio(bottomSheetDialog: BottomSheetDialog){
-        val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as View
+    private fun setupRatio(bottomSheetDialog: BottomSheetDialog) {
+        val bottomSheet =
+            bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as View
         BottomSheetBehavior.from(bottomSheet).state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         initEventObserve()
@@ -74,7 +76,7 @@ class ShortsBottomSheetFragment : BottomSheetDialogFragment() {
     private fun initEventObserve() {
         repeatOnStarted {
             viewModel.event.collect {
-                when(it){
+                when (it) {
                     is ShortsBottomSheetEvent.DismissDialog -> dismiss()
                     is ShortsBottomSheetEvent.ApplyFilter -> {
                         parentViewModel.applyFilter(it.selectedFilter)

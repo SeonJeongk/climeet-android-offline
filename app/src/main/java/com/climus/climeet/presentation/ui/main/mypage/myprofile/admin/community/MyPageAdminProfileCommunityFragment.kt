@@ -16,11 +16,14 @@ import com.climus.climeet.presentation.ui.main.global.gymprofile.community.compl
 import com.climus.climeet.presentation.ui.main.global.gymprofile.community.skill.GymProfileSkillFragment
 import com.google.android.material.tabs.TabLayout
 
-class MyPageAdminProfileCommunityFragment: BaseFragment<FragmentMypageAdminProfileCommunityBinding>(R.layout.fragment_mypage_admin_profile_community) {
-
+class MyPageAdminProfileCommunityFragment :
+    BaseFragment<FragmentMypageAdminProfileCommunityBinding>(R.layout.fragment_mypage_admin_profile_community) {
     private val sharedViewModel: GymProfileCommunityViewModel by activityViewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.svm = sharedViewModel
@@ -39,22 +42,22 @@ class MyPageAdminProfileCommunityFragment: BaseFragment<FragmentMypageAdminProfi
         layoutParams.weight = 1.5f
         tab.layoutParams = layoutParams
 
-        binding.tbCommuMenu.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                val fragment: Fragment = when (tab.position) {
-                    0 -> GymProfileSkillFragment()
-                    1 -> GymProfileBestClimberFragment()
-                    else -> GymProfileAvgCompletionFragment()
+        binding.tbCommuMenu.addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab) {
+                    val fragment: Fragment = when (tab.position) {
+                        0 -> GymProfileSkillFragment()
+                        1 -> GymProfileBestClimberFragment()
+                        else -> GymProfileAvgCompletionFragment()
+                    }
+                    replaceFragment(fragment)
                 }
-                replaceFragment(fragment)
-            }
 
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-            }
+                override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
 
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-            }
-        })
+                override fun onTabReselected(tab: TabLayout.Tab?) = Unit
+            },
+        )
     }
 
     fun replaceFragment(fragment: Fragment) {

@@ -47,7 +47,6 @@ import com.climus.climeet.data.model.response.GymProfileTabInfoResponse
 import com.climus.climeet.data.model.response.GymProfileTopInfoResponse
 import com.climus.climeet.data.model.response.GymTimeBestClimberResponse
 import com.climus.climeet.data.model.response.GymWeekStatsResponse
-import com.climus.climeet.data.model.response.MyPageClimberProfilePrivacyResponse
 import com.climus.climeet.data.model.response.MyPageProfileResponse
 import com.climus.climeet.data.model.response.MyStatsMonthResponse
 import com.climus.climeet.data.model.response.SearchAvailableGymResponse
@@ -64,7 +63,7 @@ import com.climus.climeet.data.model.response.UserFollowingInfoResponse
 import com.climus.climeet.data.model.response.UserHomeGymDetailResponse
 import com.climus.climeet.data.model.response.UserHomeGymSimpleResponse
 import com.climus.climeet.data.model.response.UserProfileInfoResponse
-import com.climus.climeet.data.model.response.userShortsSortType
+import com.climus.climeet.data.model.response.UserShortsSortType
 import com.climus.climeet.data.model.response.UserShortsVisibilityType
 import com.climus.climeet.data.model.runRemote
 import com.climus.climeet.data.remote.MainApi
@@ -75,48 +74,41 @@ import javax.inject.Inject
 class MainRepositoryImpl @Inject constructor(
     private val api: MainApi,
     private val climbingRecordDao: ClimbingRecordDao,
-    private val routeRecordDao: RouteRecordDao
+    private val routeRecordDao: RouteRecordDao,
 ) : MainRepository {
-
     override suspend fun climberNickNameCheck(nickName: String): BaseState<Boolean> =
         runRemote { api.climberNickNameCheck(nickName) }
 
-    override suspend fun uploadFile(
-        file: MultipartBody.Part
-    ): BaseState<UploadImgResponse> = runRemote { api.uploadFile(file) }
+    override suspend fun uploadFile(file: MultipartBody.Part): BaseState<UploadImgResponse> =
+        runRemote { api.uploadFile(file) }
 
     override suspend fun searchGym(
         gymName: String,
         page: Int,
-        size: Int
-    ): BaseState<SearchGymResponse> =
-        runRemote { api.searchGym(gymName, page, size) }
+        size: Int,
+    ): BaseState<SearchGymResponse> = runRemote { api.searchGym(gymName, page, size) }
 
     override suspend fun getUserFollowing(
         userId: Long?,
-        userCategory: String
-    ): BaseState<List<UserFollowingInfoResponse>> =
-        runRemote { api.getUserFollowing(userId, userCategory) }
+        userCategory: String,
+    ): BaseState<List<UserFollowingInfoResponse>> = runRemote { api.getUserFollowing(userId, userCategory) }
 
     override suspend fun getUserFollowers(
         userId: Long?,
-        userCategory: String
-    ): BaseState<List<UserFollowerInfoResponse>> =
-        runRemote { api.getUserFollowers(userId, userCategory) }
+        userCategory: String,
+    ): BaseState<List<UserFollowerInfoResponse>> = runRemote { api.getUserFollowers(userId, userCategory) }
 
     override suspend fun getRecentShorts(
         page: Int,
         size: Int,
-        filter: Map<String, Long>
-    ): BaseState<ShortsListResponse> =
-        runRemote { api.getRecentShorts(page, size, filter) }
+        filter: Map<String, Long>,
+    ): BaseState<ShortsListResponse> = runRemote { api.getRecentShorts(page, size, filter) }
 
     override suspend fun getPopularShorts(
         page: Int,
         size: Int,
-        filter: Map<String, Long>
-    ): BaseState<ShortsListResponse> =
-        runRemote { api.getPopularShorts(page, size, filter) }
+        filter: Map<String, Long>,
+    ): BaseState<ShortsListResponse> = runRemote { api.getPopularShorts(page, size, filter) }
 
     override suspend fun getGymsFollowing(): BaseState<List<UserHomeGymDetailResponse>> =
         runRemote { api.getGymsFollowing() }
@@ -124,18 +116,15 @@ class MainRepositoryImpl @Inject constructor(
     override suspend fun searchAvailableGym(
         gymName: String,
         page: Int,
-        size: Int
-    ): BaseState<SearchAvailableGymResponse> =
-        runRemote { api.searchAvailableGym(gymName, page, size) }
+        size: Int,
+    ): BaseState<SearchAvailableGymResponse> = runRemote { api.searchAvailableGym(gymName, page, size) }
 
-    override suspend fun getUserProfile(): BaseState<UserProfileInfoResponse> =
-        runRemote { api.getUserProfile() }
+    override suspend fun getUserProfile(): BaseState<UserProfileInfoResponse> = runRemote { api.getUserProfile() }
 
     override suspend fun getShortsUpdatedFollow(): BaseState<List<ShortsUpdatedFollowResponse>> =
         runRemote { api.getShortsUpdatedFollow() }
 
-    override suspend fun getHomeGyms(): BaseState<List<UserHomeGymSimpleResponse>> =
-        runRemote { api.getHomeGyms() }
+    override suspend fun getHomeGyms(): BaseState<List<UserHomeGymSimpleResponse>> = runRemote { api.getHomeGyms() }
 
     override suspend fun getClimberPrivacySetting(climberId: Int): BaseState<GetClimberPrivacySettingResponse> =
         runRemote { api.getClimberPrivacySetting(climberId) }
@@ -143,191 +132,160 @@ class MainRepositoryImpl @Inject constructor(
     override suspend fun getClimberFollowing(): BaseState<List<UserFollowSimpleResponse>> =
         runRemote { api.getClimberFollowing() }
 
-    override suspend fun followUser(
-        followingUserId: Long
-    ): BaseState<ResponseBody> =
+    override suspend fun followUser(followingUserId: Long): BaseState<ResponseBody> =
         runRemote { api.followUser(followingUserId) }
 
-    override suspend fun unfollowUser(
-        followingUserId: Long
-    ): BaseState<ResponseBody> =
+    override suspend fun unfollowUser(followingUserId: Long): BaseState<ResponseBody> =
         runRemote { api.unfollowUser(followingUserId) }
 
     override suspend fun getClimberSearchingList(
         page: Int,
         size: Int,
-        climberName: String
-    ): BaseState<ClimberDetailInfoResponse> =
-        runRemote { api.getClimberSearchingList(page, size, climberName) }
+        climberName: String,
+    ): BaseState<ClimberDetailInfoResponse> = runRemote { api.getClimberSearchingList(page, size, climberName) }
 
-    override suspend fun findBannerListBetweenDates()
-            : BaseState<List<BannerDetailInfoResponse>> =
+    override suspend fun findBannerListBetweenDates(): BaseState<List<BannerDetailInfoResponse>> =
         runRemote { api.findBannerListBetweenDates() }
 
-    override suspend fun findClimberRankingOrderClearCount()
-            : BaseState<List<BestClearClimberSimpleResponse>> =
+    override suspend fun findClimberRankingOrderClearCount(): BaseState<List<BestClearClimberSimpleResponse>> =
         runRemote { api.findClimberRankingOrderClearCount() }
 
-    override suspend fun findClimberRankingOrderTime()
-            : BaseState<List<BestTimeClimberSimpleResponse>> =
+    override suspend fun findClimberRankingOrderTime(): BaseState<List<BestTimeClimberSimpleResponse>> =
         runRemote { api.findClimberRankingOrderTime() }
 
-    override suspend fun findClimberRankingOrderLevel()
-            : BaseState<List<BestLevelCimberSimpleResponse>> =
+    override suspend fun findClimberRankingOrderLevel(): BaseState<List<BestLevelCimberSimpleResponse>> =
         runRemote { api.findClimberRankingOrderLevel() }
 
-    override suspend fun findGymRankingOrderFollowCount()
-            : BaseState<List<BestFollowGymSimpleResponse>> =
+    override suspend fun findGymRankingOrderFollowCount(): BaseState<List<BestFollowGymSimpleResponse>> =
         runRemote { api.findGymRankingOrderFollowCount() }
 
-    override suspend fun findGymRankingListOrderSelectionCount()
-            : BaseState<List<BestRecordGymDetailInfoResponse>> =
+    override suspend fun findGymRankingListOrderSelectionCount(): BaseState<List<BestRecordGymDetailInfoResponse>> =
         runRemote { api.findGymRankingListOrderSelectionCount() }
 
-    override suspend fun findRouteRankingOrderSelectionCount()
-            : BaseState<List<BestRouteDetailInfoResponse>> =
+    override suspend fun findRouteRankingOrderSelectionCount(): BaseState<List<BestRouteDetailInfoResponse>> =
         runRemote { api.findRouteRankingOrderSelectionCount() }
 
     override suspend fun getSelectDateRecord(
         startDate: String,
-        endDate: String
-    ): BaseState<List<GetSelectDateRecordResponse>> =
-        runRemote { api.getSelectDateRecord(startDate, endDate) }
+        endDate: String,
+    ): BaseState<List<GetSelectDateRecordResponse>> = runRemote { api.getSelectDateRecord(startDate, endDate) }
 
-    override suspend fun getGymFilteringKey(
-        gymId: Long,
-    ): BaseState<GetGymFilteringKeyResponse> = runRemote {
-        api.getGymFilteringKey(
-            gymId
-        )
-    }
+    override suspend fun getGymFilteringKey(gymId: Long): BaseState<GetGymFilteringKeyResponse> =
+        runRemote {
+            api.getGymFilteringKey(gymId)
+        }
 
     override suspend fun getGymFilteringKeyTime(
         gymId: Long,
-        timePoint: String
-    ): BaseState<GetGymFilteringKeyResponse> =
-        runRemote { api.getGymFilteringKeyTime(gymId, timePoint) }
+        timePoint: String,
+    ): BaseState<GetGymFilteringKeyResponse> = runRemote { api.getGymFilteringKeyTime(gymId, timePoint) }
 
     override suspend fun getGymRouteFindingData(timePoint: String): BaseState<GetRouteFindingData> =
         runRemote { api.getGymRouteFindingData(timePoint) }
 
     override suspend fun getGymRouteInfoList(
         gymId: Long,
-        body: GetGymRouteInfoRequest
-    ): BaseState<GetGymRouteInfoResponse> = runRemote {
-        api.getGymRouteInfoList(gymId, body)
-    }
+        body: GetGymRouteInfoRequest,
+    ): BaseState<GetGymRouteInfoResponse> =
+        runRemote {
+            api.getGymRouteInfoList(gymId, body)
+        }
 
     override suspend fun updateGymRouteVersion(body: UpdateGymRouteVersionRequest): BaseState<ResponseBody> =
         runRemote { api.updateGymRouteVersion(body) }
 
     override suspend fun uploadShorts(
         video: MultipartBody.Part?,
-        body: ShortsDetailRequest
-    ): BaseState<Unit> = runRemote {
-        api.uploadShorts(video, body)
-    }
+        body: ShortsDetailRequest,
+    ): BaseState<Unit> =
+        runRemote {
+            api.uploadShorts(video, body)
+        }
 
-    override suspend fun createTimerClimbingRecord(
-        body: CreateTimerClimbingRecordRequest
-    ): BaseState<ResponseBody> = runRemote { api.createTimerClimbingRecord(body) }
+    override suspend fun createTimerClimbingRecord(body: CreateTimerClimbingRecordRequest): BaseState<ResponseBody> =
+        runRemote {
+            api.createTimerClimbingRecord(body)
+        }
 
     override suspend fun getGymProfile(gymId: Long): BaseState<GetGymProfileResponse> =
         runRemote { api.getGymProfile(gymId) }
 
+    override suspend fun patchBookMark(shortsId: Long): BaseState<Unit> = runRemote { api.patchBookMarks(shortsId) }
 
-    override suspend fun patchBookMark(shortsId: Long): BaseState<Unit> =
-        runRemote { api.patchBookMarks(shortsId) }
-
-    override suspend fun patchFavorite(shortsId: Long): BaseState<Unit> =
-        runRemote { api.patchFavorites(shortsId) }
+    override suspend fun patchFavorite(shortsId: Long): BaseState<Unit> = runRemote { api.patchFavorites(shortsId) }
 
     override suspend fun addShortsComment(
         shortsId: Long,
         filter: Map<String, Long>,
-        body: AddShortsCommentRequest
+        body: AddShortsCommentRequest,
     ): BaseState<ShortsMainCommentItem> = runRemote { api.addShortsComment(shortsId, filter, body) }
 
     override suspend fun getShortsCommentList(
         shortsId: Long,
         page: Int,
-        size: Int
-    ): BaseState<ShortsMainCommentResponse> =
-        runRemote { api.getShortsCommentList(shortsId, page, size) }
+        size: Int,
+    ): BaseState<ShortsMainCommentResponse> = runRemote { api.getShortsCommentList(shortsId, page, size) }
 
     override suspend fun getShortsSubCommentList(
         shortsId: Long,
         parentCommentId: Long,
         page: Int,
-        size: Int
+        size: Int,
     ): BaseState<ShortsSubCommentResponse> =
         runRemote { api.getShortsSubCommentList(shortsId, parentCommentId, page, size) }
 
     override suspend fun patchShortsCommentInteraction(
         shortsCommentId: Long,
         isLike: Boolean,
-        isDislike: Boolean
-    ): BaseState<String> =
-        runRemote { api.patchShortsCommentInteraction(shortsCommentId, isLike, isDislike) }
+        isDislike: Boolean,
+    ): BaseState<String> = runRemote { api.patchShortsCommentInteraction(shortsCommentId, isLike, isDislike) }
 
-    override suspend fun getGymProfileTopInfo(
-        gymId: Long
-    ): BaseState<GymProfileTopInfoResponse> = runRemote { api.getGymProfileTopInfo(gymId) }
+    override suspend fun getGymProfileTopInfo(gymId: Long): BaseState<GymProfileTopInfoResponse> =
+        runRemote { api.getGymProfileTopInfo(gymId) }
 
-    override suspend fun getGymProfileTabInfo(
-        gymId: Long
-    ): BaseState<GymProfileTabInfoResponse> = runRemote { api.getGymProfileTabInfo(gymId) }
+    override suspend fun getGymProfileTabInfo(gymId: Long): BaseState<GymProfileTabInfoResponse> =
+        runRemote { api.getGymProfileTabInfo(gymId) }
 
     override suspend fun getMyStatsMonth(
         year: Int,
-        month: Int
+        month: Int,
     ): BaseState<MyStatsMonthResponse> = runRemote { api.getMyStatsMonth(year, month) }
 
     override suspend fun getGymReview(
         gymId: Long,
         page: Int,
-        size: Int
+        size: Int,
     ): BaseState<GetGymProfileReviewResponse> = runRemote { api.getGymReview(gymId, page, size) }
 
     override suspend fun createGymReview(
         gymId: Long,
-        body: CreateGymProfileReviewRequest
+        body: CreateGymProfileReviewRequest,
     ): BaseState<ResponseBody> = runRemote { api.createGymReview(gymId, body) }
 
     override suspend fun editGymReview(
         gymId: Long,
-        body: CreateGymProfileReviewRequest
+        body: CreateGymProfileReviewRequest,
     ): BaseState<ResponseBody> = runRemote { api.editGymReview(gymId, body) }
 
     override suspend fun getGymClimberRankingOrderClearCount(
-        gymId: Long
-    ): BaseState<List<GymCompleteBestClimberResponse>> =
-        runRemote { api.getGymClimberRankingOrderClearCount(gymId) }
+        gymId: Long,
+    ): BaseState<List<GymCompleteBestClimberResponse>> = runRemote { api.getGymClimberRankingOrderClearCount(gymId) }
 
-    override suspend fun getGymClimberRankingOrderLevel(
-        gymId: Long
-    ): BaseState<List<GymLevelBestClimberResponse>> =
+    override suspend fun getGymClimberRankingOrderLevel(gymId: Long): BaseState<List<GymLevelBestClimberResponse>> =
         runRemote { api.getGymClimberRankingOrderLevel(gymId) }
 
-    override suspend fun getGymClimberRankingOrderTime(
-        gymId: Long
-    ): BaseState<List<GymTimeBestClimberResponse>> =
+    override suspend fun getGymClimberRankingOrderTime(gymId: Long): BaseState<List<GymTimeBestClimberResponse>> =
         runRemote { api.getGymClimberRankingOrderTime(gymId) }
 
-    override suspend fun getGymSkillDistribution(
-        gymId: Long
-    ): BaseState<List<GetGymSkillDistributionResponse>> =
+    override suspend fun getGymSkillDistribution(gymId: Long): BaseState<List<GetGymSkillDistributionResponse>> =
         runRemote { api.getGymSkillDistribution(gymId) }
 
-    override suspend fun getMyGymSkill(gymId: Long): BaseState<ResponseBody> =
-        runRemote { api.getMyGymSkill(gymId) }
+    override suspend fun getMyGymSkill(gymId: Long): BaseState<ResponseBody> = runRemote { api.getMyGymSkill(gymId) }
 
     override suspend fun getGymStatsWeek(gymId: Long): BaseState<GymWeekStatsResponse> =
         runRemote { api.getGymStatsWeek(gymId) }
 
-    override suspend fun getMyPageProfile(): BaseState<MyPageProfileResponse> =
-        runRemote { api.getMyPageProfile() }
-
+    override suspend fun getMyPageProfile(): BaseState<MyPageProfileResponse> = runRemote { api.getMyPageProfile() }
 
     // -------- RoomDB ClimbingRecordDa0 암장 정보 -----------
     override fun insert(climbingRecordData: ClimbingRecordData) {
@@ -346,13 +304,9 @@ class MainRepositoryImpl @Inject constructor(
         climbingRecordDao.deleteAllRecord()
     }
 
-    override fun getAllRecord(): List<ClimbingRecordData> {
-        return climbingRecordDao.getAllRecord()
-    }
+    override fun getAllRecord(): List<ClimbingRecordData> = climbingRecordDao.getAllRecord()
 
-    override fun getRecord(id: Int): ClimbingRecordData {
-        return climbingRecordDao.getRecord(id)
-    }
+    override fun getRecord(id: Int): ClimbingRecordData = climbingRecordDao.getRecord(id)
 
     // --------- RoomDB RouteRecordDao 루트 기록 --------------
     override fun insert(routeRecord: RouteRecordData) {
@@ -375,80 +329,71 @@ class MainRepositoryImpl @Inject constructor(
         routeRecordDao.deleteById(id)
     }
 
-    override fun getAllRoute(): List<RouteRecordData> {
-        return routeRecordDao.getAllRoute()
-    }
+    override fun getAllRoute(): List<RouteRecordData> = routeRecordDao.getAllRoute()
 
-    override fun getRouteById(id: Int): RouteRecordData {
-        return routeRecordDao.getRouteById(id)
-    }
+    override fun getRouteById(id: Int): RouteRecordData = routeRecordDao.getRouteById(id)
 
-    override fun findExistRoute(sectorId: Long, routeId: Long): RouteRecordData? {
-        return routeRecordDao.findExistRoute(sectorId, routeId)
-    }
+    override fun findExistRoute(
+        sectorId: Long,
+        routeId: Long,
+    ): RouteRecordData? = routeRecordDao.findExistRoute(sectorId, routeId)
 
-    override fun getAverageDifficultyOfCompleted(): Double? {
-        return routeRecordDao.getAverageDifficultyOfCompleted()
-    }
+    override fun getAverageDifficultyOfCompleted(): Double? = routeRecordDao.getAverageDifficultyOfCompleted()
 
-    override fun getAllLevelRecord(): List<RouteRecordData> {
-        return routeRecordDao.getAllLevelRecord()
-    }
+    override fun getAllLevelRecord(): List<RouteRecordData> = routeRecordDao.getAllLevelRecord()
 
-    override fun getSuccessCount(level: String): Int {
-        return routeRecordDao.getSuccessCount(level)
-    }
+    override fun getSuccessCount(level: String): Int = routeRecordDao.getSuccessCount(level)
 
-    override fun getAttemptCount(level: String): Int {
-        return routeRecordDao.getAttemptCount(level)
-    }
+    override fun getAttemptCount(level: String): Int = routeRecordDao.getAttemptCount(level)
 
-    override suspend fun followGym(gymId: Long): BaseState<ResponseBody> =
-        runRemote { api.followGym(gymId) }
+    override suspend fun followGym(gymId: Long): BaseState<ResponseBody> = runRemote { api.followGym(gymId) }
 
-    override suspend fun unFollowGym(gymId: Long): BaseState<ResponseBody> =
-        runRemote { api.unfollowGym(gymId) }
+    override suspend fun unFollowGym(gymId: Long): BaseState<ResponseBody> = runRemote { api.unfollowGym(gymId) }
 
     override suspend fun getGymListToFollow(
         gymname: String,
         page: Int,
-        size: Int
-    ): BaseState<GetGymListToFollowResponse> = runRemote {
-        api.getGymListToFollow(gymname, page, size)
-    }
+        size: Int,
+    ): BaseState<GetGymListToFollowResponse> =
+        runRemote {
+            api.getGymListToFollow(gymname, page, size)
+        }
 
     override suspend fun getClimberProfileStatistics(userId: Long): BaseState<GetClimberProfileStatisticsResponse> =
         runRemote { api.getClimberProfileStatistics(userId) }
 
     override suspend fun getClimberProfileTargetGymStatistics(
         userId: Long,
-        gymId: Long
-    ): BaseState<GetClimberProfileTargetGymStatisticsResponse> = runRemote {
-        api.getClimberProfileTargetGymStatistics(userId, gymId)
-    }
+        gymId: Long,
+    ): BaseState<GetClimberProfileTargetGymStatisticsResponse> =
+        runRemote {
+            api.getClimberProfileTargetGymStatistics(userId, gymId)
+        }
 
-    override suspend fun getUserClimbedGymList(
-        userId: Int
-    ): BaseState<List<ClimbedGym>> = runRemote {
-        api.getUserClimbedGymList(userId)
-    }
+    override suspend fun getUserClimbedGymList(userId: Int): BaseState<List<ClimbedGym>> =
+        runRemote {
+            api.getUserClimbedGymList(userId)
+        }
 
     override suspend fun getMyStatsTargetGymMonth(
         gymId: Long,
         year: Int,
-        month: Int
-    ): BaseState<GetMyStatsTargetGymMonthResponse> = runRemote {
-        api.getMyStatsTargetGymMonth(gymId, year, month)
-    }
+        month: Int,
+    ): BaseState<GetMyStatsTargetGymMonthResponse> =
+        runRemote {
+            api.getMyStatsTargetGymMonth(gymId, year, month)
+        }
 
     override suspend fun getMyShorts(
         shortsVisibility: UserShortsVisibilityType,
         page: Int,
-        size: Int
+        size: Int,
     ): BaseState<ShortsListResponse> = runRemote { api.getMyShorts(shortsVisibility, page, size) }
 
-    override suspend fun getShortsLikedList(page: Int, size: Int): BaseState<ShortsListResponse> =
-        runRemote { api.getShortsLikedList(page, size) }
+    override suspend fun getShortsLikedList(
+        page: Int,
+        size: Int,
+    ): BaseState<ShortsListResponse> = runRemote { api.getShortsLikedList(page, size) }
 
     override suspend fun getShortsBookmarkedList(
         page: Int,
@@ -457,10 +402,11 @@ class MainRepositoryImpl @Inject constructor(
 
     override suspend fun getMyClimbedGymList(
         year: Int,
-        month: Int
-    ): BaseState<List<ClimbedGym>> = runRemote {
-        api.getMyClimbedGymList(year, month)
-    }
+        month: Int,
+    ): BaseState<List<ClimbedGym>> =
+        runRemote {
+            api.getMyClimbedGymList(year, month)
+        }
 
     override suspend fun getUserHomeGyms(userId: Long): BaseState<List<UserHomeGymSimpleResponse>> =
         runRemote { api.getUserHomeGyms(userId) }
@@ -480,36 +426,32 @@ class MainRepositoryImpl @Inject constructor(
     override suspend fun updateAnnouncementUnlike(boardId: Long): BaseState<ResponseBody> =
         runRemote { api.updateAnnouncementUnlike(boardId) }
 
-    override suspend fun getAdminGymId(): BaseState<Int> =
-        runRemote { api.getAdminGymId() }
+    override suspend fun getAdminGymId(): BaseState<Int> = runRemote { api.getAdminGymId() }
 
     override suspend fun getUserShorts(
         uploaderId: Long,
         page: Int,
         size: Int,
-        sortType: userShortsSortType
-    ): BaseState<ShortsListResponse> = runRemote {
-        api.getUserShorts(uploaderId, page, size, sortType)
-    }
+        sortType: UserShortsSortType,
+    ): BaseState<ShortsListResponse> =
+        runRemote {
+            api.getUserShorts(uploaderId, page, size, sortType)
+        }
 
     override suspend fun getShortsById(shortsId: Long): BaseState<ShortsListResponse> =
         runRemote { api.getShortsById(shortsId) }
 
-    override suspend fun editHomeGymPrivacy(): BaseState<ResponseBody> =
-        runRemote { api.editHomeGymPrivacy() }
+    override suspend fun editHomeGymPrivacy(): BaseState<ResponseBody> = runRemote { api.editHomeGymPrivacy() }
 
-    override suspend fun editAvgCompletePrivacy(): BaseState<ResponseBody> =
-        runRemote { api.editAvgCompletePrivacy() }
+    override suspend fun editAvgCompletePrivacy(): BaseState<ResponseBody> = runRemote { api.editAvgCompletePrivacy() }
 
     override suspend fun editAvgCompleteLevelPrivacy(): BaseState<ResponseBody> =
         runRemote { api.editAvgCompleteLevelPrivacy() }
 
-    override suspend fun updateUserProfileImage(
-        image: MultipartBody.Part
-    ): BaseState<ResponseBody> = runRemote { api.updateUserProfileImage(image) }
+    override suspend fun updateUserProfileImage(image: MultipartBody.Part): BaseState<ResponseBody> =
+        runRemote { api.updateUserProfileImage(image) }
 
-    override suspend fun updateUserName(name: String): BaseState<ResponseBody> =
-        runRemote { api.updateUserName(name) }
+    override suspend fun updateUserName(name: String): BaseState<ResponseBody> = runRemote { api.updateUserName(name) }
 
     override suspend fun updateAdminProfileImage(body: ImgUrlRequest): BaseState<ResponseBody> =
         runRemote { api.updateAdminProfileImage(body) }
@@ -533,5 +475,4 @@ class MainRepositoryImpl @Inject constructor(
         page: Int,
         size: Int,
     ): BaseState<GetMyShortsCommentsResponse> = runRemote { api.getMyShortsComments(page, size) }
-
 }

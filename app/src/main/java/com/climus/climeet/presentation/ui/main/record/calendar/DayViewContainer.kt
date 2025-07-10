@@ -12,7 +12,11 @@ import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.view.ViewContainer
 import java.time.LocalDate
 
-class DayViewContainer(view: View, val viewModel: CalendarViewModel, val dateViewModel: CreateClimbingRecordViewModel) : ViewContainer(view) {
+class DayViewContainer(
+    view: View,
+    val viewModel: CalendarViewModel,
+    val dateViewModel: CreateClimbingRecordViewModel,
+) : ViewContainer(view) {
     val textView: TextView = view.findViewById(R.id.tv_date)
     val squareView: View = view.findViewById(R.id.view_date)
     val titlesContainer: ViewGroup = view as ViewGroup
@@ -20,9 +24,9 @@ class DayViewContainer(view: View, val viewModel: CalendarViewModel, val dateVie
 
     init {
         view.setOnClickListener {
-            selectedDay?.deselect()  // 기존 선택된 날짜 deselect
-            select()  // 새로 선택된 날짜 select
-            selectedDay = this  // selectedDay 업데이트
+            selectedDay?.deselect() // 기존 선택된 날짜 deselect
+            select() // 새로 선택된 날짜 select
+            selectedDay = this // selectedDay 업데이트
             viewModel.setRecord(day.date)
             viewModel.setSelectedDate(day.date)
         }

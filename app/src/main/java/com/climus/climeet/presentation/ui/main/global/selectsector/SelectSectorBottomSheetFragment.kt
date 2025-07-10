@@ -20,7 +20,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class SelectSectorBottomSheetFragment :
     BaseFragment<FragmentSelectSectorBottomSheetBinding>(R.layout.fragment_select_sector_bottom_sheet) {
-
     private val parentShortsViewModel: ShortsBottomSheetViewModel by activityViewModels()
     private val parentUploadViewModel: UploadBottomSheetViewModel by activityViewModels()
     private val viewModel: SelectSectorBottomSheetViewModel by viewModels()
@@ -29,7 +28,10 @@ class SelectSectorBottomSheetFragment :
     private val cragId by lazy { args.cragId }
     private val cragName by lazy { args.cragName }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
@@ -53,7 +55,7 @@ class SelectSectorBottomSheetFragment :
                 when (it) {
                     is SelectSectorBottomSheetEvent.NavigateToBack -> findNavController().toBack()
                     is SelectSectorBottomSheetEvent.ApplyFilter -> {
-                        if(BottomSheetState.state == "UPLOAD"){
+                        if (BottomSheetState.state == "UPLOAD") {
                             parentUploadViewModel.applyFilter(it.filter)
                         } else {
                             parentShortsViewModel.applyFilter(it.filter)
@@ -71,9 +73,8 @@ class SelectSectorBottomSheetFragment :
     }
 
     private fun NavController.toBack() {
-        val action =
-            SelectSectorBottomSheetFragmentDirections.actionSelectSectorBottomSheetFragmentToSearchCragBottomSheetFragment()
+        val action = SelectSectorBottomSheetFragmentDirections
+            .actionSelectSectorBottomSheetFragmentToSearchCragBottomSheetFragment()
         navigate(action)
     }
-
 }

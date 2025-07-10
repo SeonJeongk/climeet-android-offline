@@ -28,15 +28,18 @@ data class SetClimberNickUiState(
 
 sealed class EditClimberProfileEvent {
     data object NavigateToBack : EditClimberProfileEvent()
+
     data object NavigateToProfile : EditClimberProfileEvent()
-    data class ShowToastMessage(val msg: String) : EditClimberProfileEvent()
+
+    data class ShowToastMessage(
+        val msg: String,
+    ) : EditClimberProfileEvent()
 }
 
 @HiltViewModel
 class MyPageClimberProfileEditViewModel @Inject constructor(
     private val mainRepository: MainRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(SetClimberNickUiState())
     val uiState: StateFlow<SetClimberNickUiState> = _uiState.asStateFlow()
 
@@ -53,26 +56,26 @@ class MyPageClimberProfileEditViewModel @Inject constructor(
     // 이미지 관리
     private val imageUpdated = MutableStateFlow(false)
     var profileImage = ""
-    private lateinit var imageToChange : MultipartBody.Part
+    private lateinit var imageToChange: MultipartBody.Part
     val imageUploaded = MutableStateFlow(true)
 
     val nextAvailable = MutableStateFlow(false)
-
 
     init {
         nickObserve()
         imageObserve()
     }
 
-    fun initProfile(userName: String, image: String) {
+    fun initProfile(
+        userName: String,
+        image: String,
+    ) {
         userNickname = userName
         profileImage = image
     }
 
     // todo 닉네임
-    private fun isNickNameValid(nickName: String): Boolean {
-        return nickName.matches("^[가-힣0-9]{2,8}\$".toRegex())
-    }
+    private fun isNickNameValid(nickName: String): Boolean = nickName.matches("^[가-힣0-9]{2,8}\$".toRegex())
 
     fun isNickNameDuplicated() {
         viewModelScope.launch {
@@ -82,21 +85,16 @@ class MyPageClimberProfileEditViewModel @Inject constructor(
                         is BaseState.Success -> {
                             if (it.body) {
                                 _uiState.update { state ->
-                                    state.copy(
-                                        nickState = InputState.Success("사용 가능한 닉네임입니다.")
-                                    )
+                                    state.copy(nickState = InputState.Success("사용 가능한 닉네임입니다."))
                                 }
                                 checkNick = nickname.value
                                 nextAvailable.value = true
                                 nickUpdated.value = true
                             } else {
                                 _uiState.update { state ->
-                                    state.copy(
-                                        nickState = InputState.Error("중복된 닉네임입니다.")
-                                    )
+                                    state.copy(nickState = InputState.Error("중복된 닉네임입니다."))
                                 }
                             }
-
                         }
 
                         is BaseState.Error -> {
@@ -114,29 +112,22 @@ class MyPageClimberProfileEditViewModel @Inject constructor(
                 if (isNickNameValid(nickname.value) && nickname.value != checkNick) {
                     nickAvailable.value = true
                     _uiState.update { state ->
-                        state.copy(
-                            nickState = InputState.Success("닉네임 중복을 확인해주세요.")
-                        )
+                        state.copy(nickState = InputState.Success("닉네임 중복을 확인해주세요."))
                     }
                     nickAvailable.value = true
                     nextAvailable.value = false
                     nickUpdated.value = false
                 } else {
                     _uiState.update { state ->
-                        state.copy(
-                            nickState = InputState.Error("2~8글자의 한글과 숫자로 입력하세요.")
-                        )
+                        state.copy(nickState = InputState.Error("2~8글자의 한글과 숫자로 입력하세요."))
                     }
                     nickAvailable.value = false
                     nextAvailable.value = false
                     nickUpdated.value = false
                 }
-
             } else {
                 _uiState.update { state ->
-                    state.copy(
-                        nickState = InputState.Empty
-                    )
+                    state.copy(nickState = InputState.Empty)
                 }
                 nickAvailable.value = false
                 nickUpdated.value = false
@@ -209,5 +200,4 @@ class MyPageClimberProfileEditViewModel @Inject constructor(
             _event.emit(EditClimberProfileEvent.NavigateToProfile)
         }
     }
-
 }

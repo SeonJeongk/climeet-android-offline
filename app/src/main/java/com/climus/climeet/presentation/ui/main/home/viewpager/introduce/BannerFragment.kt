@@ -1,12 +1,10 @@
 package com.climus.climeet.presentation.ui.main.home.viewpager.introduce
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -20,9 +18,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class BannerFragment(val bannerDetailInfo : BannerDetailInfoResponse) : Fragment() {
-
-    lateinit var binding : FragmentBannerBinding
+class BannerFragment(
+    val bannerDetailInfo: BannerDetailInfoResponse,
+) : Fragment() {
+    lateinit var binding: FragmentBannerBinding
     private val viewModel: BannerViewModel by viewModels()
 
     fun LifecycleOwner.repeatOnStarted(block: suspend CoroutineScope.() -> Unit) {
@@ -30,9 +29,11 @@ class BannerFragment(val bannerDetailInfo : BannerDetailInfoResponse) : Fragment
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED, block)
         }
     }
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         binding = FragmentBannerBinding.inflate(inflater, container, false)
         Glide.with(this)
@@ -41,10 +42,12 @@ class BannerFragment(val bannerDetailInfo : BannerDetailInfoResponse) : Fragment
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) { // api
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) { // api
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.getBannerListBetweenDates()
-
     }
 }

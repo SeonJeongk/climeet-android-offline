@@ -10,11 +10,8 @@ import com.climus.climeet.R
 import com.climus.climeet.databinding.ItemMainCommentBinding
 import com.climus.climeet.databinding.ItemSubCommentBinding
 import com.climus.climeet.presentation.ui.main.shorts.model.ShortsCommentUiData
-import com.climus.climeet.presentation.util.DefaultDiffUtil
 
-class ShortsCommentAdapter :
-    ListAdapter<ShortsCommentUiData, RecyclerView.ViewHolder>(diffCallback) {
-
+class ShortsCommentAdapter : ListAdapter<ShortsCommentUiData, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
         const val MAIN_COMMENT = 0
         const val SUB_COMMENT = 1
@@ -22,56 +19,58 @@ class ShortsCommentAdapter :
         val diffCallback = object : DiffUtil.ItemCallback<ShortsCommentUiData>() {
             override fun areItemsTheSame(
                 oldItem: ShortsCommentUiData,
-                newItem: ShortsCommentUiData
-            ): Boolean {
-                return oldItem.commentId == newItem.commentId
-            }
+                newItem: ShortsCommentUiData,
+            ): Boolean = oldItem.commentId == newItem.commentId
 
             override fun areContentsTheSame(
                 oldItem: ShortsCommentUiData,
-                newItem: ShortsCommentUiData
-            ): Boolean {
-                return oldItem == newItem
-            }
+                newItem: ShortsCommentUiData,
+            ): Boolean = oldItem == newItem
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+    ) {
         when (holder) {
             is ShortsMainCommentViewHolder -> holder.bind(getItem(position))
             is ShortsSubCommentViewHolder -> holder.bind(getItem(position))
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RecyclerView.ViewHolder =
         when (viewType) {
             MAIN_COMMENT -> {
                 ShortsMainCommentViewHolder(
                     ItemMainCommentBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
-                        false
-                    )
+                        false,
+                    ),
                 )
             }
 
             SUB_COMMENT -> {
                 ShortsSubCommentViewHolder(
                     ItemSubCommentBinding.inflate(
-                        LayoutInflater.from(
-                            parent.context
-                        ), parent, false
-                    )
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false,
+                    ),
                 )
             }
 
             else -> {
                 ShortsSubCommentViewHolder(
                     ItemSubCommentBinding.inflate(
-                        LayoutInflater.from(
-                            parent.context
-                        ), parent, false
-                    )
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false,
+                    ),
                 )
             }
         }
@@ -82,9 +81,9 @@ class ShortsCommentAdapter :
     }
 }
 
-class ShortsMainCommentViewHolder(private val binding: ItemMainCommentBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-
+class ShortsMainCommentViewHolder(
+    private val binding: ItemMainCommentBinding,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: ShortsCommentUiData) {
         binding.item = item
         with(binding) {
@@ -110,58 +109,57 @@ class ShortsMainCommentViewHolder(private val binding: ItemMainCommentBinding) :
 
             btnThumbsDown.setOnClickListener {
                 when (item.commentLikeStatus) {
-                    "DISLIKE" -> item.changeLikeStatus(
-                        item.commentId,
-                        absoluteAdapterPosition,
-                        LikeStatus.DISLIKE_MINUS,
-                        false,
-                        false
-                    )
+                    "DISLIKE" ->
+                        item.changeLikeStatus(
+                            item.commentId,
+                            LikeStatus.DISLIKE_MINUS,
+                            false,
+                            false,
+                        )
 
-                    "LIKE" -> item.changeLikeStatus(
-                        item.commentId,
-                        absoluteAdapterPosition,
-                        LikeStatus.DISLIKE_PLUS_AND_LIKE_MINUS,
-                        false,
-                        false
-                    )
+                    "LIKE" ->
+                        item.changeLikeStatus(
+                            item.commentId,
+                            LikeStatus.DISLIKE_PLUS_AND_LIKE_MINUS,
+                            false,
+                            false,
+                        )
 
-
-                    else -> item.changeLikeStatus(
-                        item.commentId,
-                        absoluteAdapterPosition,
-                        LikeStatus.DISLIKE_PLUS,
-                        false,
-                        true
-                    )
+                    else ->
+                        item.changeLikeStatus(
+                            item.commentId,
+                            LikeStatus.DISLIKE_PLUS,
+                            false,
+                            true,
+                        )
                 }
             }
 
             btnThumbsUp.setOnClickListener {
                 when (item.commentLikeStatus) {
-                    "LIKE" -> item.changeLikeStatus(
-                        item.commentId,
-                        absoluteAdapterPosition,
-                        LikeStatus.LIKE_MINUS,
-                        false,
-                        false
-                    )
+                    "LIKE" ->
+                        item.changeLikeStatus(
+                            item.commentId,
+                            LikeStatus.LIKE_MINUS,
+                            false,
+                            false,
+                        )
 
-                    "DISLIKE" -> item.changeLikeStatus(
-                        item.commentId,
-                        absoluteAdapterPosition,
-                        LikeStatus.LIKE_PLUS_AND_DISLIKE_MINUS,
-                        false,
-                        false
-                    )
+                    "DISLIKE" ->
+                        item.changeLikeStatus(
+                            item.commentId,
+                            LikeStatus.LIKE_PLUS_AND_DISLIKE_MINUS,
+                            false,
+                            false,
+                        )
 
-                    else -> item.changeLikeStatus(
-                        item.commentId,
-                        absoluteAdapterPosition,
-                        LikeStatus.LIKE_PLUS,
-                        true,
-                        false
-                    )
+                    else ->
+                        item.changeLikeStatus(
+                            item.commentId,
+                            LikeStatus.LIKE_PLUS,
+                            true,
+                            false,
+                        )
                 }
             }
 
@@ -172,9 +170,9 @@ class ShortsMainCommentViewHolder(private val binding: ItemMainCommentBinding) :
     }
 }
 
-class ShortsSubCommentViewHolder(private val binding: ItemSubCommentBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-
+class ShortsSubCommentViewHolder(
+    private val binding: ItemSubCommentBinding,
+) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: ShortsCommentUiData) {
         binding.item = item
 
@@ -208,57 +206,57 @@ class ShortsSubCommentViewHolder(private val binding: ItemSubCommentBinding) :
 
             btnThumbsDown.setOnClickListener {
                 when (item.commentLikeStatus) {
-                    "DISLIKE" -> item.changeLikeStatus(
-                        item.commentId,
-                        absoluteAdapterPosition,
-                        LikeStatus.DISLIKE_MINUS,
-                        false,
-                        false
-                    )
+                    "DISLIKE" ->
+                        item.changeLikeStatus(
+                            item.commentId,
+                            LikeStatus.DISLIKE_MINUS,
+                            false,
+                            false,
+                        )
 
-                    "LIKE" -> item.changeLikeStatus(
-                        item.commentId,
-                        absoluteAdapterPosition,
-                        LikeStatus.DISLIKE_PLUS_AND_LIKE_MINUS,
-                        false,
-                        false
-                    )
+                    "LIKE" ->
+                        item.changeLikeStatus(
+                            item.commentId,
+                            LikeStatus.DISLIKE_PLUS_AND_LIKE_MINUS,
+                            false,
+                            false,
+                        )
 
-                    else -> item.changeLikeStatus(
-                        item.commentId,
-                        absoluteAdapterPosition,
-                        LikeStatus.DISLIKE_PLUS,
-                        false,
-                        true
-                    )
+                    else ->
+                        item.changeLikeStatus(
+                            item.commentId,
+                            LikeStatus.DISLIKE_PLUS,
+                            false,
+                            true,
+                        )
                 }
             }
 
             btnThumbsUp.setOnClickListener {
                 when (item.commentLikeStatus) {
-                    "LIKE" -> item.changeLikeStatus(
-                        item.commentId,
-                        absoluteAdapterPosition,
-                        LikeStatus.LIKE_MINUS,
-                        false,
-                        false
-                    )
+                    "LIKE" ->
+                        item.changeLikeStatus(
+                            item.commentId,
+                            LikeStatus.LIKE_MINUS,
+                            false,
+                            false,
+                        )
 
-                    "DISLIKE" -> item.changeLikeStatus(
-                        item.commentId,
-                        absoluteAdapterPosition,
-                        LikeStatus.LIKE_PLUS_AND_DISLIKE_MINUS,
-                        false,
-                        false
-                    )
+                    "DISLIKE" ->
+                        item.changeLikeStatus(
+                            item.commentId,
+                            LikeStatus.LIKE_PLUS_AND_DISLIKE_MINUS,
+                            false,
+                            false,
+                        )
 
-                    else -> item.changeLikeStatus(
-                        item.commentId,
-                        absoluteAdapterPosition,
-                        LikeStatus.LIKE_PLUS,
-                        true,
-                        false
-                    )
+                    else ->
+                        item.changeLikeStatus(
+                            item.commentId,
+                            LikeStatus.LIKE_PLUS,
+                            true,
+                            false,
+                        )
                 }
             }
 
@@ -267,18 +265,18 @@ class ShortsSubCommentViewHolder(private val binding: ItemSubCommentBinding) :
                     item.parentCommentId,
                     absoluteAdapterPosition,
                     item.remainSubCommentCount,
-                    item.subCommentPage
+                    item.subCommentPage,
                 )
             }
         }
     }
 }
 
-enum class LikeStatus(){
+enum class LikeStatus {
     DISLIKE_MINUS,
     DISLIKE_PLUS,
     DISLIKE_PLUS_AND_LIKE_MINUS,
     LIKE_PLUS,
     LIKE_PLUS_AND_DISLIKE_MINUS,
-    LIKE_MINUS
+    LIKE_MINUS,
 }

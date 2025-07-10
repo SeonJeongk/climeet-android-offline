@@ -36,51 +36,62 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import javax.inject.Inject
 
-
 data class CreateRouteUiState(
     val selectedHoldImage: Int = R.drawable.ic_black_hold,
     val selectedLevelText: String = "",
     val selectedLevelColor: Int = 0,
     val selectedLevelColorHex: String = "",
-    val selectedSectorName: String = ""
+    val selectedSectorName: String = "",
 )
 
 sealed class CreateRouteEvent {
     data object CreateRoute : CreateRouteEvent()
-    data class ChangeSector(val img: String) : CreateRouteEvent()
+
+    data class ChangeSector(
+        val img: String,
+    ) : CreateRouteEvent()
 }
 
 data class MyPageAdminRouteFindingUiState(
     val levelList: List<UiLevelItem> = emptyList(),
     val layoutList: List<UiLayoutItem> = listOf(
-        UiLayoutItem(1, ""), UiLayoutItem(2, "")
+        UiLayoutItem(1, ""),
+        UiLayoutItem(2, ""),
     ),
     val sectorList: List<UiSectorItem> = emptyList(),
     val holdList: List<UiHoldItem> = emptyList(),
     val chipList: List<UiRouteChipData> = emptyList(),
     val routeList: List<UiRouteItem> = emptyList(),
-    var isReturningFromCreateRoute: Boolean = false
+    var isReturningFromCreateRoute: Boolean = false,
 )
 
 sealed class MyPageAdminRouteFindingEvent {
     data object ShowDatePicker : MyPageAdminRouteFindingEvent()
+
     data object ShowSetLevel : MyPageAdminRouteFindingEvent()
+
     data object GoToGallery : MyPageAdminRouteFindingEvent()
+
     data object GoToCreateRoute : MyPageAdminRouteFindingEvent()
+
     data object NavigateToBack : MyPageAdminRouteFindingEvent()
+
     data object DeleteSecondFloor : MyPageAdminRouteFindingEvent()
-    data class ShowLayoutImg(val uri: Uri) : MyPageAdminRouteFindingEvent()
-    data class UpdateRouteFindingData(val msg: String, val isSuccess: Boolean) :
-        MyPageAdminRouteFindingEvent()
+
+    data class ShowLayoutImg(
+        val uri: Uri,
+    ) : MyPageAdminRouteFindingEvent()
+
+    data class UpdateRouteFindingData(
+        val msg: String,
+        val isSuccess: Boolean,
+    ) : MyPageAdminRouteFindingEvent()
 }
 
 @HiltViewModel
 class MyPageAdminRouteFindingViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
-    fun empty(t1: String, t2: String) {}
-
     private val _event = MutableSharedFlow<MyPageAdminRouteFindingEvent>()
     val event: SharedFlow<MyPageAdminRouteFindingEvent> = _event.asSharedFlow()
 
@@ -118,31 +129,34 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
                     UiHoldItem(R.drawable.ic_grey_hold, ::setHoldImage),
                     UiHoldItem(R.drawable.ic_pink_hold, ::setHoldImage),
                     UiHoldItem(R.drawable.ic_black_hold, ::setHoldImage),
-                )
+                ),
             )
         }
     }
-
 
     private fun setHoldImage(image: Int) {
         _createRouteUiState.update { state ->
-            state.copy(
-                selectedHoldImage = image
-            )
+            state.copy(selectedHoldImage = image)
         }
     }
 
-    private fun setLevelColor(colorName: String, colorHex: String) {
+    private fun setLevelColor(
+        colorName: String,
+        colorHex: String,
+    ) {
         _createRouteUiState.update { state ->
             state.copy(
                 selectedLevelColor = colorHex.toColorInt(),
                 selectedLevelText = colorName,
-                selectedLevelColorHex = colorHex
+                selectedLevelColorHex = colorHex,
             )
         }
     }
 
-    private fun setSector(name: String, imgUrl: String) {
+    private fun setSector(
+        name: String,
+        imgUrl: String,
+    ) {
         _uiState.update { state ->
             state.copy(
                 sectorList = uiState.value.sectorList.map { data ->
@@ -151,14 +165,12 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
                     } else {
                         data.copy(isSelected = false)
                     }
-                }
+                },
             )
         }
 
         _createRouteUiState.update { state ->
-            state.copy(
-                selectedSectorName = name
-            )
+            state.copy(selectedSectorName = name)
         }
         viewModelScope.launch {
             _createRouteEvent.emit(CreateRouteEvent.ChangeSector(imgUrl))
@@ -175,25 +187,22 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
                             createRouteUiState.value.selectedLevelText,
                             createRouteUiState.value.selectedLevelColorHex,
                             it.body.imgUrl,
-                            createRouteUiState.value.selectedHoldImage
+                            createRouteUiState.value.selectedHoldImage,
                         )
 
                         setRoute(selectedChipData)
                     }
 
                     is BaseState.Error -> {
-
                     }
                 }
-
             }
         }
     }
 
     private fun setRoute(selectedChipData: UiRouteChipData) {
         _uiState.update { state ->
-            val existingRouteItem =
-                state.routeList.find { it.sectorName == selectedChipData.sectorName }
+            val existingRouteItem = state.routeList.find { it.sectorName == selectedChipData.sectorName }
 
             val updatedRouteList = if (existingRouteItem != null) {
                 state.routeList.map { item ->
@@ -209,7 +218,7 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
 
             state.copy(
                 chipList = state.chipList + selectedChipData,
-                routeList = updatedRouteList
+                routeList = updatedRouteList,
             )
         }
     }
@@ -220,8 +229,7 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
 
             val updatedRouteList = state.routeList.mapNotNull { routeItem ->
                 if (routeItem.sectorName == deletingChipData.sectorName) {
-                    val updatedChipListForSector =
-                        routeItem.chipList.filter { it != deletingChipData }
+                    val updatedChipListForSector = routeItem.chipList.filter { it != deletingChipData }
 
                     if (updatedChipListForSector.isNotEmpty()) {
                         routeItem.copy(chipList = updatedChipListForSector)
@@ -235,7 +243,7 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
 
             state.copy(
                 chipList = updatedChipList,
-                routeList = updatedRouteList
+                routeList = updatedRouteList,
             )
         }
     }
@@ -243,14 +251,15 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
     // --end createRoute
 
     private val initDate = MyPageAdminRouteData.selectedDate
-    val selectedDateText =
-        MutableStateFlow("${initDate.year}년 ${initDate.monthValue}월 ${initDate.dayOfMonth}일 (${dayOfWeekMap[initDate.dayOfWeek]})")
+    val selectedDateText = MutableStateFlow(
+        "${initDate.year}년 ${initDate.monthValue}월 ${initDate.dayOfMonth}일 (${dayOfWeekMap[initDate.dayOfWeek]})",
+    )
     val selectedDate = MutableStateFlow(initDate)
     private val defaultLevelItem = UiLevelItem(
         climeetLevel = "레벨 설정",
         colorHex = "#FFFFFF",
         colorName = "-",
-        setLevelListener = ::setLevelColor
+        setLevelListener = ::setLevelColor,
     )
 
     val selectedLevel = MutableStateFlow(defaultLevelItem)
@@ -274,9 +283,7 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
 
     fun updateIsReturningFromCreateRoute(flag: Boolean) {
         _uiState.update {
-            it.copy(
-                isReturningFromCreateRoute = flag
-            )
+            it.copy(isReturningFromCreateRoute = flag)
         }
     }
 
@@ -285,20 +292,7 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
             repository.getGymRouteFindingData(selectedDate.value.toString()).let {
                 when (it) {
                     is BaseState.Success -> {
-                        selectedLevel.value = defaultLevelItem
-                        modifyingLevel.value = defaultLevelItem
-
-                        isCompletable.postValue(true)
-                        isLevelAdd.postValue(true)
-
-                        selectedLayoutFloor.value = 1
-
-                        selectFloor(1)
-                        selectedSectorFloor.value = 1
-                        selectedSector.value = defaultSectorItem
-                        modifyingSector.value = defaultSectorItem
-                        selectedImageType.value = DataType.GYM
-                        _event.emit(MyPageAdminRouteFindingEvent.DeleteSecondFloor)
+                        resetRouteFindingSelection()
 
                         val result = it.body
                         if (result.maxFloor == 2) {
@@ -306,47 +300,60 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
                         }
 
                         val chipDataList: List<UiRouteChipData> =
-                            result.routeList?.map { data -> data.toUiRouteChipData() }
-                                ?: emptyList()
+                            result.routeList?.map { data -> data.toUiRouteChipData() }.orEmpty()
                         val routeItemList = groupBySectorName(chipDataList)
 
                         _uiState.update { state ->
                             val updatedLayoutList: List<UiLayoutItem> =
-                                result.layoutList?.map { data -> data.toUiLayoutItem() }
-                                    ?: emptyList()
+                                result.layoutList?.map { data -> data.toUiLayoutItem() }.orEmpty()
                             val completeLayoutList = listOf(
                                 UiLayoutItem(
                                     floor = 1,
-                                    gymImg = updatedLayoutList.find { it.floor == 1 }?.gymImg ?: ""
+                                    gymImg = updatedLayoutList.find { it.floor == 1 }?.gymImg.orEmpty(),
                                 ),
                                 UiLayoutItem(
                                     floor = 2,
-                                    gymImg = updatedLayoutList.find { it.floor == 2 }?.gymImg ?: ""
-                                )
+                                    gymImg = updatedLayoutList.find { it.floor == 2 }?.gymImg.orEmpty(),
+                                ),
                             )
 
                             state.copy(
                                 levelList = result.difficultyList?.map { data ->
-                                    data.toUiLevelItem(
-                                        ::setLevelColor
-                                    )
-                                } ?: emptyList(),
+                                    data.toUiLevelItem(::setLevelColor)
+                                }.orEmpty(),
                                 layoutList = completeLayoutList,
-                                sectorList = result.sectorList?.map { data -> data.toUiSectorItem(::setSector) }
-                                    ?: emptyList(),
+                                sectorList = result.sectorList?.map { data ->
+                                    data.toUiSectorItem(::setSector)
+                                }.orEmpty(),
                                 chipList = chipDataList,
-                                routeList = routeItemList
+                                routeList = routeItemList,
                             )
                         }
                         _floorSectorList.update { uiState.value.sectorList.filter { it.sectorFloor == 1 } }
                     }
 
                     is BaseState.Error -> {
-
                     }
                 }
             }
         }
+    }
+
+    private suspend fun resetRouteFindingSelection() {
+        selectedLevel.value = defaultLevelItem
+        modifyingLevel.value = defaultLevelItem
+
+        isCompletable.postValue(true)
+        isLevelAdd.postValue(true)
+
+        selectedLayoutFloor.value = 1
+
+        selectFloor(1)
+        selectedSectorFloor.value = 1
+        selectedSector.value = defaultSectorItem
+        modifyingSector.value = defaultSectorItem
+        selectedImageType.value = DataType.GYM
+        _event.emit(MyPageAdminRouteFindingEvent.DeleteSecondFloor)
     }
 
     private fun groupBySectorName(chipList: List<UiRouteChipData>): List<UiRouteItem> {
@@ -360,7 +367,8 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
     fun setSelectedDate(updateDate: LocalDate) {
         selectedDate.update { updateDate }
         selectedDateText.update {
-            "${updateDate.year}년 ${updateDate.monthValue}월 ${updateDate.dayOfMonth}일 (${dayOfWeekMap[updateDate.dayOfWeek]})"
+            "${updateDate.year}년 ${updateDate.monthValue}월 ${updateDate.dayOfMonth}일 " +
+                "(${dayOfWeekMap[updateDate.dayOfWeek]})"
         }
         getRouteFindingData()
     }
@@ -369,16 +377,14 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
         selectedLevel.update {
             it.copy(
                 colorHex = color.color,
-                colorName = color.name
+                colorName = color.name,
             )
         }
     }
 
     fun selectLevel(level: String) {
         selectedLevel.update {
-            it.copy(
-                climeetLevel = level
-            )
+            it.copy(climeetLevel = level)
         }
     }
 
@@ -394,11 +400,9 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
             val updatedList = state.levelList + selectedLevel.value
             val sortedList = updatedList.filter { it.climeetLevel != "C" }
                 .sortedBy { LevelColorData.LEVELS.indexOf(it.climeetLevel) } +
-                    updatedList.filter { it.climeetLevel == "C" }
+                updatedList.filter { it.climeetLevel == "C" }
 
-            state.copy(
-                levelList = sortedList
-            )
+            state.copy(levelList = sortedList)
         }
         updateIsLevelAdd(false)
     }
@@ -440,7 +444,8 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
     fun isColorAlreadySelected(): Boolean {
         val isComplete = !_uiState.value.levelList.any {
             it.colorName == selectedLevel.value.colorName
-        } || modifyingLevel.value.colorName == selectedLevel.value.colorName
+        } ||
+            modifyingLevel.value.colorName == selectedLevel.value.colorName
         isCompletable.value = isComplete
         return isComplete
     }
@@ -449,27 +454,23 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
         if (selectedImageType.value == DataType.GYM) {
             _uiState.update { state ->
                 val updatedLayoutList = state.layoutList.toMutableList()
-                updatedLayoutList[1] =
-                    updatedLayoutList[1].copy(gymImg = uri)
+                updatedLayoutList[1] = updatedLayoutList[1].copy(gymImg = uri)
 
-                state.copy(
-                    layoutList = updatedLayoutList
-                )
+                state.copy(layoutList = updatedLayoutList)
             }
         } else {
             selectedSector.update {
-                it.copy(
-                    sectorImg = uri
-                )
+                it.copy(sectorImg = uri)
             }
         }
-
     }
 
     fun selectFloor(floor: Int) {
         selectedImageType.value = DataType.GYM
         selectedLayoutFloor.update { floor }
-        val uri = uiState.value.layoutList[floor - 1].gymImg.toUri()
+        val uri = uiState.value.layoutList[floor - 1]
+            .gymImg
+            .toUri()
 
         viewModelScope.launch {
             _event.emit(MyPageAdminRouteFindingEvent.ShowLayoutImg(uri))
@@ -497,7 +498,7 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
             state.copy(
                 sectorList = state.sectorList.filter { it.sectorFloor == 1 },
                 routeList = updatedRouteList,
-                chipList = updatedChipList
+                chipList = updatedChipList,
             )
         }
         if (selectedSectorFloor.value == 2) {
@@ -512,9 +513,7 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
     fun addSector() {
         _uiState.update { state ->
             val updatedList = state.sectorList + selectedSector.value
-            state.copy(
-                sectorList = updatedList
-            )
+            state.copy(sectorList = updatedList)
         }
         _floorSectorList.update { it + selectedSector.value }
         selectedSector.update { defaultSectorItem }
@@ -525,11 +524,10 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
             state.copy(
                 sectorList = state.sectorList.filterNot { it.sectorName == deleteItem.sectorName },
                 chipList = state.chipList.filterNot { it.sectorName == deleteItem.sectorName },
-                routeList = state.routeList.filterNot { it.sectorName == deleteItem.sectorName }
+                routeList = state.routeList.filterNot { it.sectorName == deleteItem.sectorName },
             )
         }
         _floorSectorList.update { it.filterNot { it.sectorName == deleteItem.sectorName } }
-
     }
 
     fun modifySector() {
@@ -573,13 +571,13 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
             difficulty = uiState.value.levelList.map { data -> data.toDifficultyRequestItem() },
             layout = uiState.value.layoutList.map { data -> data.toLayoutRequestItem() },
             sector = uiState.value.sectorList.map { data -> data.toSectorRequestItem() },
-            route = uiState.value.chipList.map { data -> data.toRouteRequestItem() }
+            route = uiState.value.chipList.map { data -> data.toRouteRequestItem() },
         )
 
         val newRouteVersion = UpdateGymRouteVersionRequest(
             timePoint = selectedDate.value.toString(),
             existingData = UpdateGymRouteVersionRequest.ExistingData(),
-            newData = newData
+            newData = newData,
         )
 
         viewModelScope.launch {
@@ -589,8 +587,8 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
                         _event.emit(
                             MyPageAdminRouteFindingEvent.UpdateRouteFindingData(
                                 "루트 버전이 업데이트 되었습니다",
-                                true
-                            )
+                                true,
+                            ),
                         )
                     }
 
@@ -599,16 +597,14 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
                         _event.emit(
                             MyPageAdminRouteFindingEvent.UpdateRouteFindingData(
                                 "업데이트 실패",
-                                false
-                            )
+                                false,
+                            ),
                         )
                     }
                 }
             }
         }
     }
-
-    fun noUse(dateDate: LocalDate) {}
 
     fun showDatePicker() {
         viewModelScope.launch {
@@ -662,28 +658,12 @@ class MyPageAdminRouteFindingViewModel @Inject constructor(
             DayOfWeek.THURSDAY to "목",
             DayOfWeek.FRIDAY to "금",
             DayOfWeek.SATURDAY to "토",
-            DayOfWeek.SUNDAY to "일"
-        )
-        private val colorOrder = listOf(
-            "검정" to "#000000",
-            "회색" to "#8B8B8B",
-            "갈색" to "#6E4C41",
-            "핑크" to "#FF74E9",
-            "보라" to "#A259FF",
-            "남색" to "#393FD6",
-            "파랑" to "#0094FF",
-            "하늘" to "#74D5FF",
-            "초록" to "#63B75D",
-            "노랑" to "#FDDA16",
-            "주황" to "#FF9000",
-            "빨강" to "#F34040",
-            "하양" to "#FFFFFF",
-            "컴피" to "#BEDF22"
+            DayOfWeek.SUNDAY to "일",
         )
     }
-
 }
 
 enum class DataType {
-    GYM, SECTOR
+    GYM,
+    SECTOR,
 }

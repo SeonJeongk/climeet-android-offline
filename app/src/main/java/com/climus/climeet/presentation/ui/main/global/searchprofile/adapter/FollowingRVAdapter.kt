@@ -1,6 +1,5 @@
 package com.climus.climeet.presentation.ui.main.global.searchprofile.adapter
 
-
 import android.annotation.SuppressLint
 import android.util.SparseBooleanArray
 import android.view.LayoutInflater
@@ -12,40 +11,50 @@ import com.climus.climeet.databinding.ItemFollowingBinding
 import com.climus.climeet.presentation.ui.main.global.searchprofile.model.UserFollowingUiData
 import com.climus.climeet.presentation.ui.main.mypage.follow.model.FollowClimber
 
-class FollowingRVAdapter(private val followingList: List<UserFollowingUiData>) : RecyclerView.Adapter<FollowingViewHolder>(){
-
+class FollowingRVAdapter(
+    private val followingList: List<UserFollowingUiData>,
+) : RecyclerView.Adapter<FollowingViewHolder>() {
     private var searchList: List<FollowClimber> = emptyList()
     private var keyword: String = ""
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): FollowingViewHolder {
-        val binding: ItemFollowingBinding = ItemFollowingBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding: ItemFollowingBinding = ItemFollowingBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false,
+        )
         return FollowingViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: FollowingViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: FollowingViewHolder,
+        position: Int,
+    ) {
         holder.bind(followingList[position])
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setList(list: List<FollowClimber>, keyword: String) {
+    fun setList(
+        list: List<FollowClimber>,
+        keyword: String,
+    ) {
         searchList = list
         this.keyword = keyword
         notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int = followingList.size
-
 }
 
-class FollowingViewHolder(val binding: ItemFollowingBinding): RecyclerView.ViewHolder(binding.root){
-
+class FollowingViewHolder(
+    val binding: ItemFollowingBinding,
+) : RecyclerView.ViewHolder(binding.root) {
     private val followStatus = SparseBooleanArray()
 
     fun bind(following: UserFollowingUiData) {
-
         binding.tvFollowing.text = following.followers.toString()
 
         if (following.imgUrl != null) {

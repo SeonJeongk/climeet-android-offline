@@ -1,7 +1,6 @@
 package com.climus.climeet.presentation.ui.main.record.timer.setrecord
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -18,9 +17,7 @@ import com.climus.climeet.presentation.ui.main.record.timer.stopwatch.TimerViewM
 import com.climus.climeet.presentation.ui.main.record.timer.stopwatch.selectcrag.TimerCragSelectBottomSheetViewModel
 
 // ------------------------ 시간 흘러갈 때 스와이프 하면 보이는 루트기록 화면 -------------------------
-class SetTimerClimbingRecordFragment :
-    BaseFragment<FragmentTimerRecordBinding>(R.layout.fragment_timer_record) {
-
+class SetTimerClimbingRecordFragment : BaseFragment<FragmentTimerRecordBinding>(R.layout.fragment_timer_record) {
     private val viewModel: SetTimerClimbingRecordViewModel by activityViewModels()
     private val timerVM: TimerViewModel by activityViewModels()
     private val cragSelectVM: TimerCragSelectBottomSheetViewModel by activityViewModels()
@@ -31,7 +28,10 @@ class SetTimerClimbingRecordFragment :
     private var cragId: Long = 0L
     private var cragName: String = ""
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
@@ -50,8 +50,7 @@ class SetTimerClimbingRecordFragment :
     // 앱 종료 후 재시작 시에 루트기록 화면에 암장 이름 보여주기 위함
     override fun onResume() {
         super.onResume()
-        val cragName =
-            sharedPreferences.getString("cragName", getString(R.string.timer_crag_set_inform))
+        val cragName = sharedPreferences.getString("cragName", getString(R.string.timer_crag_set_inform))
         binding.tvTitle.text = cragName
     }
 
@@ -67,9 +66,12 @@ class SetTimerClimbingRecordFragment :
 
     // 아래 main color로 된 부분에 시간을 보여준다
     private fun timerObserve() {
-        timerVM.timeFormat.observe(viewLifecycleOwner, Observer { timeFormat ->
-            binding.tvTime.text = timeFormat
-        })
+        timerVM.timeFormat.observe(
+            viewLifecycleOwner,
+            Observer { timeFormat ->
+                binding.tvTime.text = timeFormat
+            },
+        )
     }
 
     private fun initClickListener() {
@@ -91,25 +93,28 @@ class SetTimerClimbingRecordFragment :
             viewModel.items.collect { items ->
                 routeItemAdapter.items = items
                 routeItemAdapter.notifyDataSetChanged()
-                //Log.d("settimerrecord", "adapter에 item 설정완 : $items")
+                // Log.d("settimerrecord", "adapter에 item 설정완 : $items")
             }
         }
     }
 
     // 루트기록 화면에 암장 이름 설정
     private fun setCragName() {
-        cragSelectVM.selectedCrag.observe(viewLifecycleOwner, Observer { cragData ->
-            if (cragData != null) {
-                cragId = cragData.id
-                cragName = cragData.name
+        cragSelectVM.selectedCrag.observe(
+            viewLifecycleOwner,
+            Observer { cragData ->
+                if (cragData != null) {
+                    cragId = cragData.id
+                    cragName = cragData.name
 
-                // 암장 이름 보여주기
-                binding.tvTitle.text = cragName
+                    // 암장 이름 보여주기
+                    binding.tvTitle.text = cragName
 
-                // 암장 이름 뷰모델에 저장
-                viewModel.selectedCrag(cragId, cragName)
-            }
-        })
+                    // 암장 이름 뷰모델에 저장
+                    viewModel.selectedCrag(cragId, cragName)
+                }
+            },
+        )
     }
 
     private fun initEventObserve() {

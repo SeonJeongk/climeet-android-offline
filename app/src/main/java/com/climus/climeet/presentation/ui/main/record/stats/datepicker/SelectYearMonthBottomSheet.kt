@@ -3,16 +3,14 @@ package com.climus.climeet.presentation.ui.main.record.stats.datepicker
 import android.content.Context
 import android.widget.NumberPicker
 import com.climus.climeet.databinding.FragmentSelectYearmonthBottomSheetBinding
-import com.climus.climeet.presentation.ui.main.record.model.CreateRecordData
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.time.LocalDate
 
 class SelectYearMonthBottomSheet(
     context: Context,
     private var curDate: LocalDate,
-    private var changeDate: (LocalDate) -> Unit
+    private var changeDate: (LocalDate) -> Unit,
 ) : BottomSheetDialog(context) {
-
     private lateinit var binding: FragmentSelectYearmonthBottomSheetBinding
 
     private val curYearPos = curDate.year - 1900
@@ -31,7 +29,7 @@ class SelectYearMonthBottomSheet(
         setContentView(binding.root)
         setDatePicker()
 
-        with(binding){
+        with(binding) {
             ivClose.setOnClickListener {
                 dismiss()
             }
@@ -48,7 +46,7 @@ class SelectYearMonthBottomSheet(
         val date = LocalDate.of(
             binding.npYear.value + 1900,
             binding.npMonth.value + 1,
-            1
+            1,
         )
         changeDate(date)
         dismiss()
@@ -73,7 +71,6 @@ class SelectYearMonthBottomSheet(
 
             npYear.value = curYearPos
             npMonth.value = curMonthPos
-
         }
     }
 }

@@ -30,18 +30,29 @@ data class ShortsCommentBottomSheetUiState(
 )
 
 sealed class ShortsCommentBottomSheetEvent {
-    data class ShowToastMessage(val msg: String) : ShortsCommentBottomSheetEvent()
+    data class ShowToastMessage(
+        val msg: String,
+    ) : ShortsCommentBottomSheetEvent()
+
     data object AddCommentComplete : ShortsCommentBottomSheetEvent()
-    data class GoToPosition(val position: Int): ShortsCommentBottomSheetEvent()
-    data class StartAddSubComment(val nick: String): ShortsCommentBottomSheetEvent()
-    data class SetMyProfile(val url: String): ShortsCommentBottomSheetEvent()
+
+    data class GoToPosition(
+        val position: Int,
+    ) : ShortsCommentBottomSheetEvent()
+
+    data class StartAddSubComment(
+        val nick: String,
+    ) : ShortsCommentBottomSheetEvent()
+
+    data class SetMyProfile(
+        val url: String,
+    ) : ShortsCommentBottomSheetEvent()
 }
 
 @HiltViewModel
 class ShortsCommentBottomSheetViewModel @Inject constructor(
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(ShortsCommentBottomSheetUiState())
     val uiState: StateFlow<ShortsCommentBottomSheetUiState> = _uiState.asStateFlow()
 
@@ -55,27 +66,27 @@ class ShortsCommentBottomSheetViewModel @Inject constructor(
 
     private var shortsId: Long = -1L
 
-    fun setShortsId(id: Long, profileImgUrl: String) {
+    fun setShortsId(
+        id: Long,
+        profileImgUrl: String,
+    ) {
         shortsId = id
         _uiState.update { state ->
-            state.copy(
-                profileImgUrl = profileImgUrl
-            )
+            state.copy(profileImgUrl = profileImgUrl)
         }
         getUserInfo()
         getCommentList()
     }
 
-    private fun getUserInfo(){
+    private fun getUserInfo() {
         viewModelScope.launch {
-            repository.getMyPageProfile().let{
-                when(it){
+            repository.getMyPageProfile().let {
+                when (it) {
                     is BaseState.Success -> {
                         _event.emit(ShortsCommentBottomSheetEvent.SetMyProfile(it.body.profileImgUrl))
                     }
 
                     is BaseState.Error -> {
-
                     }
                 }
             }
@@ -88,7 +99,6 @@ class ShortsCommentBottomSheetViewModel @Inject constructor(
                 repository.getShortsCommentList(shortsId, uiState.value.page, 15).let {
                     when (it) {
                         is BaseState.Success -> {
-
                             val newCommentList = mutableListOf<ShortsCommentUiData>()
                             var childCommentCount = 0
                             it.body.result.forEach { data ->
@@ -102,8 +112,8 @@ class ShortsCommentBottomSheetViewModel @Inject constructor(
                                         data.toShortsCommentUiData(
                                             showMoreComment = ::getMoreSubComment,
                                             addSubComment = ::readyToAddSubComment,
-                                            changeLikeStatus = ::changeLikeStatus
-                                        )
+                                            changeLikeStatus = ::changeLikeStatus,
+                                        ),
                                     )
                                 } else {
                                     newCommentList.add(
@@ -112,8 +122,8 @@ class ShortsCommentBottomSheetViewModel @Inject constructor(
                                             addSubComment = ::readyToAddSubComment,
                                             changeLikeStatus = ::changeLikeStatus,
                                             remainSubCommentCount = childCommentCount,
-                                            isLastSubComment = true
-                                        )
+                                            isLastSubComment = true,
+                                        ),
                                     )
                                 }
                             }
@@ -122,36 +132,31 @@ class ShortsCommentBottomSheetViewModel @Inject constructor(
                                 state.copy(
                                     page = uiState.value.page + 1,
                                     hasNext = it.body.hasNext,
-                                    shortsCommentList = uiState.value.shortsCommentList + newCommentList
+                                    shortsCommentList = uiState.value.shortsCommentList + newCommentList,
                                 )
                             }
                         }
 
-                        is BaseState.Error -> _event.emit(
-                            ShortsCommentBottomSheetEvent.ShowToastMessage(
-                                it.msg
+                        is BaseState.Error ->
+                            _event.emit(
+                                ShortsCommentBottomSheetEvent.ShowToastMessage(it.msg),
                             )
-                        )
                     }
                 }
             }
         }
-
     }
 
     private fun getMoreSubComment(
         parentCommentId: Long,
         position: Int,
         remainCommentCount: Int,
-        page: Int
+        page: Int,
     ) {
-
         viewModelScope.launch {
             repository.getShortsSubCommentList(shortsId, parentCommentId, page, 15).let {
                 when (it) {
-
                     is BaseState.Success -> {
-
                         val fixedCommentList = uiState.value.shortsCommentList.toMutableList()
 
                         val moreCommentList = it.body.result.mapIndexed { index, data ->
@@ -161,18 +166,14 @@ class ShortsCommentBottomSheetViewModel @Inject constructor(
                                 changeLikeStatus = ::changeLikeStatus,
                                 remainSubCommentCount = remainCommentCount - 15,
                                 isLastSubComment = index == 14 && it.body.hasNext,
-                                subCommentPage = it.body.page + 1,
-                            )
+                            ).copy(subCommentPage = it.body.page + 1)
                         }
 
                         fixedCommentList.addAll(position + 1, moreCommentList)
-                        fixedCommentList[position] =
-                            fixedCommentList[position].copy(isLastSubComment = false)
+                        fixedCommentList[position] = fixedCommentList[position].copy(isLastSubComment = false)
 
                         _uiState.update { state ->
-                            state.copy(
-                                shortsCommentList = fixedCommentList
-                            )
+                            state.copy(shortsCommentList = fixedCommentList)
                         }
                     }
 
@@ -184,8 +185,12 @@ class ShortsCommentBottomSheetViewModel @Inject constructor(
         }
     }
 
-    private fun readyToAddSubComment(parentCommentId: Long, position: Int, nick: String) {
-        Log.d(TAG,position.toString())
+    private fun readyToAddSubComment(
+        parentCommentId: Long,
+        position: Int,
+        nick: String,
+    ) {
+        Log.d(TAG, position.toString())
         addCommentMode = AddCommentType.SUB
         addCommentParentId = parentCommentId
         addCommentPosition = position
@@ -195,64 +200,62 @@ class ShortsCommentBottomSheetViewModel @Inject constructor(
         }
     }
 
-    fun changeAddCommentType(type: AddCommentType){
+    fun changeAddCommentType(type: AddCommentType) {
         addCommentMode = type
     }
 
     fun addComment() {
         viewModelScope.launch {
-
             val result = when (addCommentMode) {
-                AddCommentType.SUB -> repository.addShortsComment(
-                    shortsId,
-                    hashMapOf("parentCommentId" to addCommentParentId),
-                    AddShortsCommentRequest(comment.value)
-                )
+                AddCommentType.SUB ->
+                    repository.addShortsComment(
+                        shortsId,
+                        hashMapOf("parentCommentId" to addCommentParentId),
+                        AddShortsCommentRequest(comment.value),
+                    )
 
-                AddCommentType.MAIN -> repository.addShortsComment(
-                    shortsId,
-                    hashMapOf(),
-                    AddShortsCommentRequest(comment.value)
-                )
+                AddCommentType.MAIN ->
+                    repository.addShortsComment(
+                        shortsId,
+                        hashMapOf(),
+                        AddShortsCommentRequest(comment.value),
+                    )
             }
 
             result.let {
                 when (it) {
                     is BaseState.Success -> {
-
                         val fixedCommentList = uiState.value.shortsCommentList.toMutableList()
                         when (addCommentMode) {
                             AddCommentType.SUB -> {
                                 fixedCommentList.add(
-                                    addCommentPosition + 1, it.body.toShortsCommentUiData(
+                                    addCommentPosition + 1,
+                                    it.body.toShortsCommentUiData(
                                         showMoreComment = ::getMoreSubComment,
                                         addSubComment = ::readyToAddSubComment,
                                         changeLikeStatus = ::changeLikeStatus,
                                         isLastSubComment = false,
-                                    )
+                                    ),
                                 )
 
                                 _uiState.update { state ->
-                                    state.copy(
-                                        shortsCommentList = fixedCommentList
-                                    )
+                                    state.copy(shortsCommentList = fixedCommentList)
                                 }
                             }
 
                             AddCommentType.MAIN -> {
                                 fixedCommentList.add(
-                                    0, it.body.toShortsCommentUiData(
+                                    0,
+                                    it.body.toShortsCommentUiData(
                                         showMoreComment = ::getMoreSubComment,
                                         addSubComment = ::readyToAddSubComment,
                                         changeLikeStatus = ::changeLikeStatus,
                                         isLastSubComment = false,
-                                    )
+                                    ),
                                 )
 
                                 _uiState.update { state ->
-                                    state.copy(
-                                        shortsCommentList = fixedCommentList
-                                    )
+                                    state.copy(shortsCommentList = fixedCommentList)
                                 }
 
                                 delay(500)
@@ -266,7 +269,6 @@ class ShortsCommentBottomSheetViewModel @Inject constructor(
                     }
 
                     is BaseState.Error -> {
-
                         addCommentMode = AddCommentType.MAIN
                         _event.emit(ShortsCommentBottomSheetEvent.ShowToastMessage(it.msg))
                     }
@@ -277,36 +279,40 @@ class ShortsCommentBottomSheetViewModel @Inject constructor(
 
     private fun changeLikeStatus(
         commentId: Long,
-        position: Int,
         status: LikeStatus,
         isLike: Boolean,
-        isDislike: Boolean
+        isDislike: Boolean,
     ) {
-        Log.d(TAG,status.toString())
+        Log.d(TAG, status.toString())
         viewModelScope.launch {
             repository.patchShortsCommentInteraction(commentId, isLike, isDislike).let {
                 when (it) {
-
                     is BaseState.Success -> {
                         _uiState.update { state ->
                             state.copy(
                                 shortsCommentList = uiState.value.shortsCommentList.map { data ->
                                     if (data.commentId == commentId) {
-                                        data.copy(commentLikeStatus = it.body, likeCount = when(status){
-                                            LikeStatus.LIKE_PLUS -> data.likeCount + 1
-                                            LikeStatus.DISLIKE_PLUS_AND_LIKE_MINUS -> data.likeCount - 1
-                                            LikeStatus.LIKE_MINUS -> data.likeCount - 1
-                                            else -> data.likeCount
-                                        }, dislikeCount = when(status){
-                                            LikeStatus.DISLIKE_PLUS -> data.dislikeCount + 1
-                                            LikeStatus.DISLIKE_MINUS -> data.dislikeCount - 1
-                                            LikeStatus.LIKE_PLUS_AND_DISLIKE_MINUS -> data.dislikeCount - 1
-                                            else -> data.dislikeCount
-                                        })
+                                        data.copy(
+                                            commentLikeStatus = it.body,
+                                            likeCount = when (status) {
+                                                LikeStatus.LIKE_PLUS -> data.likeCount + 1
+                                                LikeStatus.DISLIKE_PLUS_AND_LIKE_MINUS -> data.likeCount - 1
+                                                LikeStatus.LIKE_MINUS -> data.likeCount - 1
+                                                else -> data.likeCount
+                                            },
+                                            dislikeCount = when (status) {
+                                                LikeStatus.DISLIKE_PLUS -> data.dislikeCount + 1
+                                                LikeStatus.DISLIKE_MINUS -> data.dislikeCount - 1
+                                                LikeStatus.LIKE_PLUS_AND_DISLIKE_MINUS ->
+                                                    data.dislikeCount -
+                                                        1
+                                                else -> data.dislikeCount
+                                            },
+                                        )
                                     } else {
                                         data.copy()
                                     }
-                                }
+                                },
                             )
                         }
                     }
@@ -320,7 +326,7 @@ class ShortsCommentBottomSheetViewModel @Inject constructor(
     }
 }
 
-enum class AddCommentType() {
+enum class AddCommentType {
     SUB,
-    MAIN
+    MAIN,
 }

@@ -15,12 +15,14 @@ import com.climus.climeet.presentation.base.BaseFragment
 import com.climus.climeet.presentation.ui.main.record.calendar.CalendarViewModel
 import com.climus.climeet.presentation.ui.main.record.model.CreateRecordData
 
-
 class ClimbingRecordCompleteFragment :
     BaseFragment<FragmentClimbingRecordCompleteBinding>(R.layout.fragment_climbing_record_complete) {
     private val viewModel: CalendarViewModel by activityViewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.ivCheck.setImageResource(R.drawable.ic_check_anim)
@@ -41,8 +43,7 @@ class ClimbingRecordCompleteFragment :
     }
 
     private fun NavController.toCalendarFragment() {
-        val action =
-            ClimbingRecordCompleteFragmentDirections.actionFragmentClimbingRecordCompleteToRecordFragment()
+        val action = ClimbingRecordCompleteFragmentDirections.actionFragmentClimbingRecordCompleteToRecordFragment()
         navigate(action)
     }
 }

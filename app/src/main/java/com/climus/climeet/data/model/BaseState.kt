@@ -1,19 +1,23 @@
 package com.climus.climeet.data.model
 
-import android.util.Log
-import com.climus.climeet.presentation.util.Constants.TAG
 import com.google.gson.Gson
+import kotlinx.coroutines.CancellationException
 import retrofit2.Response
 
 sealed class BaseState<out T> {
-    data class Success<out T>(val body: T) : BaseState<T>()
-    data class Error(val msg: String, val code: String) : BaseState<Nothing>()
+    data class Success<out T>(
+        val body: T,
+    ) : BaseState<T>()
+
+    data class Error(
+        val msg: String,
+        val code: String,
+        val cause: Throwable? = null,
+    ) : BaseState<Nothing>()
 }
 
-
-
-suspend fun <T> runRemote(block: suspend () -> Response<T>): BaseState<T> {
-    return try {
+suspend fun <T> runRemote(block: suspend () -> Response<T>): BaseState<T> =
+    try {
         val response = block()
         if (response.isSuccessful) {
             response.body()?.let {
@@ -25,8 +29,8 @@ suspend fun <T> runRemote(block: suspend () -> Response<T>): BaseState<T> {
             val error = Gson().fromJson(response.errorBody()?.string(), ErrorResponse::class.java)
             BaseState.Error(error.message, error.code)
         }
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
-        Log.d(TAG, e.message.toString())
-        BaseState.Error("네트워크 통신 에러", "EMPTY")
+        BaseState.Error("네트워크 통신 에러", "EMPTY", e)
     }
-}

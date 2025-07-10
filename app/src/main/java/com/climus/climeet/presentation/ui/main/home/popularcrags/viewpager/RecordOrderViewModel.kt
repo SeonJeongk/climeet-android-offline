@@ -15,24 +15,23 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class RecordOrderUiState(
-    val cragList: List<BestRecordGymDetailInfoResponse> = emptyList()
+    val cragList: List<BestRecordGymDetailInfoResponse> = emptyList(),
 )
 
 @HiltViewModel
-class RecordOrderViewModel @Inject constructor(private val repository: MainRepository): ViewModel() {
-
+class RecordOrderViewModel @Inject constructor(
+    private val repository: MainRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(RecordOrderUiState())
     val uiState: StateFlow<RecordOrderUiState> = _uiState.asStateFlow()
 
     fun getGymRankingOrderFollowCount() {
         viewModelScope.launch {
             repository.findGymRankingListOrderSelectionCount().let {
-                when(it) {
+                when (it) {
                     is BaseState.Success -> {
                         _uiState.update { state ->
-                            state.copy(
-                                cragList = it.body
-                            )
+                            state.copy(cragList = it.body)
                         }
                     }
                     is BaseState.Error -> {
@@ -43,6 +42,4 @@ class RecordOrderViewModel @Inject constructor(private val repository: MainRepos
             }
         }
     }
-
-
 }

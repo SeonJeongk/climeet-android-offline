@@ -13,5 +13,5 @@ data class SelectedFilter(
     val gymLevelColor: String = "",
     val climeetLevelName: String = "",
     val routeImg: String = "",
-    val holdImg: Int= R.drawable.ic_white_hold
+    val holdImg: Int = R.drawable.ic_white_hold,
 )

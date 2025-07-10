@@ -5,5 +5,5 @@ data class GymReview(
     val profileName: String,
     val rating: Float,
     val content: String,
-    val updatedAt: String
+    val updatedAt: String,
 )
