@@ -204,6 +204,44 @@
                             app:list="@{vm.uiState.gymLevelList}"
                             tools:listitem="@layout/item_gym_level" />
 
+                        <LinearLayout
+                            android:id="@+id/layout_route_status"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/rv_sector_level">
+
+                            <ProgressBar
+                                android:id="@+id/progress_routes"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:contentDescription="@string/gym_routes_loading"
+                                android:visibility="gone" />
+
+                            <TextView
+                                android:id="@+id/tv_route_status"
+                                style="@style/TextSmallSemiBold"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:accessibilityLiveRegion="polite"
+                                android:gravity="center"
+                                android:padding="12dp"
+                                android:visibility="gone"
+                                tools:text="에러 메세지"/>
+
+                            <androidx.appcompat.widget.AppCompatButton
+                                android:id="@+id/btn_retry_routes"
+                                style="@style/TextSmallSemiBold"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/gym_routes_retry"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
+
                         <com.climus.climeet.presentation.customview.ScrollBlockRecyclerView
                             android:id="@+id/rv_sector_image"
                             android:layout_width="0dp"
@@ -216,7 +254,7 @@
                             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/rv_sector_level"
+                            app:layout_constraintTop_toBottomOf="@id/layout_route_status"
                             app:list="@{vm.uiState.routeList}"
                             tools:listitem="@layout/item_route_image" />
 

@@ -30,7 +30,7 @@ class MainApiContractTest {
         assertEquals(1, response.gymId)
         assertEquals(2, response.maxFloor)
         assertEquals(
-            listOf("V0", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "C1", "C2", "C3"),
+            listOf("VB", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "C1", "C2", "C3"),
             response.difficultyList.map { it.gymDifficultyName },
         )
         assertEquals(
@@ -52,6 +52,8 @@ class MainApiContractTest {
             response.difficultyList.map { it.gymDifficultyColor },
         )
         assertEquals(4, response.sectorList.size)
+        assertEquals("VB", response.difficultyList.first().climeetDifficultyName)
+        assertEquals(0, response.difficultyList.first().difficulty)
         assertEquals("2026-08-12", response.timePoint)
         assertJsonRoundTrip(json, response)
     }
@@ -97,6 +99,9 @@ class MainApiContractTest {
         assertEquals(0, response.page)
         assertTrue(response.hasNext)
         assertEquals(listOf(1001L, 1002L, 1003L), response.result.map { it.routeId })
+        assertEquals("VB", response.result.first().gymDifficultyName)
+        assertEquals("VB", response.result.first().climeetDifficultyName)
+        assertEquals(0, response.result.first().difficulty)
         assertJsonRoundTrip(json, response)
     }
 
