@@ -66,4 +66,8 @@
     <string name="gym_business_hours_range">%1$s - %2$s</string>
     <string name="gym_business_hours_day">%1$s %2$s</string>
     <string name="route_finding_level_already_registered">%1$s 레벨은 이미 등록되어 있어요</string>
+
+    <string name="gym_routes_loading">루트를 불러오는 중입니다</string>
+    <string name="gym_routes_empty">선택한 조건에 맞는 루트가 없습니다</string>
+    <string name="gym_routes_retry">다시 시도</string>
 </resources>

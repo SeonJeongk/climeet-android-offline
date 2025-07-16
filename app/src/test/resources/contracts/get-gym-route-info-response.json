@@ -6,9 +6,9 @@
       "routeId": 1001,
       "sectorId": 101,
       "sectorName": "Synthetic Sector 1A",
-      "climeetDifficultyName": "V0",
+      "climeetDifficultyName": "VB",
       "difficulty": 0,
-      "gymDifficultyName": "V0",
+      "gymDifficultyName": "VB",
       "gymDifficultyColor": "#FFFFFF",
       "routeImageUrl": "https://example.invalid/images/route-small-01.png",
       "holdColor": "#FFFFFF"

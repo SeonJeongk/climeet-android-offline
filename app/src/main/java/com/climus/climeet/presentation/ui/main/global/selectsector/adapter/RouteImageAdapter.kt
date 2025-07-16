@@ -14,7 +14,7 @@ class RouteImageAdapter : ListAdapter<RouteUiData, RouteImageViewHolder>(diffCal
             override fun areItemsTheSame(
                 oldItem: RouteUiData,
                 newItem: RouteUiData,
-            ): Boolean = oldItem.sectorId == newItem.sectorId
+            ): Boolean = oldItem.routeId == newItem.routeId
 
             override fun areContentsTheSame(
                 oldItem: RouteUiData,

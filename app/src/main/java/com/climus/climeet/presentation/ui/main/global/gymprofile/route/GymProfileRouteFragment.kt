@@ -45,12 +45,7 @@ class GymProfileRouteFragment : BaseFragment<FragmentGymProfileRouteBinding>(R.l
         initShortsEventObserve()
         addOnScrollListener()
 
-        viewModel.selectedDate.observe(
-            viewLifecycleOwner,
-            Observer { date ->
-                viewModel.setDate()
-            },
-        )
+        observeRouteState()
     }
 
     private fun setRouteTab() {
@@ -64,6 +59,26 @@ class GymProfileRouteFragment : BaseFragment<FragmentGymProfileRouteBinding>(R.l
                 viewModel.setCragInfo(id, parentViewModel.uiState.value.gymName)
             },
         )
+    }
+
+    private fun observeRouteState() {
+        binding.btnRetryRoutes.setOnClickListener { viewModel.retry() }
+        repeatOnStarted {
+            viewModel.uiState.collect { state ->
+                val loadState = state.loadState
+                binding.progressRoutes.visibility = if (loadState is RouteLoadState.Loading) View.VISIBLE else View.GONE
+                binding.btnRetryRoutes.visibility =
+                    if (loadState is RouteLoadState.RetryableError) View.VISIBLE else View.GONE
+                val message = when (loadState) {
+                    RouteLoadState.Empty -> getString(R.string.gym_routes_empty)
+                    is RouteLoadState.RetryableError -> loadState.error.msg
+                    is RouteLoadState.TerminalError -> loadState.error.msg
+                    else -> ""
+                }
+                binding.tvRouteStatus.text = message
+                binding.tvRouteStatus.visibility = if (message.isEmpty()) View.GONE else View.VISIBLE
+            }
+        }
     }
 
     private fun addOnScrollListener() {

@@ -32,7 +32,7 @@ class RunRemoteTest {
     fun emptyResponse_runRemote_preservesEmptyError() =
         runBlocking {
             assertEquals(
-                BaseState.Error("응답이 비어있습니다", "EMPTY"),
+                BaseState.Error("응답이 비어있습니다", "EMPTY", type = ErrorType.EMPTY_BODY, httpStatus = 200),
                 runRemote { Response.success<String>(null) },
             )
         }
