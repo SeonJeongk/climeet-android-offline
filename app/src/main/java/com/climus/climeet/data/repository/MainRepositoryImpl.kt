@@ -1,11 +1,15 @@
 package com.climus.climeet.data.repository
 
+import androidx.room.withTransaction
+import com.climus.climeet.data.local.ClimbingDatabase
 import com.climus.climeet.data.local.ClimbingRecordDao
 import com.climus.climeet.data.local.ClimbingRecordData
 import com.climus.climeet.data.local.RouteRecordDao
 import com.climus.climeet.data.local.RouteRecordData
+import com.climus.climeet.data.local.completedAverageDifficulty
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.request.AddShortsCommentRequest
+import com.climus.climeet.data.model.request.ClimbingRecord
 import com.climus.climeet.data.model.request.CreateGymProfileReviewRequest
 import com.climus.climeet.data.model.request.CreateTimerClimbingRecordRequest
 import com.climus.climeet.data.model.request.GetGymRouteInfoRequest
@@ -71,8 +75,12 @@ import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import javax.inject.Inject
 
+// TODO(offline-first-05/06): 서버가 nullable 평균을 지원하면 완등 없음은 null로 전송합니다.
+private const val NO_COMPLETION_AVERAGE_FALLBACK = 0
+
 class MainRepositoryImpl @Inject constructor(
     private val api: MainApi,
+    private val climbingDatabase: ClimbingDatabase,
     private val climbingRecordDao: ClimbingRecordDao,
     private val routeRecordDao: RouteRecordDao,
 ) : MainRepository {
@@ -288,63 +296,90 @@ class MainRepositoryImpl @Inject constructor(
     override suspend fun getMyPageProfile(): BaseState<MyPageProfileResponse> = runRemote { api.getMyPageProfile() }
 
     // -------- RoomDB ClimbingRecordDa0 암장 정보 -----------
-    override fun insert(climbingRecordData: ClimbingRecordData) {
+    override suspend fun insert(climbingRecordData: ClimbingRecordData) {
         climbingRecordDao.insert(climbingRecordData)
     }
 
-    override fun update(climbingRecordData: ClimbingRecordData) {
+    override suspend fun update(climbingRecordData: ClimbingRecordData) {
         climbingRecordDao.update(climbingRecordData)
     }
 
-    override fun delete(climbingRecordData: ClimbingRecordData) {
+    override suspend fun delete(climbingRecordData: ClimbingRecordData) {
         climbingRecordDao.delete(climbingRecordData)
     }
 
-    override fun deleteAllRecord() {
+    override suspend fun deleteAllRecord() {
         climbingRecordDao.deleteAllRecord()
     }
 
-    override fun getAllRecord(): List<ClimbingRecordData> = climbingRecordDao.getAllRecord()
+    override suspend fun getAllRecord(): List<ClimbingRecordData> = climbingRecordDao.getAllRecord()
 
-    override fun getRecord(id: Int): ClimbingRecordData = climbingRecordDao.getRecord(id)
+    override suspend fun getRecord(id: Int): ClimbingRecordData? = climbingRecordDao.getRecord(id)
+
+    override suspend fun finalizeTimerClimbingRecord(
+        id: Int,
+        time: String,
+    ): CreateTimerClimbingRecordRequest? =
+        climbingDatabase.withTransaction {
+            val record = climbingRecordDao.getRecord(id) ?: return@withTransaction null
+            val routes = routeRecordDao.getAllRoute()
+            val averageDifficulty = completedAverageDifficulty(routes) ?: NO_COMPLETION_AVERAGE_FALLBACK
+            climbingRecordDao.update(record.copy(time = time, avgDifficulty = averageDifficulty))
+            CreateTimerClimbingRecordRequest(
+                gymId = record.gymId,
+                date = record.date,
+                time = time,
+                avgDifficulty = averageDifficulty,
+                routeRecordRequestDtoList = routes.map { route ->
+                    ClimbingRecord(route.routeId, route.attemptCount, route.isCompleted)
+                },
+            )
+        }
+
+    override suspend fun clearTimerClimbingRecordDraft() {
+        climbingDatabase.withTransaction {
+            routeRecordDao.deleteAllRoute()
+            climbingRecordDao.deleteAllRecord()
+        }
+    }
 
     // --------- RoomDB RouteRecordDao 루트 기록 --------------
-    override fun insert(routeRecord: RouteRecordData) {
+    override suspend fun insert(routeRecord: RouteRecordData) {
         routeRecordDao.insert(routeRecord)
     }
 
-    override fun update(routeRecord: RouteRecordData) {
+    override suspend fun update(routeRecord: RouteRecordData) {
         routeRecordDao.update(routeRecord)
     }
 
-    override fun delete(routeRecord: RouteRecordData) {
+    override suspend fun delete(routeRecord: RouteRecordData) {
         routeRecordDao.delete(routeRecord)
     }
 
-    override fun deleteAllRoute() {
+    override suspend fun deleteAllRoute() {
         routeRecordDao.deleteAllRoute()
     }
 
-    override fun deleteById(id: Int) {
+    override suspend fun deleteById(id: Int) {
         routeRecordDao.deleteById(id)
     }
 
-    override fun getAllRoute(): List<RouteRecordData> = routeRecordDao.getAllRoute()
+    override suspend fun getAllRoute(): List<RouteRecordData> = routeRecordDao.getAllRoute()
 
-    override fun getRouteById(id: Int): RouteRecordData = routeRecordDao.getRouteById(id)
+    override suspend fun getRouteById(id: Int): RouteRecordData = routeRecordDao.getRouteById(id)
 
-    override fun findExistRoute(
+    override suspend fun findExistRoute(
         sectorId: Long,
         routeId: Long,
     ): RouteRecordData? = routeRecordDao.findExistRoute(sectorId, routeId)
 
-    override fun getAverageDifficultyOfCompleted(): Double? = routeRecordDao.getAverageDifficultyOfCompleted()
+    override suspend fun getAverageDifficultyOfCompleted(): Double? = routeRecordDao.getAverageDifficultyOfCompleted()
 
-    override fun getAllLevelRecord(): List<RouteRecordData> = routeRecordDao.getAllLevelRecord()
+    override suspend fun getAllLevelRecord(): List<RouteRecordData> = routeRecordDao.getAllLevelRecord()
 
-    override fun getSuccessCount(level: String): Int = routeRecordDao.getSuccessCount(level)
+    override suspend fun getSuccessCount(level: String): Int = routeRecordDao.getSuccessCount(level)
 
-    override fun getAttemptCount(level: String): Int = routeRecordDao.getAttemptCount(level)
+    override suspend fun getAttemptCount(level: String): Int = routeRecordDao.getAttemptCount(level)
 
     override suspend fun followGym(gymId: Long): BaseState<ResponseBody> = runRemote { api.followGym(gymId) }
 

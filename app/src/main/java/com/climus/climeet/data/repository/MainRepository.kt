@@ -274,45 +274,52 @@ interface MainRepository {
     ): BaseState<GetMyShortsCommentsResponse>
 
     // -------- RoomDB ClimbingRecordDao 암장 정보 ----------
-    fun insert(climbingRecordData: ClimbingRecordData)
+    suspend fun insert(climbingRecordData: ClimbingRecordData)
 
-    fun update(climbingRecordData: ClimbingRecordData)
+    suspend fun update(climbingRecordData: ClimbingRecordData)
 
-    fun delete(climbingRecordData: ClimbingRecordData)
+    suspend fun delete(climbingRecordData: ClimbingRecordData)
 
-    fun deleteAllRecord()
+    suspend fun deleteAllRecord()
 
-    fun getAllRecord(): List<ClimbingRecordData>
+    suspend fun getAllRecord(): List<ClimbingRecordData>
 
-    fun getRecord(id: Int): ClimbingRecordData
+    suspend fun getRecord(id: Int): ClimbingRecordData?
+
+    suspend fun finalizeTimerClimbingRecord(
+        id: Int,
+        time: String,
+    ): CreateTimerClimbingRecordRequest?
+
+    suspend fun clearTimerClimbingRecordDraft()
 
     // ------ RoomDB RouteRecordDao 루트 기록 정보 ---------
-    fun insert(routeRecord: RouteRecordData)
+    suspend fun insert(routeRecord: RouteRecordData)
 
-    fun update(routeRecord: RouteRecordData)
+    suspend fun update(routeRecord: RouteRecordData)
 
-    fun delete(routeRecord: RouteRecordData)
+    suspend fun delete(routeRecord: RouteRecordData)
 
-    fun deleteAllRoute()
+    suspend fun deleteAllRoute()
 
-    fun deleteById(id: Int)
+    suspend fun deleteById(id: Int)
 
-    fun getAllRoute(): List<RouteRecordData>
+    suspend fun getAllRoute(): List<RouteRecordData>
 
-    fun getRouteById(id: Int): RouteRecordData
+    suspend fun getRouteById(id: Int): RouteRecordData
 
-    fun findExistRoute(
+    suspend fun findExistRoute(
         sectorId: Long,
         routeId: Long,
     ): RouteRecordData?
 
-    fun getAverageDifficultyOfCompleted(): Double?
+    suspend fun getAverageDifficultyOfCompleted(): Double?
 
-    fun getAllLevelRecord(): List<RouteRecordData>
+    suspend fun getAllLevelRecord(): List<RouteRecordData>
 
-    fun getSuccessCount(level: String): Int
+    suspend fun getSuccessCount(level: String): Int
 
-    fun getAttemptCount(level: String): Int
+    suspend fun getAttemptCount(level: String): Int
 
     suspend fun getGymListToFollow(
         gymname: String,

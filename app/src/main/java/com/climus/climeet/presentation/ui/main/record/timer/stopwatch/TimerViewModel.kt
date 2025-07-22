@@ -74,7 +74,7 @@ class TimerViewModel @Inject constructor(
             val routeData: List<RouteRecordData>?
             val requestBody: CreateTimerClimbingRecordRequest
 
-            val recordData: ClimbingRecordData = repository.getRecord(1)
+            val recordData: ClimbingRecordData = repository.getRecord(1) ?: return@launch
             routeData = repository.getAllRoute()
 
             // avgDifficulty 계산
