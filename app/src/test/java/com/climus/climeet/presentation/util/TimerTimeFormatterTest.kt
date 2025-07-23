@@ -46,4 +46,20 @@ class TimerTimeFormatterTest {
             Locale.setDefault(originalLocale)
         }
     }
+
+    @Test
+    fun storedRequestDuration_parseTimerTime_restoresDisplayDuration() {
+        val elapsedTime = parseTimerTime("00:01:19")
+
+        assertEquals(79_000L, elapsedTime)
+        assertEquals("01:19", formatTimerTime(requireNotNull(elapsedTime)))
+    }
+
+    @Test
+    fun malformedDuration_parseTimerTime_returnsNull() {
+        assertEquals(null, parseTimerTime(""))
+        assertEquals(null, parseTimerTime("00:60"))
+        assertEquals(null, parseTimerTime("00:01:60"))
+        assertEquals(null, parseTimerTime("not-a-time"))
+    }
 }

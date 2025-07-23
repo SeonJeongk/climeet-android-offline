@@ -23,6 +23,29 @@ internal fun formatTimerTime(
     }
 }
 
+internal fun parseTimerTime(timerTime: String): Long? {
+    val parts = timerTime.split(':')
+    if (parts.size !in 2..3) return null
+
+    val values = parts.map { part -> part.toLongOrNull() ?: return null }
+    val hours = if (values.size == 3) values[0] else 0L
+    val minutes = values[values.size - 2]
+    val seconds = values.last()
+    if (hours < 0 || minutes !in 0..59 || seconds !in 0..59) return null
+
+    return try {
+        Math.addExact(
+            Math.addExact(
+                Math.multiplyExact(hours, TimeUnit.HOURS.toMillis(1)),
+                Math.multiplyExact(minutes, TimeUnit.MINUTES.toMillis(1)),
+            ),
+            Math.multiplyExact(seconds, TimeUnit.SECONDS.toMillis(1)),
+        )
+    } catch (_: ArithmeticException) {
+        null
+    }
+}
+
 internal fun formatRecordTimeRange(
     start: LocalTime,
     end: LocalTime,
