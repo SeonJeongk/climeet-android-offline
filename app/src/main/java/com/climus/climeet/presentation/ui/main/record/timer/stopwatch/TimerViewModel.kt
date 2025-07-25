@@ -53,7 +53,7 @@ class TimerViewModel @Inject constructor(
             val state = intent.getStringExtra("pauseState")
             if (state != null) {
                 pauseState.value = state.toString()
-                pauseTime.value = sharedPreferences.getLong("pauseTime", 0L)
+                pauseTime.value = intent.getLongExtra("pauseTime", sharedPreferences.getLong("pauseTime", 0L))
             }
         }
     }
@@ -128,6 +128,11 @@ class TimerViewModel @Inject constructor(
                 repository.deleteAllRecord()
             }
         }
+    }
+
+    fun restoreElapsedTime(elapsedTimeMillis: Long) {
+        _time.value = elapsedTimeMillis
+        pauseTime.value = elapsedTimeMillis
     }
 
     fun registerReceiver(context: Context) {

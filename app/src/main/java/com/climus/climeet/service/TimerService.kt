@@ -49,8 +49,8 @@ class TimerService : Service() {
 
         when (command) {
             "START" -> {
-                startTimer()
-                val notification = createNotification(0L)
+                startTimer(intent.getLongExtra(EXTRA_INITIAL_ELAPSED_TIME, 0L))
+                val notification = createNotification(elapsedTime)
                 startForeground(1, notification) // 스톱워치 시작 -> 알림창 띄움
             }
 
@@ -152,6 +152,7 @@ class TimerService : Service() {
                 object : TimerTask() {
                     override fun run() {
                         elapsedTime += System.currentTimeMillis() - startTime
+                        editor.putLong(PAUSE_TIME, elapsedTime).apply()
                         val notification = createNotification(elapsedTime)
                         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                         notificationManager.notify(1, notification) // 새로운 알림 생성
@@ -170,7 +171,9 @@ class TimerService : Service() {
         }
     }
 
-    private fun startTimer() {
+    private fun startTimer(initialElapsedTime: Long) {
+        elapsedTime = initialElapsedTime.coerceAtLeast(0L)
+        pauseTime = elapsedTime
         setTimer()
         isStart = true
         isPaused = false
@@ -183,6 +186,7 @@ class TimerService : Service() {
         editor.putBoolean(KEY_IS_RESTART, isRestart)
         editor.putBoolean(KEY_IS_STOP, isStopped)
         editor.putBoolean(KEY_IS_RUNNING, isRunning)
+        editor.putLong(PAUSE_TIME, elapsedTime)
         editor.apply()
 
         // 서비스 실행중이면 serviceRunning을 true로 성정 (실행 중이지 않으면 null)
@@ -214,6 +218,8 @@ class TimerService : Service() {
 
         // TimerViewModel에 전달 정지 상태 broadcast로 전달
         val intent = Intent("StopwatchUpdate")
+        intent.putExtra("elapsedTime", elapsedTime)
+        intent.putExtra("pauseTime", pauseTime)
         intent.putExtra("pauseState", "yes")
         LocalBroadcastManager.getInstance(this@TimerService).sendBroadcast(intent)
 
@@ -241,7 +247,6 @@ class TimerService : Service() {
         intent.putExtra("pauseState", "no")
         LocalBroadcastManager.getInstance(this@TimerService).sendBroadcast(intent)
 
-        editor.putLong(PAUSE_TIME, 0L)
         editor.putString("pauseTimeFormat", "00:00")
         editor.putBoolean(KEY_IS_START, isStart)
         editor.putBoolean(KEY_IS_PAUSE, isPaused)
@@ -287,5 +292,6 @@ class TimerService : Service() {
         const val KEY_IS_RESTART = "isRestart"
         const val KEY_IS_STOP = "isStop"
         const val KEY_IS_RUNNING = "isRunning"
+        const val EXTRA_INITIAL_ELAPSED_TIME = "initialElapsedTime"
     }
 }
