@@ -105,10 +105,16 @@ class TimerService : Service() {
 
         // 알림창 클릭시 타이머 화면으로 이동
         val timerIntent = Intent(this, MainActivity::class.java).apply {
-            putExtra("showTimerFragment", true)
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(MainActivity.EXTRA_SHOW_TIMER, true)
         }
 
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, timerIntent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            timerIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(timeFormat)

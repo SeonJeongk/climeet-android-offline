@@ -60,6 +60,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         initEventObserve()
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
     private fun setBnv() {
         binding.mainBnv.itemIconTintList = null
 
@@ -92,14 +98,19 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
             }
         }
 
-        handleIntent()
+        handleIntent(intent)
     }
 
     // 알림창을 눌렀을 때 스톱워치 화면이 보여지게 설정하는 함수
-    private fun handleIntent() {
-        if (intent.hasExtra("showTimerFragment")) {
-            navController.navigate(R.id.record_fragment)
+    private fun handleIntent(targetIntent: Intent?) {
+        if (targetIntent?.getBooleanExtra(EXTRA_SHOW_TIMER, false) != true) return
+
+        targetIntent.removeExtra(EXTRA_SHOW_TIMER)
+        binding.mainBnv.menu.findItem(R.id.record_fragment).isChecked = true
+        if (navController.currentDestination?.id == R.id.timerMainFragment) {
+            navController.popBackStack(R.id.timerMainFragment, inclusive = true)
         }
+        navController.navigate(R.id.timerMainFragment)
     }
 
     private fun initEventObserve() {
@@ -270,5 +281,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                 }
             }
         }
+    }
+
+    companion object {
+        const val EXTRA_SHOW_TIMER = "showTimerFragment"
     }
 }
