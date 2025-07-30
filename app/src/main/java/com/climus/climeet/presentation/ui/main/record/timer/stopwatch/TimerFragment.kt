@@ -9,6 +9,7 @@ import android.view.View
 import androidx.core.content.edit
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.climus.climeet.R
 import com.climus.climeet.app.App.Companion.sharedPreferences
 import com.climus.climeet.data.local.ClimbingRecordData
@@ -16,6 +17,7 @@ import com.climus.climeet.data.local.RouteRecordData
 import com.climus.climeet.data.repository.MainRepository
 import com.climus.climeet.databinding.FragmentTimerBinding
 import com.climus.climeet.presentation.base.BaseFragment
+import com.climus.climeet.presentation.customview.DeleteDialog
 import com.climus.climeet.presentation.customview.NoticePopup
 import com.climus.climeet.presentation.ui.main.global.selectsector.adapter.GymLevelAdapter
 import com.climus.climeet.presentation.ui.main.global.selectsector.adapter.RouteImageAdapter
@@ -24,13 +26,13 @@ import com.climus.climeet.presentation.ui.main.record.model.LevelItemForAvg
 import com.climus.climeet.presentation.ui.main.record.timer.setrecord.ClimbingRecordAdapter
 import com.climus.climeet.presentation.ui.main.record.timer.setrecord.RecordAverageAdapter
 import com.climus.climeet.presentation.ui.main.record.timer.setrecord.SetTimerClimbingRecordViewModel
+import com.climus.climeet.presentation.ui.main.record.timer.setrecord.TimerSubmissionEffect
+import com.climus.climeet.presentation.ui.main.record.timer.setrecord.TimerSubmissionState
 import com.climus.climeet.presentation.ui.main.record.timer.stopwatch.selectcrag.TimerCragSelectBottomSheetFragment
 import com.climus.climeet.presentation.ui.main.record.timer.stopwatch.selectcrag.TimerCragSelectBottomSheetViewModel
 import com.climus.climeet.service.TimerService
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -77,6 +79,7 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
         timerObserve()
         pauseObserve()
         initRouteObserve()
+        observeSubmission()
 
         // 암장 이름 설정
         initCragName()
@@ -97,7 +100,7 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
         Log.d("TIMER", "서비스 실행중? : ${serviceState.value}")
 
         if (serviceState.value == null) {
-            stopStopwatch()
+            viewMode(ViewMode.STOP)
             timerVM.isStart.value = false
             timerVM.isPaused.value = false
             timerVM.isRestart.value = false
@@ -106,22 +109,10 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
             timerVM.pauseTime.value = 0L
             timerVM.pauseState.value = ""
             updateStatePref()
-
-            clearRouteRecord()
+            recordVM.restoreDraft()
         } else {
             // 스톱워치 서비스가 실행중인 상태 -> spf값으로 뷰모델 변수 초기화 -> initTimerLayout() 통해 ViewMode 설정
             setViewModel()
-        }
-    }
-
-    private fun clearRouteRecord() {
-        // 저장된 루트기록 초기화
-        CoroutineScope(Dispatchers.IO).launch {
-            repository.deleteAllRoute()
-            // 잘 지워졌나 확인
-            val result = repository.getAllRoute()
-            delay(1000)
-            Log.d("recorddd", "저장된 기록들 reset $result")
         }
     }
 
@@ -150,14 +141,7 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
                         avgDifficulty = 0,
                     )
 
-                    CoroutineScope(Dispatchers.IO).launch {
-                        // 저장
-                        repository.insert(recordData)
-                        // 저장된 값 확인
-                        val result = repository.getAllRecord()
-                        delay(1000)
-                        Log.d("recorddd", result.toString())
-                    }
+                    recordVM.saveDraft(recordData)
                 }
             },
         )
@@ -184,7 +168,7 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
                 val levelAdapter = RecordAverageAdapter()
                 binding.rvAvgRecord.adapter = levelAdapter
 
-                CoroutineScope(Dispatchers.IO).launch {
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                     val levelData = repository.getAllLevelRecord()
                     val firstRecords = mutableListOf<RouteRecordData>() // 중복 없게 각 레벨별 첫번째 데이터만 골라냄
 
@@ -195,16 +179,14 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
                             firstRecords.add(record)
                         }
                     }
-                    if (firstRecords != null) {
-                        items = firstRecords.map { data ->
-                            val attemptCount = repository.getAttemptCount(data.levelName)
-                            val successCount = repository.getSuccessCount(data.levelName)
-                            val levelColor = data.levelColor
-                            LevelItemForAvg(data.levelName, levelColor, attemptCount, successCount)
-                        }
-                        withContext(Dispatchers.Main) {
-                            levelAdapter.setItems(items)
-                        }
+                    items = firstRecords.map { data ->
+                        val attemptCount = repository.getAttemptCount(data.levelName)
+                        val successCount = repository.getSuccessCount(data.levelName)
+                        val levelColor = data.levelColor
+                        LevelItemForAvg(data.levelName, levelColor, attemptCount, successCount)
+                    }
+                    withContext(Dispatchers.Main) {
+                        levelAdapter.setItems(items)
                     }
                 }
             },
@@ -223,12 +205,8 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
 
     // 루트기록 더보기 item
     private fun initRouteObserve() {
-        repeatOnStarted {
-            recordVM.items.collect { items ->
-                routeItemAdapter.items = items
-                routeItemAdapter.notifyDataSetChanged()
-                // Log.d("timer", "adapter에 item 설정완 : $items")
-            }
+        recordVM.itemsLiveData.observe(viewLifecycleOwner) { items ->
+            routeItemAdapter.submitList(items)
         }
     }
 
@@ -239,10 +217,9 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
         if (serviceState.value != null) {
             val id = sharedPreferences.getLong("cragId", 0)
             val name = sharedPreferences.getString("cragName", getString(R.string.timer_crag_set_inform))
-            if (name != null) {
+            if (id > 0L && name != null) {
                 // 앱 재시작 시, 암장 정보 가져오는 API 재호출
-                recordVM.selectedCrag(id, name)
-                recordVM.isRestart.value = true
+                recordVM.restoreSelectedCrag(id, name)
             }
         }
     }
@@ -250,7 +227,11 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
     override fun onResume() {
         super.onResume()
         // 암장 이름 및 상단 요소 설정
-        if (timerVM.isStop.value == true) {
+        val restoredCragId = sharedPreferences.getLong("cragId", 0L)
+        if (timerVM.isStop.value == true &&
+            recordVM.submissionState.value !is TimerSubmissionState.Preserved &&
+            restoredCragId <= 0L
+        ) {
             binding.tvTitle.text = getString(R.string.timer_crag_set_inform)
             recordVM.totalRoute.value = "--"
             recordVM.totalComplete.value = "--"
@@ -267,10 +248,6 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
     override fun onDestroy() {
         super.onDestroy()
         timerVM.unregisterReceiver(requireContext())
-        recordVM.apiCheck = false
-
-        // items 초기화
-        recordVM.clearItems()
     }
 
     // spf -> viewmodel
@@ -298,11 +275,16 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
     }
 
     private fun timerObserve() {
+        if (recordVM.submissionState.value is TimerSubmissionState.Preserved) {
+            recordVM.restoredDuration.value?.let { binding.tvTime.text = it }
+            return
+        }
         // pauseTimeFormat
         // broadcast로 viewmodel에 넘어온 일시정지 시점의 시간을 "00:00"의 형식으로 바꾼 시간이다
         // todo : pauseTimeFormat에 저장된 시간을 spf에 업데이트 해준다 (TimerViewModel에서는 spf에 저장해 줄 방법을 모르겠어서 이렇게 설정해 둔 상태)
         timerVM.pauseTimeFormat.observe(viewLifecycleOwner) { pauseTime ->
-            if (pauseTime != null && pauseTime != "00:00") {
+            val isEditableDraft = recordVM.submissionState.value == TimerSubmissionState.Draft
+            if (isEditableDraft && pauseTime != null && pauseTime != "00:00") {
                 sharedPreferences.edit { putString("pauseTimeFormat", pauseTime) }
                 binding.tvTime.text = pauseTime
             }
@@ -315,7 +297,9 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
         } else {
             timerVM.timeFormat.observe(viewLifecycleOwner) { timeFormat ->
                 // 스톱워치 isStart, reStart일 때의 시간을 화면에 보여줌
-                binding.tvTime.text = timeFormat
+                if (recordVM.submissionState.value == TimerSubmissionState.Draft) {
+                    binding.tvTime.text = timeFormat
+                }
             }
         }
     }
@@ -345,13 +329,10 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
 
         recordVM.resetView.observe(viewLifecycleOwner) { reset ->
             if (reset) {
-                if (timerVM.isPaused.value == true) {
-                    // 일시정지 상태면 화면 재설정
-                    binding.layoutAvgComplete.visibility = View.VISIBLE
-                    binding.tvTimeTitle.visibility = View.VISIBLE
-                    binding.layoutRouteRecord.visibility = View.VISIBLE
-                    recordVM.isAvgToggleOn.value = false
-                    recordVM.isRouteToggleOn.value = true
+                val canShowDetails = timerVM.isRunning.value != true &&
+                    (timerVM.isPaused.value == true || recordVM.restoredElapsedTimeMillis.value != null)
+                if (canShowDetails) {
+                    showRestoredDraftDetails()
                 }
             }
         }
@@ -363,6 +344,7 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
         timerVM.isStart.observe(viewLifecycleOwner) { isStart ->
             if (isStart) {
                 viewMode(ViewMode.START)
+                hidePausedDraftDetails()
             }
         }
         timerVM.isPaused.observe(viewLifecycleOwner) { isPaused ->
@@ -370,11 +352,7 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
                 viewMode(ViewMode.PAUSE)
                 // 기록 유무에 따른 보이기 설정
                 if (recordVM.itemsLiveData.value?.isEmpty() == false) {
-                    binding.layoutAvgComplete.visibility = View.VISIBLE
-                    binding.tvTimeTitle.visibility = View.VISIBLE
-                    binding.layoutRouteRecord.visibility = View.VISIBLE
-                    recordVM.isAvgToggleOn.value = false
-                    recordVM.isRouteToggleOn.value = true
+                    showRestoredDraftDetails()
                 }
             }
         }
@@ -382,19 +360,13 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
             if (isRestart) {
                 viewMode(ViewMode.RESTART)
                 timerObserve()
-
-                binding.layoutAvgComplete.visibility = View.GONE
-                binding.tvTimeTitle.visibility = View.GONE
-                binding.layoutRouteRecord.visibility = View.GONE
+                hidePausedDraftDetails()
             }
         }
         timerVM.isStop.observe(viewLifecycleOwner) { isStop ->
             if (isStop) {
                 viewMode(ViewMode.STOP)
-
-                binding.layoutAvgComplete.visibility = View.GONE
-                binding.tvTimeTitle.visibility = View.GONE
-                binding.layoutRouteRecord.visibility = View.GONE
+                hidePausedDraftDetails()
             }
         }
     }
@@ -403,15 +375,21 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
     private fun initClickListener() {
         // 암장 선택
         binding.layoutSelectCrag.setOnClickListener {
-            if (timerVM.isStop.value == false) {
-                NoticePopup.make(it, "운동중에는 암장을 바꿀 수 없어요!").show()
-            } else {
-                showCragSelectBottomSheet()
+            when {
+                recordVM.isCatalogRetryAvailable.value -> recordVM.retryCatalog()
+                recordVM.submissionState.value is TimerSubmissionState.Preserved -> showDiscardDraftDialog()
+                timerVM.isStop.value == false -> {
+                    NoticePopup.make(it, "운동중에는 암장을 바꿀 수 없어요!").show()
+                }
+
+                else -> showCragSelectBottomSheet()
             }
         }
         // 스톱워치 시작
         binding.ivStart.setOnClickListener {
-            if (binding.tvTitle.text == getString(R.string.timer_crag_set_inform)) {
+            if (recordVM.submissionState.value is TimerSubmissionState.Preserved) {
+                showDiscardDraftDialog()
+            } else if (binding.tvTitle.text == getString(R.string.timer_crag_set_inform)) {
                 NoticePopup.make(it, "운동 전, 암장을 먼저 선택해주세요.").show()
             } else {
                 startStopwatch() // 스톱워치 서비스 시작
@@ -430,41 +408,100 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
             NoticePopup.make(it, "정지 버튼을 길게 누르면\n운동이 종료됩니다.").show()
         }
         binding.ivStop.setOnLongClickListener {
-            // 종료 시간 저장
-            CoroutineScope(Dispatchers.IO).launch {
-                if (timerVM.isPaused.value == true) {
-                    timerVM.pauseTime.value?.let { pauseTime ->
-                        sharedPreferences.edit(commit = true) { putLong("stopTime", pauseTime) }
-                    }
-                } else {
-                    timerVM.time.value?.let { time ->
-                        sharedPreferences.edit(commit = true) { putLong("stopTime", time) }
-                    }
-                }
-            }
-            stopStopwatch()
-
-            // TimerCragSelectBottomSheetViewModel의 selectedCrag 초기화
-            cragSelectVM.resetItem()
-
-            // 루트기록 API로 전송
-            timerVM.sendClimbingRecord()
-
-            recordVM.resetAtStop()
-
-            // 완료화면 띄우기
-            val transaction = requireActivity().supportFragmentManager.beginTransaction()
-            transaction.add(R.id.main_container, ClimbingCompleteFragment())
-            transaction.addToBackStack(null) // 이전 Fragment로 돌아갈 수 있게 스택에 추가
-            transaction.commit()
+            val endTime = if (timerVM.isPaused.value == true) {
+                timerVM.pauseTime.value
+            } else {
+                timerVM.time.value
+            } ?: return@setOnLongClickListener true
+            sharedPreferences.edit(commit = true) { putLong("stopTime", endTime) }
+            stopServiceForSubmission()
+            recordVM.submitRecord(endTime)
             true // OnClickListener와 같이 쓰기 위해 true로 설정
         }
     }
 
+    private fun observeSubmission() {
+        repeatOnStarted {
+            recordVM.submissionState.collect { state ->
+                binding.ivStop.isEnabled = state == TimerSubmissionState.Draft
+                if (state == TimerSubmissionState.Submitting || state is TimerSubmissionState.Preserved) {
+                    binding.tvTitle.text = recordVM.cragName.ifBlank {
+                        sharedPreferences.getString("cragName", getString(R.string.timer_crag_set_inform))
+                    }
+                    recordVM.restoredDuration.value?.let { binding.tvTime.text = it }
+                    recordVM.restoredElapsedTimeMillis.value?.let(timerVM::restoreElapsedTime)
+                    if (recordVM.items.value.isNotEmpty()) showRestoredDraftDetails()
+                }
+            }
+        }
+        repeatOnStarted {
+            recordVM.restoredDuration.collect { duration ->
+                val state = recordVM.submissionState.value
+                if (duration != null &&
+                    state != TimerSubmissionState.Succeeded
+                ) {
+                    binding.tvTitle.text = recordVM.cragName
+                    binding.tvTime.text = duration
+                    recordVM.restoredElapsedTimeMillis.value?.let(timerVM::restoreElapsedTime)
+                }
+            }
+        }
+        repeatOnStarted {
+            recordVM.submissionEffect.collect { effect ->
+                when (effect) {
+                    is TimerSubmissionEffect.ShowMessage -> showToastMessage(effect.message)
+                    TimerSubmissionEffect.DraftDiscarded -> {
+                        binding.tvTime.text = "00:00"
+                        sharedPreferences.edit {
+                            putLong(PAUSE_TIME, 0L)
+                            putString("pauseTimeFormat", "00:00")
+                        }
+                        showCragSelectBottomSheet()
+                    }
+                    TimerSubmissionEffect.NavigateToComplete -> completeSubmission()
+                }
+            }
+        }
+    }
+
+    private fun showDiscardDraftDialog() {
+        DeleteDialog(
+            requireContext(),
+            "전송하지 못한 기록이 남아 있어요.\n삭제한 뒤 새 운동을 시작할까요?",
+            "삭제 후 시작",
+            "기록 유지",
+        ) { shouldDiscard ->
+            if (shouldDiscard) recordVM.discardPreservedDraft()
+        }.show()
+    }
+
+    private fun stopServiceForSubmission() {
+        if (TimerService.serviceRunning.value == true) {
+            context?.stopService(Intent(context, TimerService::class.java))
+        }
+        updateViewModel(start = false, pause = false, restart = false, stop = true, running = false)
+        updateStatePref()
+    }
+
+    private fun completeSubmission() {
+        stopStopwatch()
+        cragSelectVM.resetItem()
+        recordVM.resetAtStop()
+        recordVM.acknowledgeSubmissionSuccess()
+        requireActivity().supportFragmentManager.beginTransaction()
+            .add(R.id.main_container, ClimbingCompleteFragment())
+            .addToBackStack(null)
+            .commit()
+    }
+
     private fun startStopwatch() {
         viewMode(ViewMode.START)
+        hidePausedDraftDetails()
+        val initialElapsedTime = recordVM.restoredElapsedTimeMillis.value ?: 0L
+        timerVM.restoreElapsedTime(initialElapsedTime)
         val intent = Intent(context, TimerService::class.java).apply {
             putExtra("command", "START")
+            putExtra(TimerService.EXTRA_INITIAL_ELAPSED_TIME, initialElapsedTime)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context?.startForegroundService(intent)
@@ -474,6 +511,22 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
 
         // todo : 서비스가 실행된 뒤 setViewModel함수를 호출해 spf값을 반영해주는게 가능하면 아래처럼 일일이 변수 업데이트 할 필요 없음
         updateViewModel(start = true, pause = false, restart = false, stop = false, running = true)
+    }
+
+    private fun showRestoredDraftDetails() {
+        routeItemAdapter.submitList(recordVM.items.value.toList())
+        binding.layoutAvgComplete.visibility = View.VISIBLE
+        binding.tvTimeTitle.visibility = View.VISIBLE
+        binding.layoutRouteRecord.visibility = View.VISIBLE
+        recordVM.isAvgToggleOn.value = false
+        recordVM.isRouteToggleOn.value = true
+        binding.rvRouteRecord.post(binding.rvRouteRecord::requestLayout)
+    }
+
+    private fun hidePausedDraftDetails() {
+        binding.layoutAvgComplete.visibility = View.GONE
+        binding.tvTimeTitle.visibility = View.GONE
+        binding.layoutRouteRecord.visibility = View.GONE
     }
 
     private fun pauseStopwatch() {
@@ -491,6 +544,7 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
 
     private fun restartStopwatch() {
         viewMode(ViewMode.RESTART)
+        hidePausedDraftDetails()
         val intent = Intent(context, TimerService::class.java).apply {
             putExtra("command", "RESTART")
         }
@@ -515,6 +569,10 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
         sharedPreferences.edit { putString(TOP_CHALLENGE, "--") }
         sharedPreferences.edit { putString(TOP_COMPLETE, "--") }
         sharedPreferences.edit { putString(TOP_LEVEL, "--") }
+        sharedPreferences.edit {
+            putLong(PAUSE_TIME, 0L)
+            putString("pauseTimeFormat", "00:00")
+        }
         binding.tvTitle.text = getString(R.string.timer_crag_set_inform)
 
         // 루트기록 관련 초기화

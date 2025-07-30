@@ -4,31 +4,18 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.climus.climeet.app.App.Companion.sharedPreferences
-import com.climus.climeet.data.local.ClimbingRecordData
-import com.climus.climeet.data.local.RouteRecordData
-import com.climus.climeet.data.model.BaseState
-import com.climus.climeet.data.model.request.ClimbingRecord
-import com.climus.climeet.data.model.request.CreateTimerClimbingRecordRequest
-import com.climus.climeet.data.repository.MainRepository
 import com.climus.climeet.presentation.util.formatTimerTime
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class TimerViewModel @Inject constructor(
-    private val repository: MainRepository,
-) : ViewModel() {
+class TimerViewModel @Inject constructor() : ViewModel() {
     private val _time = MutableLiveData<Long>().apply { value = 0L }
     val time: LiveData<Long> get() = _time
     var pauseState = MutableLiveData<String>()
@@ -67,67 +54,6 @@ class TimerViewModel @Inject constructor(
     // 서비스에서 보낸 broadcast를 통해 pauseTime값이 업데이트 되면, pauseTimeFormat을 설정한다
     val pauseTimeFormat: LiveData<String> = pauseTime.map { pauseTime ->
         formatTimerTime(pauseTime)
-    }
-
-    fun sendClimbingRecord() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val routeData: List<RouteRecordData>?
-            val requestBody: CreateTimerClimbingRecordRequest
-
-            val recordData: ClimbingRecordData = repository.getRecord(1) ?: return@launch
-            routeData = repository.getAllRoute()
-
-            // avgDifficulty 계산
-            val avgDifficulty = if (routeData.isNotEmpty()) {
-                val totalDifficulty = routeData.sumOf { it.difficulty }
-                totalDifficulty / routeData.size
-            } else {
-                0
-            }
-
-            // 루트 기록 생성
-            val routeRecords = routeData.map { route ->
-                ClimbingRecord(route.routeId, route.attemptCount, route.isCompleted)
-            }
-
-            val endTime = if (isPaused.value == true) {
-                checkNotNull(pauseTime.value) { "일시정지 시간이 초기화되지 않았습니다." }
-            } else {
-                checkNotNull(time.value) { "타이머 시간이 초기화되지 않았습니다." }
-            }
-
-            val formattedTime = formatTimerTime(endTime, alwaysShowHours = true)
-
-            // 요청 바디 생성
-            requestBody = CreateTimerClimbingRecordRequest(
-                gymId = recordData.gymId,
-                date = recordData.date,
-                time = formattedTime,
-                avgDifficulty = avgDifficulty,
-                routeRecordRequestDtoList = routeRecords,
-            )
-            // Log.d("recorddd", "리퀘스트 : $requestBody")
-
-            repository.createTimerClimbingRecord(requestBody).let {
-                when (it) {
-                    is BaseState.Success -> {
-                        // 성공
-                        Log.d("testss", it.toString())
-                    }
-
-                    is BaseState.Error -> {
-                        it.msg // 서버 에러 메시지
-                        Log.d("testss", it.msg)
-                    }
-                }
-            }
-
-            // 다음 운동 기록을 위해 루트기록 초기화
-            withContext(Dispatchers.IO) {
-                repository.deleteAllRoute()
-                repository.deleteAllRecord()
-            }
-        }
     }
 
     fun restoreElapsedTime(elapsedTimeMillis: Long) {

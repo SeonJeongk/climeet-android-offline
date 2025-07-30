@@ -50,8 +50,14 @@ class SetTimerClimbingRecordFragment : BaseFragment<FragmentTimerRecordBinding>(
     // 앱 종료 후 재시작 시에 루트기록 화면에 암장 이름 보여주기 위함
     override fun onResume() {
         super.onResume()
-        val cragName = sharedPreferences.getString("cragName", getString(R.string.timer_crag_set_inform))
-        binding.tvTitle.text = cragName
+        val restoredCragId = sharedPreferences.getLong("cragId", 0L)
+        val restoredCragName = sharedPreferences.getString("cragName", getString(R.string.timer_crag_set_inform))
+        binding.tvTitle.text = restoredCragName
+        if (restoredCragId > 0L && restoredCragName != null) {
+            cragId = restoredCragId
+            cragName = restoredCragName
+            viewModel.restoreSelectedCrag(restoredCragId, restoredCragName)
+        }
     }
 
     private fun setRecyclerView() {
@@ -89,12 +95,8 @@ class SetTimerClimbingRecordFragment : BaseFragment<FragmentTimerRecordBinding>(
     }
 
     private fun initRouteObserve() {
-        repeatOnStarted {
-            viewModel.items.collect { items ->
-                routeItemAdapter.items = items
-                routeItemAdapter.notifyDataSetChanged()
-                // Log.d("settimerrecord", "adapter에 item 설정완 : $items")
-            }
+        viewModel.itemsLiveData.observe(viewLifecycleOwner) { items ->
+            routeItemAdapter.submitList(items)
         }
     }
 

@@ -3,14 +3,28 @@ package com.climus.climeet.presentation.ui.main.record.timer.setrecord
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.climus.climeet.databinding.ItemTimerRouteRecordBinding
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
 
 class ClimbingRecordAdapter(
     private val viewModel: SetTimerClimbingRecordViewModel,
-) : RecyclerView.Adapter<ClimbingRecordViewHolder>() {
-    var items: List<RouteUiData> = emptyList()
+) : ListAdapter<RouteUiData, ClimbingRecordViewHolder>(diffCallback) {
+    companion object {
+        private val diffCallback = object : DiffUtil.ItemCallback<RouteUiData>() {
+            override fun areItemsTheSame(
+                oldItem: RouteUiData,
+                newItem: RouteUiData,
+            ): Boolean = oldItem.routeId == newItem.routeId
+
+            override fun areContentsTheSame(
+                oldItem: RouteUiData,
+                newItem: RouteUiData,
+            ): Boolean = oldItem == newItem
+        }
+    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -26,10 +40,8 @@ class ClimbingRecordAdapter(
         position: Int,
     ) {
         val context = holder.itemView.context
-        holder.bind(items[position], context)
+        holder.bind(getItem(position), context)
     }
-
-    override fun getItemCount() = items.size
 }
 
 class ClimbingRecordViewHolder(
