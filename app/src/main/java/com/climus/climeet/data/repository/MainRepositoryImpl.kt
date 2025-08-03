@@ -295,7 +295,6 @@ class MainRepositoryImpl @Inject constructor(
 
     override suspend fun getMyPageProfile(): BaseState<MyPageProfileResponse> = runRemote { api.getMyPageProfile() }
 
-    // -------- RoomDB ClimbingRecordDa0 암장 정보 -----------
     override suspend fun insert(climbingRecordData: ClimbingRecordData) {
         climbingRecordDao.insert(climbingRecordData)
     }
@@ -343,7 +342,6 @@ class MainRepositoryImpl @Inject constructor(
         }
     }
 
-    // --------- RoomDB RouteRecordDao 루트 기록 --------------
     override suspend fun insert(routeRecord: RouteRecordData) {
         routeRecordDao.insert(routeRecord)
     }

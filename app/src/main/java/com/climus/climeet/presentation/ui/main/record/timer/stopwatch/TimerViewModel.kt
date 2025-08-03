@@ -29,8 +29,6 @@ class TimerViewModel @Inject constructor() : ViewModel() {
 
     var challengeNum = MutableLiveData<Long>()
 
-    // 스톱워치 경과시간과 일시정지 여부를 전달받음
-    // pauseState를 String으로 전달받는 이유 : default값을 설정하지 않기 위해
     private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(
             context: Context,
@@ -45,13 +43,10 @@ class TimerViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    // 흘러가는 시간 형식 설정
     val timeFormat: LiveData<String> = time.map { elapsedTime ->
         formatTimerTime(elapsedTime)
     }
 
-    // 일시정지 시간 형식 설정
-    // 서비스에서 보낸 broadcast를 통해 pauseTime값이 업데이트 되면, pauseTimeFormat을 설정한다
     val pauseTimeFormat: LiveData<String> = pauseTime.map { pauseTime ->
         formatTimerTime(pauseTime)
     }

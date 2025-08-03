@@ -39,7 +39,6 @@ interface RouteRecordDao {
     @Query("SELECT AVG(difficulty) FROM route_record WHERE isCompleted = 1 AND difficulty BETWEEN 0 AND 12")
     suspend fun getAverageDifficultyOfCompleted(): Double?
 
-    // 레벨별 평균 완등률 계산
     @Query("SELECT * FROM route_record WHERE levelName IN (SELECT DISTINCT levelName FROM route_record)")
     suspend fun getAllLevelRecord(): List<RouteRecordData>
 

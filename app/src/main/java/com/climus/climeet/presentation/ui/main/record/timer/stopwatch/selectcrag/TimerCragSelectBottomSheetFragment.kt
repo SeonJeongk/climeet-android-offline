@@ -37,7 +37,6 @@ class TimerCragSelectBottomSheetFragment : BottomSheetDialogFragment() {
         binding = FragmentTimerSelectCragBottomSheetBinding.inflate(inflater, container, false)
         binding.vm = viewModel
 
-        // 바텀시트 상단 모서리 radius 적용
         binding.layoutBottom.background = context?.let {
             ContextCompat.getDrawable(
                 it,
@@ -86,20 +85,16 @@ class TimerCragSelectBottomSheetFragment : BottomSheetDialogFragment() {
             viewModel.uiState.collect { uiState ->
                 cragSearchAdapter?.setList(uiState.searchList, viewModel.keyword.value)
 
-                // XML에서 visibility를 설정하면 적용이 안 됨 -> fragment에서 설정
+                // XML의 visibility가 반영되지 않아 수집한 상태로 직접 갱신합니다.
                 if (uiState.progressState) {
-                    // progress 상태일 때의 UI 처리
                     binding.pbLoading.visibility = View.VISIBLE
                 } else {
-                    // non-progress 상태일 때의 UI 처리
                     binding.pbLoading.visibility = View.INVISIBLE
                 }
 
                 if (uiState.emptyResultState) {
-                    // empty result 상태일 때의 UI 처리
                     binding.layoutSearchNone.visibility = View.VISIBLE
                 } else {
-                    // non-empty result 상태일 때의 UI 처리
                     binding.layoutSearchNone.visibility = View.INVISIBLE
                 }
 
@@ -126,7 +121,6 @@ class TimerCragSelectBottomSheetFragment : BottomSheetDialogFragment() {
             viewLifecycleOwner,
             Observer { cragName ->
                 if (cragName != null) {
-                    // 암장 검색 바텀 시트 닫기
                     dismiss()
                 }
             },

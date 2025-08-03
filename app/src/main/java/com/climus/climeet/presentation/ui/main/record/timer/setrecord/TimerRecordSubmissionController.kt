@@ -35,6 +35,12 @@ sealed interface TimerSubmissionEffect {
     data object DraftDiscarded : TimerSubmissionEffect
 }
 
+/**
+ * 운동 기록을 수정하고 서버로 보내는 순서를 관리합니다.
+ *
+ * 한 번에 한 작업만 처리해 전송 중인 기록이 바뀌지 않게 합니다.
+ * 전송에 성공하면 기기 기록을 삭제하고, 실패하면 다음 실행에서 복구할 수 있도록 남깁니다.
+ */
 internal class TimerRecordSubmissionController(
     private val repository: MainRepository,
 ) {

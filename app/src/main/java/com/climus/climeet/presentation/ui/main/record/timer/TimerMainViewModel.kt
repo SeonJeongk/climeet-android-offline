@@ -11,7 +11,6 @@ class TimerMainViewModel @Inject constructor() : ViewModel() {
     private val _moveToTimerFragmentEvent = MutableLiveData<Unit>()
     val moveToTimerFragmentEvent: LiveData<Unit> get() = _moveToTimerFragmentEvent
 
-    // TimerFragment로 이동하는 이벤트 발생
     fun moveToStopwatch() {
         _moveToTimerFragmentEvent.value = Unit
     }

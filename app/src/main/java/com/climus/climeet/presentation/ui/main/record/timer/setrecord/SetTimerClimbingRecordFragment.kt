@@ -16,7 +16,6 @@ import com.climus.climeet.presentation.ui.main.record.timer.TimerMainViewModel
 import com.climus.climeet.presentation.ui.main.record.timer.stopwatch.TimerViewModel
 import com.climus.climeet.presentation.ui.main.record.timer.stopwatch.selectcrag.TimerCragSelectBottomSheetViewModel
 
-// ------------------------ 시간 흘러갈 때 스와이프 하면 보이는 루트기록 화면 -------------------------
 class SetTimerClimbingRecordFragment : BaseFragment<FragmentTimerRecordBinding>(R.layout.fragment_timer_record) {
     private val viewModel: SetTimerClimbingRecordViewModel by activityViewModels()
     private val timerVM: TimerViewModel by activityViewModels()
@@ -47,7 +46,6 @@ class SetTimerClimbingRecordFragment : BaseFragment<FragmentTimerRecordBinding>(
         setCragName()
     }
 
-    // 앱 종료 후 재시작 시에 루트기록 화면에 암장 이름 보여주기 위함
     override fun onResume() {
         super.onResume()
         val restoredCragId = sharedPreferences.getLong("cragId", 0L)
@@ -70,7 +68,6 @@ class SetTimerClimbingRecordFragment : BaseFragment<FragmentTimerRecordBinding>(
         binding.rvSectorImage.itemAnimator = null
     }
 
-    // 아래 main color로 된 부분에 시간을 보여준다
     private fun timerObserve() {
         timerVM.timeFormat.observe(
             viewLifecycleOwner,
@@ -81,14 +78,12 @@ class SetTimerClimbingRecordFragment : BaseFragment<FragmentTimerRecordBinding>(
     }
 
     private fun initClickListener() {
-        // 암장 이름이 보여지는 영역을 누르면 팝업 메세지를 보여준다
         binding.layoutSelectCrag.setOnClickListener {
             if (timerVM.isStop.value == false) {
                 NoticePopup.make(it, "운동중에는 암장을 바꿀 수 없어요!").show()
             }
         }
 
-        // 시간 클릭시 스톱워치 화면으로 이동하기 위한 이벤트를 발생시킨다
         binding.layoutIdcTime.setOnClickListener {
             mainVM.moveToStopwatch()
         }
@@ -100,7 +95,6 @@ class SetTimerClimbingRecordFragment : BaseFragment<FragmentTimerRecordBinding>(
         }
     }
 
-    // 루트기록 화면에 암장 이름 설정
     private fun setCragName() {
         cragSelectVM.selectedCrag.observe(
             viewLifecycleOwner,
@@ -109,10 +103,7 @@ class SetTimerClimbingRecordFragment : BaseFragment<FragmentTimerRecordBinding>(
                     cragId = cragData.id
                     cragName = cragData.name
 
-                    // 암장 이름 보여주기
                     binding.tvTitle.text = cragName
-
-                    // 암장 이름 뷰모델에 저장
                     viewModel.selectedCrag(cragId, cragName)
                 }
             },

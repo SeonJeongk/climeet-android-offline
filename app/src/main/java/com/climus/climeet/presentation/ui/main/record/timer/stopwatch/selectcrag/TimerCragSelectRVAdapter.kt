@@ -1,7 +1,6 @@
 package com.climus.climeet.presentation.ui.main.record.timer.stopwatch.selectcrag
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -35,12 +34,9 @@ class TimerCragSelectRVAdapter(
         val cragData = searchList[position]
         holder.bind(cragData, keyword)
 
-        // 선택된 암장 정보 TimerFragment로 전달
         holder.binding.btnSelect.setOnClickListener {
             viewModel.selectItem(cragData)
             routeVM.isSelectedCrag.value = true
-            Log.d("timer", "isSelectedCrag true")
-            // 암장 정보 roomDB에 저장은 TimerFragment에서 진행함
         }
     }
 

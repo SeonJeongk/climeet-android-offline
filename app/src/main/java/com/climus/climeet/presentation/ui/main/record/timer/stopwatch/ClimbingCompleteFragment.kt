@@ -14,7 +14,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 class ClimbingCompleteFragment : BaseFragment<FragmentTimerCompleteBinding>(R.layout.fragment_timer_complete) {
     private val handler = Handler(Looper.getMainLooper())
     private val runnable = Runnable {
-        // 바텀 네비게이션 뷰 보이기
         (activity as MainActivity).findViewById<BottomNavigationView>(R.id.main_bnv).visibility = View.VISIBLE
 
         requireActivity()
@@ -30,7 +29,6 @@ class ClimbingCompleteFragment : BaseFragment<FragmentTimerCompleteBinding>(R.la
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 바텀 네비게이션 뷰 숨기기
         (activity as MainActivity).findViewById<BottomNavigationView>(R.id.main_bnv).visibility = View.GONE
 
         binding.ivCheck.setImageResource(R.drawable.ic_check_anim)

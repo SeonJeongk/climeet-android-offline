@@ -273,7 +273,6 @@ interface MainRepository {
         size: Int,
     ): BaseState<GetMyShortsCommentsResponse>
 
-    // -------- RoomDB ClimbingRecordDao 암장 정보 ----------
     suspend fun insert(climbingRecordData: ClimbingRecordData)
 
     suspend fun update(climbingRecordData: ClimbingRecordData)
@@ -286,6 +285,11 @@ interface MainRepository {
 
     suspend fun getRecord(id: Int): ClimbingRecordData?
 
+    /**
+     * 운동 종료 시간을 저장하고 현재 루트 기록을 서버 전송용 값으로 묶습니다.
+     *
+     * 두 작업은 함께 처리되며, 저장된 운동 기록이 없으면 `null`을 반환합니다.
+     */
     suspend fun finalizeTimerClimbingRecord(
         id: Int,
         time: String,
@@ -293,7 +297,6 @@ interface MainRepository {
 
     suspend fun clearTimerClimbingRecordDraft()
 
-    // ------ RoomDB RouteRecordDao 루트 기록 정보 ---------
     suspend fun insert(routeRecord: RouteRecordData)
 
     suspend fun update(routeRecord: RouteRecordData)

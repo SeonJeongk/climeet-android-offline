@@ -1,6 +1,5 @@
 package com.climus.climeet.presentation.ui.main.record.timer.stopwatch.selectcrag
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -55,7 +54,6 @@ class TimerCragSelectBottomSheetViewModel @Inject constructor(
 
     val keyword = MutableStateFlow("")
 
-    // 선택된 암장 정보
     private val _selectedCrag = MutableLiveData<SearchCragUiData?>()
     val selectedCrag: MutableLiveData<SearchCragUiData?> get() = _selectedCrag
 
@@ -65,7 +63,6 @@ class TimerCragSelectBottomSheetViewModel @Inject constructor(
 
     fun resetItem() {
         _selectedCrag.value = null
-        Log.d("TIMER", "선택된 암장 정보 초기화 -> ${selectedCrag.value}")
     }
 
     init {

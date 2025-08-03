@@ -11,7 +11,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -39,7 +38,6 @@ class TimerService : Service() {
 
     override fun onBind(intent: Intent): IBinder = throw UnsupportedOperationException("Not yet implemented")
 
-    // command 를 통해 스톱워치 서비스 상태 변경
     override fun onStartCommand(
         intent: Intent?,
         flags: Int,
@@ -51,7 +49,7 @@ class TimerService : Service() {
             "START" -> {
                 startTimer(intent.getLongExtra(EXTRA_INITIAL_ELAPSED_TIME, 0L))
                 val notification = createNotification(elapsedTime)
-                startForeground(1, notification) // 스톱워치 시작 -> 알림창 띄움
+                startForeground(1, notification)
             }
 
             "PAUSE" -> pauseTimer()
@@ -72,38 +70,32 @@ class TimerService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         stopTimer()
-        Log.d("timer", "서비스 종료")
     }
 
-    // 알림 채널 설정
     private fun createNotificationChannelAndGroup() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            // Notification Channel Group 생성
-            val groupName = "운동 설정" // 그룹 이름
+            val groupName = "운동 설정"
             val channelGroup = NotificationChannelGroup(GROUP_ID, groupName)
             notificationManager.createNotificationChannelGroup(channelGroup)
 
-            // Notification Channel 생성
             val channelName = "운동 시간"
             val descriptionText = "운동한 시간을 알려줍니다."
             val importance = NotificationManager.IMPORTANCE_LOW
             val channel = NotificationChannel(CHANNEL_ID, channelName, importance).apply {
                 description = descriptionText
-                group = GROUP_ID // 채널을 그룹에 할당
+                group = GROUP_ID
             }
 
             notificationManager.createNotificationChannel(channel)
         }
     }
 
-    // 알림 생성
     private fun createNotification(elapsedTime: Long): Notification {
         val timeFormat = formatTimerTime(elapsedTime)
 
-        // 알림창 클릭시 타이머 화면으로 이동
         val timerIntent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(MainActivity.EXTRA_SHOW_TIMER, true)
@@ -122,18 +114,15 @@ class TimerService : Service() {
             .setContentIntent(pendingIntent)
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            notification.setSound(null) // 알림음을 null로 설정
+            notification.setSound(null)
         }
 
-        // 알림창 재시작, 일시중지 버튼
-        // 일시중지 상태면 재시작 버튼이 보이고, 재시작 상태면 일시중지 버튼이 보인다
         if (isPaused) {
             val restartIntent = Intent(this, TimerService::class.java).apply {
                 putExtra("command", "RESTART")
             }
             val restartPendingIntent: PendingIntent =
                 PendingIntent.getService(this, 0, restartIntent, PendingIntent.FLAG_MUTABLE)
-            // 재시작 액션 추가
             notification.addAction(R.drawable.ic_notification, "재시작", restartPendingIntent)
         } else {
             val pauseIntent = Intent(this, TimerService::class.java).apply {
@@ -141,14 +130,12 @@ class TimerService : Service() {
             }
             val pausePendingIntent: PendingIntent =
                 PendingIntent.getService(this, 1, pauseIntent, PendingIntent.FLAG_MUTABLE)
-            // 일시정지 액션 추가
             notification.addAction(R.drawable.ic_notification, "일시중지", pausePendingIntent)
         }
 
         return notification.build()
     }
 
-    // 시간이 흘러갈 때 호출 (start, restart)
     private fun setTimer() {
         if (!isPaused) {
             startTime = System.currentTimeMillis()
@@ -161,9 +148,8 @@ class TimerService : Service() {
                         editor.putLong(PAUSE_TIME, elapsedTime).apply()
                         val notification = createNotification(elapsedTime)
                         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                        notificationManager.notify(1, notification) // 새로운 알림 생성
+                        notificationManager.notify(1, notification)
 
-                        // 시간 브로드캐스트로 보내기
                         val intent = Intent("StopwatchUpdate")
                         intent.putExtra("elapsedTime", elapsedTime)
                         LocalBroadcastManager.getInstance(this@TimerService).sendBroadcast(intent)
@@ -195,17 +181,7 @@ class TimerService : Service() {
         editor.putLong(PAUSE_TIME, elapsedTime)
         editor.apply()
 
-        // 서비스 실행중이면 serviceRunning을 true로 성정 (실행 중이지 않으면 null)
         serviceRunning.postValue(true)
-
-        Log.d("TIMER", "서비스 타이머 시작, serviceRunning : ${serviceRunning.value}")
-
-//        val r1 = sharedPreferences.getBoolean(KEY_IS_START, false)
-//        val r2 = sharedPreferences.getBoolean(KEY_IS_PAUSE, false)
-//        val r3 = sharedPreferences.getBoolean(KEY_IS_RESTART, false)
-//        val r4 = sharedPreferences.getBoolean(KEY_IS_STOP, false)
-//        val r5 = sharedPreferences.getBoolean(KEY_IS_RUNNING, false)
-//        Log.d("TIMER", "서비스 타이머 시작 spf 확인  -> start :$r1, pause : $r2, restart : $r3, , stop : $r4, running : $r5")
     }
 
     private fun pauseTimer() {
@@ -214,15 +190,14 @@ class TimerService : Service() {
         isRestart = false
         isStopped = false
         isRunning = false
-        timer?.cancel() // 스톱워치 멈추기
+        timer?.cancel()
         pauseTime = elapsedTime
 
-        // 알림창 재생성 (재생성하지 않으면 스톱워치 시간이 반영되지 않음)
+        // 일시정지 시각을 반영하려면 알림을 다시 게시해야 합니다.
         val notification = createNotification(elapsedTime)
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(1, notification)
 
-        // TimerViewModel에 전달 정지 상태 broadcast로 전달
         val intent = Intent("StopwatchUpdate")
         intent.putExtra("elapsedTime", elapsedTime)
         intent.putExtra("pauseTime", pauseTime)
@@ -236,8 +211,6 @@ class TimerService : Service() {
         editor.putBoolean(KEY_IS_STOP, isStopped)
         editor.putBoolean(KEY_IS_RUNNING, isRunning)
         editor.apply()
-
-        Log.d("TIMER", "서비스 타이머 일시정지 : $pauseTime")
     }
 
     private fun restartTimer() {
@@ -246,9 +219,8 @@ class TimerService : Service() {
         isRestart = true
         isStopped = false
         isRunning = true
-        setTimer() // 타이머 재시작
+        setTimer()
 
-        // TimerViewModel에 전달
         val intent = Intent("StopwatchUpdate")
         intent.putExtra("pauseState", "no")
         LocalBroadcastManager.getInstance(this@TimerService).sendBroadcast(intent)
@@ -260,8 +232,6 @@ class TimerService : Service() {
         editor.putBoolean(KEY_IS_STOP, isStopped)
         editor.putBoolean(KEY_IS_RUNNING, isRunning)
         editor.apply()
-
-        Log.d("TIMER", "서비스 타이머 재시작")
     }
 
     private fun stopTimer() {
@@ -272,7 +242,6 @@ class TimerService : Service() {
         isRunning = false
         timer?.cancel()
 
-        // 스톱워치 화면 시간 0으로 바꿔주기 위해 값 전달
         val intent = Intent("StopwatchUpdate")
         intent.putExtra("elapsedTime", 0L)
         LocalBroadcastManager.getInstance(this@TimerService).sendBroadcast(intent)
@@ -283,14 +252,19 @@ class TimerService : Service() {
         editor.putBoolean(KEY_IS_STOP, isStopped)
         editor.putBoolean(KEY_IS_RUNNING, isRunning)
         editor.apply()
-
-        Log.d("TIMER", "서비스 타이머 종료")
     }
 
     companion object {
         const val PREF_NAME = "timer_prefs"
         private const val CHANNEL_ID = "stopwatch_channel"
         private const val GROUP_ID = "exercise_record_group"
+
+        /**
+         * 앱이 실행된 뒤 타이머 서비스가 시작됐는지 나타냅니다.
+         *
+         * 앱이 완전히 종료됐다가 다시 실행되면 `null`로 돌아갑니다.
+         * 이때 화면은 기기에 저장된 운동 기록을 복구합니다.
+         */
         val serviceRunning = MutableLiveData<Boolean>()
         const val PAUSE_TIME = "pauseTime"
         const val KEY_IS_START = "isStart"

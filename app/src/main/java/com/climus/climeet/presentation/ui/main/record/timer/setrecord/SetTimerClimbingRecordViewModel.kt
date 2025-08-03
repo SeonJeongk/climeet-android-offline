@@ -3,7 +3,6 @@ package com.climus.climeet.presentation.ui.main.record.timer.setrecord
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.Context
-import android.util.Log
 import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -110,8 +109,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         addSource(totalComplete) { recalculateAvgRate() }
     }
 
-    // 루트기록 재설정용
-    val updateRecord = MutableLiveData(false) // 레벨 완등률 업데이트
+    val updateRecord = MutableLiveData(false)
     val isRestart = MutableLiveData(false)
     val resetView = MutableLiveData(false)
     private var isSecondFloorExist: Boolean = false
@@ -120,7 +118,6 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     private var firstFloorRouteList: List<RouteUiData> = emptyList()
     private var secondFloorRouteList: List<RouteUiData> = emptyList()
 
-    // items 초기화
     fun clearItems() {
         _items.value = emptyList()
     }
@@ -221,7 +218,6 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
 
     private fun getClimbingData() {
         viewModelScope.launch(Dispatchers.IO) {
-            // Room DB에서 루트기록 가져오기
             val routeDataList = repository.getAllRoute()
 
             if (_items.value.isEmpty()) {
@@ -256,7 +252,6 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         }
     }
 
-    // 1. 암장의 섹터와 난이도 정보 가져오기 (총 몇층인기 저장)
     private fun getCragInfo(id: Long) {
         viewModelScope.launch {
             repository.getGymFilteringKey(id).let {
@@ -307,7 +302,6 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         }
     }
 
-    // [사용자 입력] 층 설정 -> 층에 맞는 sector만 필터링
     fun selectFloor(floor: Int) {
         _uiState.update { state ->
             state.copy(
@@ -329,7 +323,6 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         setFloorInfo(floor)
     }
 
-    // 2. 1번에서 호출 -> 가져온 정보를 층에 맞는 섹터, 레벨, 루트 보여주게 설정
     private fun setFloorInfo(floor: Int) {
         viewModelScope.launch {
             loadFloorInfo(floor, publish = true)
@@ -366,7 +359,6 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
             }
         }
 
-    // 3. 4, 5에서 호출 (섹터, 레벨 선택) -> 해당 층, 섹터, 레벨을 가진 루트 정보 가져오기
     private fun getRouteList(
         floor: Int,
         sectorId: Long? = null,
@@ -394,10 +386,8 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
                 }
             }
         }
-        Log.d("recorddd", "routeList 업데이트")
     }
 
-    // 4. 1에서 호출 -> 선택된 섹터의 레벨과 루트정보 보여주기
     private fun selectSectorName(item: SectorNameUiData) {
         _uiState.update { state ->
             state.copy(
@@ -416,7 +406,6 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         )
     }
 
-    // 5. 1에서 호출 -> 선택된 레벨의 루트 정보 보여주기
     private fun selectGymLevel(item: GymLevelUiData) {
         _uiState.update { state ->
             state.copy(
@@ -435,7 +424,6 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         )
     }
 
-    // 6. 2, 3에서 호출 (층, 루트 선택) ->  선택된 루트 저장
     fun selectRoute(item: RouteUiData) {
         _uiState.update { state ->
             state.copy(
@@ -448,12 +436,10 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         addItem(item)
     }
 
-    // 루트기록 item 클릭 시 RouteUiData에 저장된 challengeNum 가져옴
     fun setChallengeNum(count: Int) {
         _challengeNumber.value = count
     }
 
-    // 상단 루트기록 도전 횟수 증가
     fun addChallengeNum() {
         if (submissionState.value != TimerSubmissionState.Draft) return
         _challengeNumber.value = (_challengeNumber.value ?: 0) + 1
@@ -467,12 +453,10 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
             }
         }
         _items.value.filter { it.routeId == uiState.value.selectedRoute.routeId }.forEach {
-            // roomDB 도전 횟수 증가
             setRoomChallengeNum(it, true)
         }
     }
 
-    // 상단 루트기록 도전 횟수 감소
     fun subChallengeNum() {
         if (submissionState.value != TimerSubmissionState.Draft) return
         val currentValue = _challengeNumber.value ?: 0
@@ -489,7 +473,6 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
             }
         }
         _items.value.filter { it.routeId == uiState.value.selectedRoute.routeId && check }.forEach {
-            // roomDB 도전 횟수 감소
             setRoomChallengeNum(it, false)
         }
     }
@@ -509,7 +492,6 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         animatorSet.start()
     }
 
-    // 완등 버튼 상태 (위에서 눌렀을 때)
     fun setClear() {
         if (submissionState.value != TimerSubmissionState.Draft) return
         _uiState.update { state ->
@@ -528,25 +510,21 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
             animateImage()
         }
 
-        // 루트 기록 완등 여부 반영
         _items.value.filter { it.routeId == uiState.value.selectedRoute.routeId }.forEach {
             setComplete(it, uiState.value.clearBtnState)
             setAvgLevel()
         }
     }
 
-    // 루트 기록에 추가
     private fun addItem(item: RouteUiData) {
         if (_items.value.none { it.routeId == item.routeId && it.sectorId == item.sectorId }) {
             val newItem = item.copy(isSelected = true)
             _items.value += newItem
 
-            // roomDB에 루트 기록 저장
             saveRouteRecord(newItem)
         }
     }
 
-    // 토글 루트 기록 도전 수 증가
     fun itemIncrease(
         id: Long,
         num: Int,
@@ -563,12 +541,10 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
             }
         }
         _items.value.filter { it.routeId == id }.forEach {
-            // roomDB 도전 횟수 증가
             setRoomChallengeNum(it, true)
         }
     }
 
-    // 토글 루트 기록 도전 수 감소
     fun itemDecrease(id: Long) {
         if (submissionState.value != TimerSubmissionState.Draft) return
         var check = false
@@ -584,12 +560,10 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
             }
         }
         _items.value.filter { it.routeId == id && check }.forEach {
-            // roomDB 도전 횟수 감소
             setRoomChallengeNum(it, false)
         }
     }
 
-    // 삭제 다이얼로그 띄우기
     fun showDeleteDialog(
         context: Context,
         id: Long,
@@ -605,12 +579,10 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         dialog.show()
     }
 
-    // 루트 기록 삭제
     private fun removeItem(id: Long) {
         if (submissionState.value != TimerSubmissionState.Draft) return
         val itemToRemove = _items.value.find { it.routeId == id }
         if (itemToRemove != null) {
-            // roomDB 루트 기록 삭제
             deleteRouteRecord(itemToRemove, itemToRemove.clearBtnState)
             setAvgLevel()
         }
@@ -620,7 +592,6 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         }
     }
 
-    // 완등 버튼 상태 (토글에서 눌렀을 때)
     fun setBtnState(id: Long) {
         if (submissionState.value != TimerSubmissionState.Draft) return
         _items.value = _items.value.map {
@@ -640,24 +611,20 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
             animateImage()
         }
 
-        // 루트 기록 완등 여부 반영
         _items.value.filter { it.routeId == uiState.value.selectedRoute.routeId }.forEach {
             setComplete(it, uiState.value.clearBtnState)
             setAvgLevel()
         }
     }
 
-    // 평균 완등률 더보기
     fun setAvgToggle() {
         isAvgToggleOn.value = !(isAvgToggleOn.value ?: false)
     }
 
-    // 루트기록 더보기
     fun setRouteToggle() {
         isRouteToggleOn.value = !(isRouteToggleOn.value ?: false)
     }
 
-    // uiState, items 초기화
     fun resetAtStop() {
         _uiState.value = CreateRecordUiState()
         _items.value = emptyList()
@@ -682,7 +649,6 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         secondFloorRouteList = emptyList()
     }
 
-    // -------- room DB ----------
     private fun saveRouteRecord(item: RouteUiData) {
         mutateDraft {
             if (draftStore.saveRoute(item)) {
@@ -747,7 +713,6 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         return true
     }
 
-    // 상단 평균 레벨 설정
     private fun setAvgLevel() {
         viewModelScope.launch {
             submissionController.mutateDraft { refreshAverageLevel() }

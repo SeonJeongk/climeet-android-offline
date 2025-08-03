@@ -3,8 +3,13 @@ package com.climus.climeet.data.local
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-// 저장 및 API에 넘길 데이터
-// id = 1에 계속 업데이트하며 사용할 예정
+/**
+ * 진행 중인 운동 한 건을 기기에 저장한 값입니다.
+ *
+ * [time]이 비어 있으면 계속 수정할 수 있는 기록입니다.
+ * [time]에 값이 있으면 운동을 끝내고 서버 전송을 시도한 기록입니다.
+ * 전송에 실패하면 이 값을 남겨 다음 실행에서 복구합니다.
+ */
 @Entity(tableName = "climbing_record")
 data class ClimbingRecordData(
     @PrimaryKey(autoGenerate = false) val id: Int = 0,

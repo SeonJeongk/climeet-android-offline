@@ -11,7 +11,6 @@ import com.climus.climeet.presentation.base.BaseFragment
 import com.climus.climeet.presentation.ui.main.record.timer.stopwatch.TimerViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
-// --------------------------- 스톱워치, 루트기록 화면을 담는 뷰페이저 -----------------------------
 @AndroidEntryPoint
 class TimerMainFragment : BaseFragment<FragmentTimerViewPagerBinding>(R.layout.fragment_timer_view_pager) {
     private val viewModel: TimerMainViewModel by activityViewModels()
@@ -30,15 +29,14 @@ class TimerMainFragment : BaseFragment<FragmentTimerViewPagerBinding>(R.layout.f
         moveToTimerFragment()
     }
 
-    // indicator 보이기 설정
     override fun onResume() {
         super.onResume()
         if (timerVM.isRunning.value == true) {
             binding.idcTimer.visibility = View.VISIBLE
-            binding.vpTimer.isUserInputEnabled = true // 화면 넘길 수 있음
+            binding.vpTimer.isUserInputEnabled = true
         } else {
             binding.idcTimer.visibility = View.INVISIBLE
-            binding.vpTimer.isUserInputEnabled = false // 화면 넘길 수 없음
+            binding.vpTimer.isUserInputEnabled = false
         }
     }
 
@@ -57,7 +55,6 @@ class TimerMainFragment : BaseFragment<FragmentTimerViewPagerBinding>(R.layout.f
             object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
-                    // 0번에 연결된 스톱워치 화면에서 스톱워치가 running 상태일 때만 indicator를 보여준다
                     if (position == 0) {
                         if (timerVM.isRunning.value == true) {
                             binding.idcTimer.visibility = View.VISIBLE
@@ -74,15 +71,14 @@ class TimerMainFragment : BaseFragment<FragmentTimerViewPagerBinding>(R.layout.f
         timerVM.isRunning.observe(viewLifecycleOwner) { stopwatchState ->
             if (stopwatchState) {
                 binding.idcTimer.visibility = View.VISIBLE
-                binding.vpTimer.isUserInputEnabled = true // 화면 넘길 수 있음
+                binding.vpTimer.isUserInputEnabled = true
             } else {
                 binding.idcTimer.visibility = View.INVISIBLE
-                binding.vpTimer.isUserInputEnabled = false // 화면 넘길 수 없음
+                binding.vpTimer.isUserInputEnabled = false
             }
         }
     }
 
-    // 루트기록 화면에서 시간을 누르면 스톱워치 화면으로 이동한다 (TimerFragment)
     private fun moveToTimerFragment() {
         viewModel.moveToTimerFragmentEvent.observe(
             viewLifecycleOwner,
