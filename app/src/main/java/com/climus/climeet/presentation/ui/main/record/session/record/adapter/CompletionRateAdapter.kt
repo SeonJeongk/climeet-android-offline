@@ -1,13 +1,13 @@
-package com.climus.climeet.presentation.ui.main.record.timer.setrecord
+package com.climus.climeet.presentation.ui.main.record.session.record
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.climus.climeet.databinding.ItemTimerAvgCompleteBinding
+import com.climus.climeet.databinding.ItemSessionCompletionRateBinding
 import com.climus.climeet.presentation.ui.main.record.model.LevelItemForAvg
 import kotlin.math.roundToInt
 
-class RecordAverageAdapter : RecyclerView.Adapter<RecordAverageAdapter.RecordAvgViewHolder>() {
+class CompletionRateAdapter : RecyclerView.Adapter<CompletionRateAdapter.RecordAvgViewHolder>() {
     private var items: List<LevelItemForAvg> = emptyList()
 
     fun setItems(items: List<LevelItemForAvg>) {
@@ -21,7 +21,7 @@ class RecordAverageAdapter : RecyclerView.Adapter<RecordAverageAdapter.RecordAvg
         parent: ViewGroup,
         viewType: Int,
     ): RecordAvgViewHolder {
-        val binding = ItemTimerAvgCompleteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemSessionCompletionRateBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return RecordAvgViewHolder(binding)
     }
 
@@ -33,7 +33,7 @@ class RecordAverageAdapter : RecyclerView.Adapter<RecordAverageAdapter.RecordAvg
     }
 
     class RecordAvgViewHolder(
-        val binding: ItemTimerAvgCompleteBinding,
+        val binding: ItemSessionCompletionRateBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: LevelItemForAvg) {
             val successRate = if (item.attemptCount > 0) item.successCount / item.attemptCount.toFloat() else 0f

@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.timer.stopwatch.selectcrag
+package com.climus.climeet.presentation.ui.main.record.session.gym
 
 import android.app.Dialog
 import android.os.Bundle
@@ -13,8 +13,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.climus.climeet.R
-import com.climus.climeet.databinding.FragmentTimerSelectCragBottomSheetBinding
-import com.climus.climeet.presentation.ui.main.record.timer.setrecord.SetTimerClimbingRecordViewModel
+import com.climus.climeet.databinding.FragmentGymSelectBottomSheetBinding
+import com.climus.climeet.presentation.ui.main.record.session.record.SessionRecordViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -22,19 +22,19 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class TimerCragSelectBottomSheetFragment : BottomSheetDialogFragment() {
-    private val viewModel: TimerCragSelectBottomSheetViewModel by activityViewModels()
-    private val routeVM: SetTimerClimbingRecordViewModel by activityViewModels()
-    private lateinit var binding: FragmentTimerSelectCragBottomSheetBinding
+class GymSelectBottomSheetFragment : BottomSheetDialogFragment() {
+    private val viewModel: GymSelectViewModel by activityViewModels()
+    private val routeVM: SessionRecordViewModel by activityViewModels()
+    private lateinit var binding: FragmentGymSelectBottomSheetBinding
 
-    private var cragSearchAdapter: TimerCragSelectRVAdapter? = null
+    private var gymSearchAdapter: GymSelectAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        binding = FragmentTimerSelectCragBottomSheetBinding.inflate(inflater, container, false)
+        binding = FragmentGymSelectBottomSheetBinding.inflate(inflater, container, false)
         binding.vm = viewModel
 
         binding.layoutBottom.background = context?.let {
@@ -75,15 +75,15 @@ class TimerCragSelectBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun initRecyclerview() {
-        cragSearchAdapter = TimerCragSelectRVAdapter(viewModel, routeVM)
-        binding.rvSearchCrag.layoutManager = LinearLayoutManager(context)
-        binding.rvSearchCrag.adapter = cragSearchAdapter
+        gymSearchAdapter = GymSelectAdapter(viewModel, routeVM)
+        binding.rvSearchGym.layoutManager = LinearLayoutManager(context)
+        binding.rvSearchGym.adapter = gymSearchAdapter
     }
 
     private fun initStateObserve() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState.collect { uiState ->
-                cragSearchAdapter?.setList(uiState.searchList, viewModel.keyword.value)
+                gymSearchAdapter?.setList(uiState.searchList, viewModel.keyword.value)
 
                 // XML의 visibility가 반영되지 않아 수집한 상태로 직접 갱신합니다.
                 if (uiState.progressState) {
@@ -99,7 +99,7 @@ class TimerCragSelectBottomSheetFragment : BottomSheetDialogFragment() {
                 }
 
                 if (uiState.emptyTextState) {
-                    binding.etCragName.setText("")
+                    binding.etGymName.setText("")
                 }
             }
         }
@@ -109,18 +109,18 @@ class TimerCragSelectBottomSheetFragment : BottomSheetDialogFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.event.collect {
                 when (it) {
-                    is CragSelectEvent.NavigateToBack -> findNavController().navigateUp()
-                    is CragSelectEvent.ShowToastMessage -> showToastMessage(it.msg)
+                    is GymSelectEvent.NavigateToBack -> findNavController().navigateUp()
+                    is GymSelectEvent.ShowToastMessage -> showToastMessage(it.msg)
                 }
             }
         }
     }
 
     private fun closeBottomSheet() {
-        viewModel.selectedCrag.observe(
+        viewModel.selectedGym.observe(
             viewLifecycleOwner,
-            Observer { cragName ->
-                if (cragName != null) {
+            Observer { gymName ->
+                if (gymName != null) {
                     dismiss()
                 }
             },

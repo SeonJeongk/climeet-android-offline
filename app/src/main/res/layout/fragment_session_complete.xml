@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
                 android:lineSpacingExtra="10dp"
-                android:text="@string/timer_complete_inform"
+                android:text="@string/session_complete_message"
                 android:textAlignment="center"
                 app:layout_constraintBottom_toBottomOf="@id/iv_check"
                 app:layout_constraintEnd_toEndOf="parent"

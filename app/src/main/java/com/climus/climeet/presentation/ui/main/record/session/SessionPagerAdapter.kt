@@ -1,18 +1,18 @@
-package com.climus.climeet.presentation.ui.main.record.timer
+package com.climus.climeet.presentation.ui.main.record.session
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.climus.climeet.presentation.ui.main.record.timer.setrecord.SetTimerClimbingRecordFragment
-import com.climus.climeet.presentation.ui.main.record.timer.stopwatch.TimerFragment
+import com.climus.climeet.presentation.ui.main.record.session.record.SessionRecordFragment
+import com.climus.climeet.presentation.ui.main.record.session.stopwatch.StopwatchFragment
 
-class TimerMainAdapter(
+class SessionPagerAdapter(
     fragment: Fragment,
 ) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment =
         when (position) {
-            0 -> TimerFragment()
-            else -> SetTimerClimbingRecordFragment()
+            0 -> StopwatchFragment()
+            else -> SessionRecordFragment()
         }
 }

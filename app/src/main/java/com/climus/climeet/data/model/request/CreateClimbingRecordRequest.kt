@@ -1,6 +1,6 @@
 package com.climus.climeet.data.model.request
 
-data class CreateTimerClimbingRecordRequest(
+data class CreateClimbingRecordRequest(
     val gymId: Long,
     val date: String,
     val time: String,

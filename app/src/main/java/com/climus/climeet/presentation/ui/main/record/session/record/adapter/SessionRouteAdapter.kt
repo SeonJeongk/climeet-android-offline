@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.timer.setrecord
+package com.climus.climeet.presentation.ui.main.record.session.record
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,12 +6,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.climus.climeet.databinding.ItemTimerRouteRecordBinding
+import com.climus.climeet.databinding.ItemSessionRouteRecordBinding
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
+import com.climus.climeet.presentation.ui.main.record.session.record.SessionRecordViewModel
 
-class ClimbingRecordAdapter(
-    private val viewModel: SetTimerClimbingRecordViewModel,
-) : ListAdapter<RouteUiData, ClimbingRecordViewHolder>(diffCallback) {
+class SessionRouteAdapter(
+    private val viewModel: SessionRecordViewModel,
+) : ListAdapter<RouteUiData, SessionRouteViewHolder>(diffCallback) {
     companion object {
         private val diffCallback = object : DiffUtil.ItemCallback<RouteUiData>() {
             override fun areItemsTheSame(
@@ -29,14 +30,14 @@ class ClimbingRecordAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): ClimbingRecordViewHolder {
+    ): SessionRouteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemTimerRouteRecordBinding.inflate(inflater, parent, false)
-        return ClimbingRecordViewHolder(binding, viewModel)
+        val binding = ItemSessionRouteRecordBinding.inflate(inflater, parent, false)
+        return SessionRouteViewHolder(binding, viewModel)
     }
 
     override fun onBindViewHolder(
-        holder: ClimbingRecordViewHolder,
+        holder: SessionRouteViewHolder,
         position: Int,
     ) {
         val context = holder.itemView.context
@@ -44,9 +45,9 @@ class ClimbingRecordAdapter(
     }
 }
 
-class ClimbingRecordViewHolder(
-    val binding: ItemTimerRouteRecordBinding,
-    private val viewModel: SetTimerClimbingRecordViewModel,
+class SessionRouteViewHolder(
+    val binding: ItemSessionRouteRecordBinding,
+    private val viewModel: SessionRecordViewModel,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(
         item: RouteUiData,

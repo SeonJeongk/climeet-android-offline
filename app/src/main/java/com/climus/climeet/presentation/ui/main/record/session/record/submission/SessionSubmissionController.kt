@@ -1,9 +1,9 @@
-package com.climus.climeet.presentation.ui.main.record.timer.setrecord
+package com.climus.climeet.presentation.ui.main.record.session.record
 
 import com.climus.climeet.data.local.ClimbingRecordData
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.repository.MainRepository
-import com.climus.climeet.presentation.util.formatTimerTime
+import com.climus.climeet.presentation.util.formatStopwatchTime
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,26 +13,26 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-sealed interface TimerSubmissionState {
-    data object Draft : TimerSubmissionState
+sealed interface SessionSubmissionState {
+    data object Draft : SessionSubmissionState
 
-    data object Submitting : TimerSubmissionState
+    data object Submitting : SessionSubmissionState
 
     data class Preserved(
         val message: String,
-    ) : TimerSubmissionState
+    ) : SessionSubmissionState
 
-    data object Succeeded : TimerSubmissionState
+    data object Succeeded : SessionSubmissionState
 }
 
-sealed interface TimerSubmissionEffect {
+sealed interface SessionSubmissionEffect {
     data class ShowMessage(
         val message: String,
-    ) : TimerSubmissionEffect
+    ) : SessionSubmissionEffect
 
-    data object NavigateToComplete : TimerSubmissionEffect
+    data object NavigateToComplete : SessionSubmissionEffect
 
-    data object DraftDiscarded : TimerSubmissionEffect
+    data object DraftDiscarded : SessionSubmissionEffect
 }
 
 /**
@@ -41,64 +41,64 @@ sealed interface TimerSubmissionEffect {
  * 한 번에 한 작업만 처리해 전송 중인 기록이 바뀌지 않게 합니다.
  * 전송에 성공하면 기기 기록을 삭제하고, 실패하면 다음 실행에서 복구할 수 있도록 남깁니다.
  */
-internal class TimerRecordSubmissionController(
+internal class SessionSubmissionController(
     private val repository: MainRepository,
 ) {
     private val mutationMutex = Mutex()
-    private val mutableState = MutableStateFlow<TimerSubmissionState>(TimerSubmissionState.Draft)
-    val state: StateFlow<TimerSubmissionState> = mutableState.asStateFlow()
+    private val mutableState = MutableStateFlow<SessionSubmissionState>(SessionSubmissionState.Draft)
+    val state: StateFlow<SessionSubmissionState> = mutableState.asStateFlow()
 
-    private val effects = Channel<TimerSubmissionEffect>(Channel.BUFFERED)
+    private val effects = Channel<SessionSubmissionEffect>(Channel.BUFFERED)
     val effect = effects.receiveAsFlow()
 
     suspend fun restoreDraft(): ClimbingRecordData? =
         mutationMutex.withLock {
             val draft = repository.getRecord(RECORD_ID) ?: return@withLock null
             mutableState.value = if (draft.time.isBlank()) {
-                TimerSubmissionState.Draft
+                SessionSubmissionState.Draft
             } else {
-                TimerSubmissionState.Preserved(PRESERVED_RECORD_MESSAGE)
+                SessionSubmissionState.Preserved(PRESERVED_RECORD_MESSAGE)
             }
             draft
         }
 
     suspend fun submit(elapsedTimeMillis: Long) {
         mutationMutex.withLock {
-            if (mutableState.value != TimerSubmissionState.Draft) return
-            mutableState.value = TimerSubmissionState.Submitting
+            if (mutableState.value != SessionSubmissionState.Draft) return
+            mutableState.value = SessionSubmissionState.Submitting
             var snapshotFinalized = false
             try {
-                val request = repository.finalizeTimerClimbingRecord(
+                val request = repository.finalizeSessionRecord(
                     RECORD_ID,
-                    formatTimerTime(elapsedTimeMillis, alwaysShowHours = true),
+                    formatStopwatchTime(elapsedTimeMillis, alwaysShowHours = true),
                 ) ?: run {
-                    mutableState.value = TimerSubmissionState.Draft
-                    effects.send(TimerSubmissionEffect.ShowMessage("저장된 운동 기록을 찾지 못했습니다."))
+                    mutableState.value = SessionSubmissionState.Draft
+                    effects.send(SessionSubmissionEffect.ShowMessage("저장된 운동 기록을 찾지 못했습니다."))
                     return
                 }
                 snapshotFinalized = true
-                when (val result = repository.createTimerClimbingRecord(request)) {
+                when (val result = repository.createClimbingRecord(request)) {
                     is BaseState.Success -> {
-                        repository.clearTimerClimbingRecordDraft()
-                        mutableState.value = TimerSubmissionState.Succeeded
-                        effects.send(TimerSubmissionEffect.NavigateToComplete)
+                        repository.clearSessionDraft()
+                        mutableState.value = SessionSubmissionState.Succeeded
+                        effects.send(SessionSubmissionEffect.NavigateToComplete)
                     }
 
                     is BaseState.Error -> preserve(result.msg)
                 }
             } catch (cancellation: CancellationException) {
                 mutableState.value = if (snapshotFinalized) {
-                    TimerSubmissionState.Preserved(PRESERVED_RECORD_MESSAGE)
+                    SessionSubmissionState.Preserved(PRESERVED_RECORD_MESSAGE)
                 } else {
-                    TimerSubmissionState.Draft
+                    SessionSubmissionState.Draft
                 }
                 throw cancellation
             } catch (_: Exception) {
                 if (snapshotFinalized) {
                     preserve(PRESERVED_RECORD_MESSAGE)
                 } else {
-                    mutableState.value = TimerSubmissionState.Draft
-                    effects.send(TimerSubmissionEffect.ShowMessage("운동 기록을 저장하지 못했습니다."))
+                    mutableState.value = SessionSubmissionState.Draft
+                    effects.send(SessionSubmissionEffect.ShowMessage("운동 기록을 저장하지 못했습니다."))
                 }
             }
         }
@@ -106,30 +106,30 @@ internal class TimerRecordSubmissionController(
 
     suspend fun discardPreservedDraft(): Boolean =
         mutationMutex.withLock {
-            if (mutableState.value !is TimerSubmissionState.Preserved) return@withLock false
-            repository.clearTimerClimbingRecordDraft()
-            mutableState.value = TimerSubmissionState.Draft
-            effects.send(TimerSubmissionEffect.DraftDiscarded)
+            if (mutableState.value !is SessionSubmissionState.Preserved) return@withLock false
+            repository.clearSessionDraft()
+            mutableState.value = SessionSubmissionState.Draft
+            effects.send(SessionSubmissionEffect.DraftDiscarded)
             true
         }
 
     suspend fun acknowledgeSuccess() {
         mutationMutex.withLock {
-            if (mutableState.value == TimerSubmissionState.Succeeded) {
-                mutableState.value = TimerSubmissionState.Draft
+            if (mutableState.value == SessionSubmissionState.Succeeded) {
+                mutableState.value = SessionSubmissionState.Draft
             }
         }
     }
 
     suspend fun mutateDraft(block: suspend () -> Unit) {
         mutationMutex.withLock {
-            if (mutableState.value == TimerSubmissionState.Draft) block()
+            if (mutableState.value == SessionSubmissionState.Draft) block()
         }
     }
 
     private suspend fun preserve(message: String) {
-        mutableState.value = TimerSubmissionState.Preserved(message.ifBlank { PRESERVED_RECORD_MESSAGE })
-        effects.send(TimerSubmissionEffect.ShowMessage(PRESERVED_RECORD_MESSAGE))
+        mutableState.value = SessionSubmissionState.Preserved(message.ifBlank { PRESERVED_RECORD_MESSAGE })
+        effects.send(SessionSubmissionEffect.ShowMessage(PRESERVED_RECORD_MESSAGE))
     }
 
     private companion object {

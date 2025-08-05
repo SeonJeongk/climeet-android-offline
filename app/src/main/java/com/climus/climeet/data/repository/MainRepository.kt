@@ -4,8 +4,8 @@ import com.climus.climeet.data.local.ClimbingRecordData
 import com.climus.climeet.data.local.RouteRecordData
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.request.AddShortsCommentRequest
+import com.climus.climeet.data.model.request.CreateClimbingRecordRequest
 import com.climus.climeet.data.model.request.CreateGymProfileReviewRequest
-import com.climus.climeet.data.model.request.CreateTimerClimbingRecordRequest
 import com.climus.climeet.data.model.request.GetGymRouteInfoRequest
 import com.climus.climeet.data.model.request.GymServiceUpdateRequest
 import com.climus.climeet.data.model.request.ImgUrlRequest
@@ -169,7 +169,7 @@ interface MainRepository {
 
     suspend fun updateGymRouteVersion(body: UpdateGymRouteVersionRequest): BaseState<ResponseBody>
 
-    suspend fun createTimerClimbingRecord(body: CreateTimerClimbingRecordRequest): BaseState<ResponseBody>
+    suspend fun createClimbingRecord(body: CreateClimbingRecordRequest): BaseState<ResponseBody>
 
     suspend fun getGymProfile(gymId: Long): BaseState<GetGymProfileResponse>
 
@@ -290,12 +290,12 @@ interface MainRepository {
      *
      * 두 작업은 함께 처리되며, 저장된 운동 기록이 없으면 `null`을 반환합니다.
      */
-    suspend fun finalizeTimerClimbingRecord(
+    suspend fun finalizeSessionRecord(
         id: Int,
         time: String,
-    ): CreateTimerClimbingRecordRequest?
+    ): CreateClimbingRecordRequest?
 
-    suspend fun clearTimerClimbingRecordDraft()
+    suspend fun clearSessionDraft()
 
     suspend fun insert(routeRecord: RouteRecordData)
 

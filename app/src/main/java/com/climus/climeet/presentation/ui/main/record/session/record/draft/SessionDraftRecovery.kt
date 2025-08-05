@@ -1,34 +1,34 @@
-package com.climus.climeet.presentation.ui.main.record.timer.setrecord
+package com.climus.climeet.presentation.ui.main.record.session.record
 
 import com.climus.climeet.data.local.RouteRecordData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
-import com.climus.climeet.presentation.util.formatTimerTime
-import com.climus.climeet.presentation.util.parseTimerTime
+import com.climus.climeet.presentation.util.formatStopwatchTime
+import com.climus.climeet.presentation.util.parseStopwatchTime
 
-internal data class RecoveredTimer(
+internal data class RecoveredStopwatch(
     val elapsedTimeMillis: Long,
     val displayDuration: String,
 )
 
-internal data class TimerDraftSummary(
+internal data class SessionDraftSummary(
     val routeCount: String,
     val completedCount: String,
 )
 
-internal fun recoverTimer(
+internal fun recoverStopwatch(
     storedDuration: String,
     pausedElapsedTimeMillis: Long,
-): RecoveredTimer? {
+): RecoveredStopwatch? {
     val elapsedTime = if (storedDuration.isBlank()) {
         pausedElapsedTimeMillis.takeIf { it > 0L }
     } else {
-        parseTimerTime(storedDuration)
+        parseStopwatchTime(storedDuration)
     } ?: return null
-    return RecoveredTimer(elapsedTime, formatTimerTime(elapsedTime))
+    return RecoveredStopwatch(elapsedTime, formatStopwatchTime(elapsedTime))
 }
 
-internal fun summarizeTimerDraft(routes: List<RouteRecordData>): TimerDraftSummary =
-    TimerDraftSummary(
+internal fun summarizeSessionDraft(routes: List<RouteRecordData>): SessionDraftSummary =
+    SessionDraftSummary(
         routeCount = routes.size.takeIf { it > 0 }?.toString() ?: "--",
         completedCount = routes.count(RouteRecordData::isCompleted).takeIf { routes.isNotEmpty() }?.toString() ?: "--",
     )

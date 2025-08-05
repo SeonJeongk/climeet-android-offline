@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.timer.stopwatch
+package com.climus.climeet.presentation.ui.main.record.session.stopwatch
 
 import android.content.Context
 import android.content.Intent
@@ -14,7 +14,7 @@ import com.climus.climeet.app.App.Companion.sharedPreferences
 import com.climus.climeet.data.local.ClimbingRecordData
 import com.climus.climeet.data.local.RouteRecordData
 import com.climus.climeet.data.repository.MainRepository
-import com.climus.climeet.databinding.FragmentTimerBinding
+import com.climus.climeet.databinding.FragmentStopwatchBinding
 import com.climus.climeet.presentation.base.BaseFragment
 import com.climus.climeet.presentation.customview.DeleteDialog
 import com.climus.climeet.presentation.customview.NoticePopup
@@ -22,14 +22,14 @@ import com.climus.climeet.presentation.ui.main.global.selectsector.adapter.GymLe
 import com.climus.climeet.presentation.ui.main.global.selectsector.adapter.RouteImageAdapter
 import com.climus.climeet.presentation.ui.main.global.selectsector.adapter.SectorNameAdapter
 import com.climus.climeet.presentation.ui.main.record.model.LevelItemForAvg
-import com.climus.climeet.presentation.ui.main.record.timer.setrecord.ClimbingRecordAdapter
-import com.climus.climeet.presentation.ui.main.record.timer.setrecord.RecordAverageAdapter
-import com.climus.climeet.presentation.ui.main.record.timer.setrecord.SetTimerClimbingRecordViewModel
-import com.climus.climeet.presentation.ui.main.record.timer.setrecord.TimerSubmissionEffect
-import com.climus.climeet.presentation.ui.main.record.timer.setrecord.TimerSubmissionState
-import com.climus.climeet.presentation.ui.main.record.timer.stopwatch.selectcrag.TimerCragSelectBottomSheetFragment
-import com.climus.climeet.presentation.ui.main.record.timer.stopwatch.selectcrag.TimerCragSelectBottomSheetViewModel
-import com.climus.climeet.service.TimerService
+import com.climus.climeet.presentation.ui.main.record.session.gym.GymSelectBottomSheetFragment
+import com.climus.climeet.presentation.ui.main.record.session.gym.GymSelectViewModel
+import com.climus.climeet.presentation.ui.main.record.session.record.SessionRecordViewModel
+import com.climus.climeet.presentation.ui.main.record.session.record.CompletionRateAdapter
+import com.climus.climeet.presentation.ui.main.record.session.record.SessionRouteAdapter
+import com.climus.climeet.presentation.ui.main.record.session.record.SessionSubmissionEffect
+import com.climus.climeet.presentation.ui.main.record.session.record.SessionSubmissionState
+import com.climus.climeet.service.StopwatchService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,7 +38,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-enum class ViewMode {
+enum class StopwatchMode {
     START,
     PAUSE,
     RESTART,
@@ -46,15 +46,15 @@ enum class ViewMode {
 }
 
 @AndroidEntryPoint
-class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer) {
+class StopwatchFragment : BaseFragment<FragmentStopwatchBinding>(R.layout.fragment_stopwatch) {
     @Inject
     lateinit var repository: MainRepository
 
-    private val timerVM: TimerViewModel by activityViewModels()
-    private val recordVM: SetTimerClimbingRecordViewModel by activityViewModels()
-    private val cragSelectVM: TimerCragSelectBottomSheetViewModel by activityViewModels()
+    private val stopwatchViewModel: StopwatchViewModel by activityViewModels()
+    private val sessionRecordViewModel: SessionRecordViewModel by activityViewModels()
+    private val gymSelectViewModel: GymSelectViewModel by activityViewModels()
 
-    private lateinit var routeItemAdapter: ClimbingRecordAdapter
+    private lateinit var routeItemAdapter: SessionRouteAdapter
 
     override fun onViewCreated(
         view: View,
@@ -62,76 +62,76 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.mainVM = timerVM
-        binding.recordVM = recordVM
+        binding.stopwatchViewModel = stopwatchViewModel
+        binding.sessionRecordViewModel = sessionRecordViewModel
 
-        routeItemAdapter = ClimbingRecordAdapter(recordVM)
+        routeItemAdapter = SessionRouteAdapter(sessionRecordViewModel)
 
-        timerVM.registerReceiver(requireContext())
+        stopwatchViewModel.registerReceiver(requireContext())
         sharedPreferences = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
 
         checkService()
-        initTimerLayout()
+        observeStopwatchState()
         initClickListener()
-        timerObserve()
+        observeStopwatchTime()
         pauseObserve()
         initRouteObserve()
         observeSubmission()
 
-        initCragName()
+        observeSelectedGym()
         setAverage()
         setAverageByLevel()
         setRouteRecyclerView()
     }
 
     private fun checkService() {
-        val serviceState = TimerService.serviceRunning
+        val serviceState = StopwatchService.hasStartedInProcess
 
         if (serviceState.value == null) {
-            viewMode(ViewMode.STOP)
-            timerVM.isStart.value = false
-            timerVM.isPaused.value = false
-            timerVM.isRestart.value = false
-            timerVM.isStop.value = true
-            timerVM.isRunning.value = false
-            timerVM.pauseTime.value = 0L
-            timerVM.pauseState.value = ""
+            viewMode(StopwatchMode.STOP)
+            stopwatchViewModel.isStart.value = false
+            stopwatchViewModel.isPaused.value = false
+            stopwatchViewModel.isRestart.value = false
+            stopwatchViewModel.isStop.value = true
+            stopwatchViewModel.isRunning.value = false
+            stopwatchViewModel.pauseTime.value = 0L
+            stopwatchViewModel.pauseState.value = ""
             updateStatePref()
-            recordVM.restoreDraft()
+            sessionRecordViewModel.restoreDraft()
         } else {
             setViewModel()
         }
     }
 
-    private fun initCragName() {
-        cragSelectVM.selectedCrag.observe(
+    private fun observeSelectedGym() {
+        gymSelectViewModel.selectedGym.observe(
             viewLifecycleOwner,
-            Observer { cragData ->
-                if (cragData != null) {
-                    val cragId = cragData.id
-                    val cragName = cragData.name
+            Observer { gym ->
+                if (gym != null) {
+                    val gymId = gym.id
+                    val gymName = gym.name
                     val date = LocalDate.now().toString()
-                    sharedPreferences.edit().putString("cragName", cragName).apply()
-                    sharedPreferences.edit().putLong("cragId", cragId).apply()
+                    sharedPreferences.edit().putString("gymName", gymName).apply()
+                    sharedPreferences.edit().putLong("gymId", gymId).apply()
 
-                    binding.tvTitle.text = cragName
+                    binding.tvTitle.text = gymName
                     val recordData = ClimbingRecordData(
                         id = 1,
-                        gymId = cragId,
-                        gymName = cragName,
+                        gymId = gymId,
+                        gymName = gymName,
                         date = date,
                         time = "",
                         avgDifficulty = 0,
                     )
 
-                    recordVM.saveDraft(recordData)
+                    sessionRecordViewModel.saveDraft(recordData)
                 }
             },
         )
     }
 
     private fun setAverage() {
-        recordVM.avgCompleteRate.observe(
+        sessionRecordViewModel.avgCompleteRate.observe(
             viewLifecycleOwner,
             Observer { rate ->
                 val progress = (rate * 100).roundToInt()
@@ -142,11 +142,11 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
     }
 
     private fun setAverageByLevel() {
-        recordVM.updateRecord.observe(
+        sessionRecordViewModel.routeRecordsChanged.observe(
             viewLifecycleOwner,
             Observer {
                 var items: List<LevelItemForAvg>
-                val levelAdapter = RecordAverageAdapter()
+                val levelAdapter = CompletionRateAdapter()
                 binding.rvAvgRecord.adapter = levelAdapter
 
                 viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
@@ -185,86 +185,86 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
     }
 
     private fun initRouteObserve() {
-        recordVM.itemsLiveData.observe(viewLifecycleOwner) { items ->
+        sessionRecordViewModel.itemsLiveData.observe(viewLifecycleOwner) { items ->
             routeItemAdapter.submitList(items)
         }
     }
 
     override fun onStart() {
         super.onStart()
-        val serviceState = TimerService.serviceRunning
+        val serviceState = StopwatchService.hasStartedInProcess
 
         if (serviceState.value != null) {
-            val id = sharedPreferences.getLong("cragId", 0)
-            val name = sharedPreferences.getString("cragName", getString(R.string.timer_crag_set_inform))
+            val id = sharedPreferences.getLong("gymId", 0)
+            val name = sharedPreferences.getString("gymName", getString(R.string.session_gym_select_prompt))
             if (id > 0L && name != null) {
-                recordVM.restoreSelectedCrag(id, name)
+                sessionRecordViewModel.restoreSelectedGym(id, name)
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        val restoredCragId = sharedPreferences.getLong("cragId", 0L)
-        if (timerVM.isStop.value == true &&
-            recordVM.submissionState.value !is TimerSubmissionState.Preserved &&
-            restoredCragId <= 0L
+        val restoredGymId = sharedPreferences.getLong("gymId", 0L)
+        if (stopwatchViewModel.isStop.value == true &&
+            sessionRecordViewModel.submissionState.value !is SessionSubmissionState.Preserved &&
+            restoredGymId <= 0L
         ) {
-            binding.tvTitle.text = getString(R.string.timer_crag_set_inform)
-            recordVM.totalRoute.value = "--"
-            recordVM.totalComplete.value = "--"
-            recordVM.avgLevel.value = "--"
+            binding.tvTitle.text = getString(R.string.session_gym_select_prompt)
+            sessionRecordViewModel.totalRoute.value = "--"
+            sessionRecordViewModel.totalComplete.value = "--"
+            sessionRecordViewModel.avgLevel.value = "--"
         } else {
-            binding.tvTitle.text = sharedPreferences.getString("cragName", getString(R.string.timer_crag_set_inform))
+            binding.tvTitle.text = sharedPreferences.getString("gymName", getString(R.string.session_gym_select_prompt))
         }
 
         setViewModel()
-        timerObserve()
+        observeStopwatchTime()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        timerVM.unregisterReceiver(requireContext())
+        stopwatchViewModel.unregisterReceiver(requireContext())
     }
 
     private fun setViewModel() {
-        timerVM.isStart.value = sharedPreferences.getBoolean(KEY_IS_START, false)
-        timerVM.isPaused.value = sharedPreferences.getBoolean(KEY_IS_PAUSE, false)
-        timerVM.isRestart.value = sharedPreferences.getBoolean(KEY_IS_RESTART, false)
-        timerVM.isStop.value = sharedPreferences.getBoolean(KEY_IS_STOP, true)
-        timerVM.isRunning.value = sharedPreferences.getBoolean(KEY_IS_RUNNING, true)
-        timerVM.pauseTime.value = sharedPreferences.getLong(PAUSE_TIME, 0L)
+        stopwatchViewModel.isStart.value = sharedPreferences.getBoolean(KEY_IS_START, false)
+        stopwatchViewModel.isPaused.value = sharedPreferences.getBoolean(KEY_IS_PAUSE, false)
+        stopwatchViewModel.isRestart.value = sharedPreferences.getBoolean(KEY_IS_RESTART, false)
+        stopwatchViewModel.isStop.value = sharedPreferences.getBoolean(KEY_IS_STOP, true)
+        stopwatchViewModel.isRunning.value = sharedPreferences.getBoolean(KEY_IS_RUNNING, true)
+        stopwatchViewModel.pauseTime.value = sharedPreferences.getLong(PAUSE_TIME, 0L)
     }
 
     private fun updateStatePref() {
         sharedPreferences.edit {
-            timerVM.isStart.value?.let { putBoolean(KEY_IS_START, it) }
-            timerVM.isPaused.value?.let { putBoolean(KEY_IS_PAUSE, it) }
-            timerVM.isRestart.value?.let { putBoolean(KEY_IS_RESTART, it) }
-            timerVM.isStop.value?.let { putBoolean(KEY_IS_STOP, it) }
-            timerVM.isRunning.value?.let { putBoolean(KEY_IS_RUNNING, it) }
+            stopwatchViewModel.isStart.value?.let { putBoolean(KEY_IS_START, it) }
+            stopwatchViewModel.isPaused.value?.let { putBoolean(KEY_IS_PAUSE, it) }
+            stopwatchViewModel.isRestart.value?.let { putBoolean(KEY_IS_RESTART, it) }
+            stopwatchViewModel.isStop.value?.let { putBoolean(KEY_IS_STOP, it) }
+            stopwatchViewModel.isRunning.value?.let { putBoolean(KEY_IS_RUNNING, it) }
         }
     }
 
-    private fun timerObserve() {
-        if (recordVM.submissionState.value is TimerSubmissionState.Preserved) {
-            recordVM.restoredDuration.value?.let { binding.tvTime.text = it }
+    private fun observeStopwatchTime() {
+        if (sessionRecordViewModel.submissionState.value is SessionSubmissionState.Preserved) {
+            sessionRecordViewModel.restoredDuration.value?.let { binding.tvTime.text = it }
             return
         }
-        timerVM.pauseTimeFormat.observe(viewLifecycleOwner) { pauseTime ->
-            val isEditableDraft = recordVM.submissionState.value == TimerSubmissionState.Draft
+        stopwatchViewModel.pauseTimeFormat.observe(viewLifecycleOwner) { pauseTime ->
+            val isEditableDraft = sessionRecordViewModel.submissionState.value == SessionSubmissionState.Draft
             if (isEditableDraft && pauseTime != null && pauseTime != "00:00") {
                 sharedPreferences.edit { putString("pauseTimeFormat", pauseTime) }
                 binding.tvTime.text = pauseTime
             }
         }
 
-        if (timerVM.isPaused.value == true) {
+        if (stopwatchViewModel.isPaused.value == true) {
             val time = sharedPreferences.getString("pauseTimeFormat", "00:00")
             binding.tvTime.text = time
         } else {
-            timerVM.timeFormat.observe(viewLifecycleOwner) { timeFormat ->
-                if (recordVM.submissionState.value == TimerSubmissionState.Draft) {
+            stopwatchViewModel.timeFormat.observe(viewLifecycleOwner) { timeFormat ->
+                if (sessionRecordViewModel.submissionState.value == SessionSubmissionState.Draft) {
                     binding.tvTime.text = timeFormat
                 }
             }
@@ -272,9 +272,9 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
     }
 
     private fun pauseObserve() {
-        timerVM.pauseState.observe(viewLifecycleOwner) { state ->
+        stopwatchViewModel.pauseState.observe(viewLifecycleOwner) { state ->
             if (state == "yes") {
-                viewMode(ViewMode.PAUSE)
+                viewMode(StopwatchMode.PAUSE)
                 updateViewModel(
                     start = false,
                     pause = true,
@@ -283,7 +283,7 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
                     running = false,
                 )
             } else if (state == "no") {
-                viewMode(ViewMode.RESTART)
+                viewMode(StopwatchMode.RESTART)
                 updateViewModel(
                     start = false,
                     pause = false,
@@ -294,10 +294,12 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
             }
         }
 
-        recordVM.resetView.observe(viewLifecycleOwner) { reset ->
+        sessionRecordViewModel.draftDetailsRestored.observe(viewLifecycleOwner) { reset ->
             if (reset) {
-                val canShowDetails = timerVM.isRunning.value != true &&
-                    (timerVM.isPaused.value == true || recordVM.restoredElapsedTimeMillis.value != null)
+                val hasRestoredElapsedTime =
+                    sessionRecordViewModel.restoredElapsedTimeMillis.value != null
+                val canShowDetails = stopwatchViewModel.isRunning.value != true &&
+                    (stopwatchViewModel.isPaused.value == true || hasRestoredElapsedTime)
                 if (canShowDetails) {
                     showRestoredDraftDetails()
                 }
@@ -305,52 +307,53 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
         }
     }
 
-    private fun initTimerLayout() {
-        timerVM.isStart.observe(viewLifecycleOwner) { isStart ->
+    private fun observeStopwatchState() {
+        stopwatchViewModel.isStart.observe(viewLifecycleOwner) { isStart ->
             if (isStart) {
-                viewMode(ViewMode.START)
+                viewMode(StopwatchMode.START)
                 hidePausedDraftDetails()
             }
         }
-        timerVM.isPaused.observe(viewLifecycleOwner) { isPaused ->
+        stopwatchViewModel.isPaused.observe(viewLifecycleOwner) { isPaused ->
             if (isPaused) {
-                viewMode(ViewMode.PAUSE)
-                if (recordVM.itemsLiveData.value?.isEmpty() == false) {
+                viewMode(StopwatchMode.PAUSE)
+                if (sessionRecordViewModel.itemsLiveData.value?.isEmpty() == false) {
                     showRestoredDraftDetails()
                 }
             }
         }
-        timerVM.isRestart.observe(viewLifecycleOwner) { isRestart ->
+        stopwatchViewModel.isRestart.observe(viewLifecycleOwner) { isRestart ->
             if (isRestart) {
-                viewMode(ViewMode.RESTART)
-                timerObserve()
+                viewMode(StopwatchMode.RESTART)
+                observeStopwatchTime()
                 hidePausedDraftDetails()
             }
         }
-        timerVM.isStop.observe(viewLifecycleOwner) { isStop ->
+        stopwatchViewModel.isStop.observe(viewLifecycleOwner) { isStop ->
             if (isStop) {
-                viewMode(ViewMode.STOP)
+                viewMode(StopwatchMode.STOP)
                 hidePausedDraftDetails()
             }
         }
     }
 
     private fun initClickListener() {
-        binding.layoutSelectCrag.setOnClickListener {
+        binding.layoutSelectGym.setOnClickListener {
             when {
-                recordVM.isCatalogRetryAvailable.value -> recordVM.retryCatalog()
-                recordVM.submissionState.value is TimerSubmissionState.Preserved -> showDiscardDraftDialog()
-                timerVM.isStop.value == false -> {
+                sessionRecordViewModel.isCatalogRetryAvailable.value -> sessionRecordViewModel.retryCatalog()
+                sessionRecordViewModel.submissionState.value is SessionSubmissionState.Preserved ->
+                    showDiscardDraftDialog()
+                stopwatchViewModel.isStop.value == false -> {
                     NoticePopup.make(it, "운동중에는 암장을 바꿀 수 없어요!").show()
                 }
 
-                else -> showCragSelectBottomSheet()
+                else -> showGymSelectBottomSheet()
             }
         }
         binding.ivStart.setOnClickListener {
-            if (recordVM.submissionState.value is TimerSubmissionState.Preserved) {
+            if (sessionRecordViewModel.submissionState.value is SessionSubmissionState.Preserved) {
                 showDiscardDraftDialog()
-            } else if (binding.tvTitle.text == getString(R.string.timer_crag_set_inform)) {
+            } else if (binding.tvTitle.text == getString(R.string.session_gym_select_prompt)) {
                 NoticePopup.make(it, "운동 전, 암장을 먼저 선택해주세요.").show()
             } else {
                 startStopwatch()
@@ -366,57 +369,57 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
             NoticePopup.make(it, "정지 버튼을 길게 누르면\n운동이 종료됩니다.").show()
         }
         binding.ivStop.setOnLongClickListener {
-            val endTime = if (timerVM.isPaused.value == true) {
-                timerVM.pauseTime.value
+            val endTime = if (stopwatchViewModel.isPaused.value == true) {
+                stopwatchViewModel.pauseTime.value
             } else {
-                timerVM.time.value
+                stopwatchViewModel.time.value
             } ?: return@setOnLongClickListener true
             sharedPreferences.edit(commit = true) { putLong("stopTime", endTime) }
             stopServiceForSubmission()
-            recordVM.submitRecord(endTime)
+            sessionRecordViewModel.submitRecord(endTime)
             true
         }
     }
 
     private fun observeSubmission() {
         repeatOnStarted {
-            recordVM.submissionState.collect { state ->
-                binding.ivStop.isEnabled = state == TimerSubmissionState.Draft
-                if (state == TimerSubmissionState.Submitting || state is TimerSubmissionState.Preserved) {
-                    binding.tvTitle.text = recordVM.cragName.ifBlank {
-                        sharedPreferences.getString("cragName", getString(R.string.timer_crag_set_inform))
+            sessionRecordViewModel.submissionState.collect { state ->
+                binding.ivStop.isEnabled = state == SessionSubmissionState.Draft
+                if (state == SessionSubmissionState.Submitting || state is SessionSubmissionState.Preserved) {
+                    binding.tvTitle.text = sessionRecordViewModel.gymName.ifBlank {
+                        sharedPreferences.getString("gymName", getString(R.string.session_gym_select_prompt))
                     }
-                    recordVM.restoredDuration.value?.let { binding.tvTime.text = it }
-                    recordVM.restoredElapsedTimeMillis.value?.let(timerVM::restoreElapsedTime)
-                    if (recordVM.items.value.isNotEmpty()) showRestoredDraftDetails()
+                    sessionRecordViewModel.restoredDuration.value?.let { binding.tvTime.text = it }
+                    sessionRecordViewModel.restoredElapsedTimeMillis.value?.let(stopwatchViewModel::restoreElapsedTime)
+                    if (sessionRecordViewModel.items.value.isNotEmpty()) showRestoredDraftDetails()
                 }
             }
         }
         repeatOnStarted {
-            recordVM.restoredDuration.collect { duration ->
-                val state = recordVM.submissionState.value
+            sessionRecordViewModel.restoredDuration.collect { duration ->
+                val state = sessionRecordViewModel.submissionState.value
                 if (duration != null &&
-                    state != TimerSubmissionState.Succeeded
+                    state != SessionSubmissionState.Succeeded
                 ) {
-                    binding.tvTitle.text = recordVM.cragName
+                    binding.tvTitle.text = sessionRecordViewModel.gymName
                     binding.tvTime.text = duration
-                    recordVM.restoredElapsedTimeMillis.value?.let(timerVM::restoreElapsedTime)
+                    sessionRecordViewModel.restoredElapsedTimeMillis.value?.let(stopwatchViewModel::restoreElapsedTime)
                 }
             }
         }
         repeatOnStarted {
-            recordVM.submissionEffect.collect { effect ->
+            sessionRecordViewModel.submissionEffect.collect { effect ->
                 when (effect) {
-                    is TimerSubmissionEffect.ShowMessage -> showToastMessage(effect.message)
-                    TimerSubmissionEffect.DraftDiscarded -> {
+                    is SessionSubmissionEffect.ShowMessage -> showToastMessage(effect.message)
+                    SessionSubmissionEffect.DraftDiscarded -> {
                         binding.tvTime.text = "00:00"
                         sharedPreferences.edit {
                             putLong(PAUSE_TIME, 0L)
                             putString("pauseTimeFormat", "00:00")
                         }
-                        showCragSelectBottomSheet()
+                        showGymSelectBottomSheet()
                     }
-                    TimerSubmissionEffect.NavigateToComplete -> completeSubmission()
+                    SessionSubmissionEffect.NavigateToComplete -> completeSubmission()
                 }
             }
         }
@@ -429,13 +432,13 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
             "삭제 후 시작",
             "기록 유지",
         ) { shouldDiscard ->
-            if (shouldDiscard) recordVM.discardPreservedDraft()
+            if (shouldDiscard) sessionRecordViewModel.discardPreservedDraft()
         }.show()
     }
 
     private fun stopServiceForSubmission() {
-        if (TimerService.serviceRunning.value == true) {
-            context?.stopService(Intent(context, TimerService::class.java))
+        if (StopwatchService.hasStartedInProcess.value == true) {
+            context?.stopService(Intent(context, StopwatchService::class.java))
         }
         updateViewModel(start = false, pause = false, restart = false, stop = true, running = false)
         updateStatePref()
@@ -443,23 +446,23 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
 
     private fun completeSubmission() {
         stopStopwatch()
-        cragSelectVM.resetItem()
-        recordVM.resetAtStop()
-        recordVM.acknowledgeSubmissionSuccess()
+        gymSelectViewModel.resetItem()
+        sessionRecordViewModel.resetAtStop()
+        sessionRecordViewModel.acknowledgeSubmissionSuccess()
         requireActivity().supportFragmentManager.beginTransaction()
-            .add(R.id.main_container, ClimbingCompleteFragment())
+            .add(R.id.main_container, SessionCompleteFragment())
             .addToBackStack(null)
             .commit()
     }
 
     private fun startStopwatch() {
-        viewMode(ViewMode.START)
+        viewMode(StopwatchMode.START)
         hidePausedDraftDetails()
-        val initialElapsedTime = recordVM.restoredElapsedTimeMillis.value ?: 0L
-        timerVM.restoreElapsedTime(initialElapsedTime)
-        val intent = Intent(context, TimerService::class.java).apply {
+        val initialElapsedTime = sessionRecordViewModel.restoredElapsedTimeMillis.value ?: 0L
+        stopwatchViewModel.restoreElapsedTime(initialElapsedTime)
+        val intent = Intent(context, StopwatchService::class.java).apply {
             putExtra("command", "START")
-            putExtra(TimerService.EXTRA_INITIAL_ELAPSED_TIME, initialElapsedTime)
+            putExtra(StopwatchService.EXTRA_INITIAL_ELAPSED_TIME, initialElapsedTime)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context?.startForegroundService(intent)
@@ -471,12 +474,12 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
     }
 
     private fun showRestoredDraftDetails() {
-        routeItemAdapter.submitList(recordVM.items.value.toList())
+        routeItemAdapter.submitList(sessionRecordViewModel.items.value.toList())
         binding.layoutAvgComplete.visibility = View.VISIBLE
         binding.tvTimeTitle.visibility = View.VISIBLE
         binding.layoutRouteRecord.visibility = View.VISIBLE
-        recordVM.isAvgToggleOn.value = false
-        recordVM.isRouteToggleOn.value = true
+        sessionRecordViewModel.isAvgToggleOn.value = false
+        sessionRecordViewModel.isRouteToggleOn.value = true
         binding.rvRouteRecord.post(binding.rvRouteRecord::requestLayout)
     }
 
@@ -487,21 +490,21 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
     }
 
     private fun pauseStopwatch() {
-        viewMode(ViewMode.PAUSE)
-        val intent = Intent(context, TimerService::class.java).apply {
+        viewMode(StopwatchMode.PAUSE)
+        val intent = Intent(context, StopwatchService::class.java).apply {
             putExtra("command", "PAUSE")
         }
         context?.startService(intent)
 
-        timerVM.pauseTime.value = sharedPreferences.getLong("pauseTime", 0L)
+        stopwatchViewModel.pauseTime.value = sharedPreferences.getLong("pauseTime", 0L)
 
         updateViewModel(start = false, pause = true, restart = false, stop = false, running = false)
     }
 
     private fun restartStopwatch() {
-        viewMode(ViewMode.RESTART)
+        viewMode(StopwatchMode.RESTART)
         hidePausedDraftDetails()
-        val intent = Intent(context, TimerService::class.java).apply {
+        val intent = Intent(context, StopwatchService::class.java).apply {
             putExtra("command", "RESTART")
         }
         context?.startService(intent)
@@ -510,38 +513,38 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
     }
 
     private fun stopStopwatch() {
-        viewMode(ViewMode.STOP)
+        viewMode(StopwatchMode.STOP)
         binding.tvTime.text = "00:00"
 
-        if (TimerService.serviceRunning.value == true) {
-            val intent = Intent(context, TimerService::class.java)
+        if (StopwatchService.hasStartedInProcess.value == true) {
+            val intent = Intent(context, StopwatchService::class.java)
             context?.stopService(intent)
         }
 
         updateViewModel(start = false, pause = false, restart = false, stop = true, running = false)
 
-        sharedPreferences.edit { putString(TOP_CHALLENGE, "--") }
-        sharedPreferences.edit { putString(TOP_COMPLETE, "--") }
-        sharedPreferences.edit { putString(TOP_LEVEL, "--") }
+        sharedPreferences.edit { putString(PREF_TOTAL_ATTEMPTS, "--") }
+        sharedPreferences.edit { putString(PREF_TOTAL_COMPLETIONS, "--") }
+        sharedPreferences.edit { putString(PREF_AVERAGE_LEVEL, "--") }
         sharedPreferences.edit {
             putLong(PAUSE_TIME, 0L)
             putString("pauseTimeFormat", "00:00")
         }
-        binding.tvTitle.text = getString(R.string.timer_crag_set_inform)
+        binding.tvTitle.text = getString(R.string.session_gym_select_prompt)
 
-        recordVM.totalRoute.value = "--"
-        recordVM.totalComplete.value = "--"
-        recordVM.avgLevel.value = "--"
+        sessionRecordViewModel.totalRoute.value = "--"
+        sessionRecordViewModel.totalComplete.value = "--"
+        sessionRecordViewModel.avgLevel.value = "--"
 
-        recordVM.apiCheck = false
-        recordVM.isSelectedCrag.value = false
+        sessionRecordViewModel.prepareGymChange()
+        sessionRecordViewModel.isGymSelected.value = false
     }
 
-    private fun showCragSelectBottomSheet() {
-        cragSelectVM.resetItem()
-        recordVM.apiCheck = false
-        val bottomSheetFragment = TimerCragSelectBottomSheetFragment()
-        bottomSheetFragment.show(parentFragmentManager, "timerCragSelectBottomSheet")
+    private fun showGymSelectBottomSheet() {
+        gymSelectViewModel.resetItem()
+        sessionRecordViewModel.prepareGymChange()
+        val bottomSheetFragment = GymSelectBottomSheetFragment()
+        bottomSheetFragment.show(parentFragmentManager, "gymSelectBottomSheet")
     }
 
     private fun updateViewModel(
@@ -551,37 +554,37 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
         stop: Boolean,
         running: Boolean,
     ) {
-        timerVM.isStart.value = start
-        timerVM.isPaused.value = pause
-        timerVM.isRestart.value = restart
-        timerVM.isStop.value = stop
-        timerVM.isRunning.value = running
+        stopwatchViewModel.isStart.value = start
+        stopwatchViewModel.isPaused.value = pause
+        stopwatchViewModel.isRestart.value = restart
+        stopwatchViewModel.isStop.value = stop
+        stopwatchViewModel.isRunning.value = running
     }
 
-    private fun viewMode(mode: ViewMode) {
+    private fun viewMode(mode: StopwatchMode) {
         when (mode) {
-            ViewMode.START -> {
+            StopwatchMode.START -> {
                 binding.ivStart.visibility = View.GONE
                 binding.ivPause.visibility = View.VISIBLE
                 binding.ivRestart.visibility = View.GONE
                 binding.ivStop.visibility = View.VISIBLE
             }
 
-            ViewMode.PAUSE -> {
+            StopwatchMode.PAUSE -> {
                 binding.ivStart.visibility = View.GONE
                 binding.ivPause.visibility = View.GONE
                 binding.ivRestart.visibility = View.VISIBLE
                 binding.ivStop.visibility = View.VISIBLE
             }
 
-            ViewMode.RESTART -> {
+            StopwatchMode.RESTART -> {
                 binding.ivStart.visibility = View.GONE
                 binding.ivPause.visibility = View.VISIBLE
                 binding.ivRestart.visibility = View.GONE
                 binding.ivStop.visibility = View.VISIBLE
             }
 
-            ViewMode.STOP -> {
+            StopwatchMode.STOP -> {
                 binding.ivStart.visibility = View.VISIBLE
                 binding.ivPause.visibility = View.GONE
                 binding.ivRestart.visibility = View.GONE
@@ -598,8 +601,8 @@ class TimerFragment : BaseFragment<FragmentTimerBinding>(R.layout.fragment_timer
         const val KEY_IS_RESTART = "isRestart"
         const val KEY_IS_STOP = "isStop"
         const val KEY_IS_RUNNING = "isRunning"
-        const val TOP_CHALLENGE = "timerChallenge"
-        const val TOP_COMPLETE = "timerComplete"
-        const val TOP_LEVEL = "timerLevel"
+        const val PREF_TOTAL_ATTEMPTS = "timerChallenge"
+        const val PREF_TOTAL_COMPLETIONS = "timerComplete"
+        const val PREF_AVERAGE_LEVEL = "timerLevel"
     }
 }

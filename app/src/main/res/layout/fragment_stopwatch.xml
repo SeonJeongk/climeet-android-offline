@@ -8,12 +8,12 @@
         <import type="android.view.View" />
 
         <variable
-            name="mainVM"
-            type="com.climus.climeet.presentation.ui.main.record.timer.stopwatch.TimerViewModel" />
+            name="stopwatchViewModel"
+            type="com.climus.climeet.presentation.ui.main.record.session.stopwatch.StopwatchViewModel" />
 
         <variable
-            name="recordVM"
-            type="com.climus.climeet.presentation.ui.main.record.timer.setrecord.SetTimerClimbingRecordViewModel" />
+            name="sessionRecordViewModel"
+            type="com.climus.climeet.presentation.ui.main.record.session.record.SessionRecordViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -47,7 +47,7 @@
                         style="@style/TextMediumBold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{recordVM.totalRoute}"
+                        android:text="@{sessionRecordViewModel.totalRoute}"
                         android:textSize="30sp"
                         app:layout_constraintEnd_toEndOf="@id/tv_challenge"
                         app:layout_constraintStart_toStartOf="@id/tv_challenge"
@@ -68,7 +68,7 @@
                         style="@style/TextMediumBold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{recordVM.totalComplete}"
+                        android:text="@{sessionRecordViewModel.totalComplete}"
                         android:textSize="30sp"
                         app:layout_constraintEnd_toEndOf="@id/tv_complete"
                         app:layout_constraintStart_toStartOf="@id/tv_complete"
@@ -91,7 +91,7 @@
                         style="@style/TextMediumBold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{recordVM.avgLevel}"
+                        android:text="@{sessionRecordViewModel.avgLevel}"
                         android:textSize="30sp"
                         app:layout_constraintEnd_toEndOf="@id/tv_avg_level"
                         app:layout_constraintStart_toStartOf="@id/tv_avg_level"
@@ -111,7 +111,7 @@
 
                 <!--    암장 선택    -->
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_select_crag"
+                    android:id="@+id/layout_select_gym"
                     android:layout_width="246dp"
                     android:layout_height="35dp"
                     android:layout_marginTop="20dp"
@@ -141,7 +141,7 @@
                         android:ellipsize="end"
                         android:maxWidth="200dp"
                         android:maxLines="1"
-                        android:text="@string/timer_crag_set_inform"
+                        android:text="@string/session_gym_select_prompt"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/iv_map"
@@ -160,12 +160,12 @@
                     android:visibility="gone"
                     app:layout_constraintBottom_toTopOf="@id/tv_time"
                     app:layout_constraintStart_toStartOf="@id/layout_top_record"
-                    app:layout_constraintTop_toBottomOf="@id/layout_select_crag" />
+                    app:layout_constraintTop_toBottomOf="@id/layout_select_gym" />
 
                 <!--    시간    -->
                 <TextView
                     android:id="@+id/tv_time"
-                    style="@style/TextTimer"
+                    style="@style/TextStopwatch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="50dp"
@@ -174,7 +174,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_select_crag" />
+                    app:layout_constraintTop_toBottomOf="@id/layout_select_gym" />
 
                 <TextView
                     style="@style/TextMediumBold"
@@ -182,7 +182,7 @@
                     android:layout_height="70dp"
                     android:layout_marginTop="5dp"
                     android:text="시간"
-                    android:visibility="@{mainVM.isPaused ? View.GONE : View.VISIBLE}"
+                    android:visibility="@{stopwatchViewModel.isPaused ? View.GONE : View.VISIBLE}"
                     app:layout_constraintBottom_toTopOf="@id/layout_buttons"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -214,9 +214,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
-                        android:onClick="@{() -> recordVM.setAvgToggle()}"
+                        android:onClick="@{() -> sessionRecordViewModel.setAvgToggle()}"
                         android:padding="10dp"
-                        android:src="@{!recordVM.isAvgToggleOn() ? @drawable/ic_toggle_on : @drawable/ic_toggle_off}"
+                        android:src="@{!sessionRecordViewModel.isAvgToggleOn() ? @drawable/ic_toggle_on : @drawable/ic_toggle_off}"
                         android:textOff=""
                         android:textOn=""
                         app:layout_constraintBottom_toBottomOf="@id/tv_avg_title"
@@ -228,7 +228,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="15dp"
                         android:background="@drawable/rect_grey8fill_nostroke_10radius"
-                        android:visibility="@{!recordVM.itemsLiveData.isEmpty() ? View.VISIBLE : View.GONE}"
+                        android:visibility="@{!sessionRecordViewModel.itemsLiveData.isEmpty() ? View.VISIBLE : View.GONE}"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tv_avg_title">
 
@@ -275,7 +275,7 @@
                             android:id="@+id/layout_avg_toggle_list"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:visibility="@{recordVM.isAvgToggleOn() ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{sessionRecordViewModel.isAvgToggleOn() ? View.VISIBLE : View.GONE}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/layout_default_avg">
@@ -301,7 +301,7 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
                                 tools:itemCount="3"
-                                tools:listitem="@layout/item_timer_avg_complete" />
+                                tools:listitem="@layout/item_session_completion_rate" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -350,7 +350,7 @@
                             android:background="@drawable/rect_silver2fill_nostroke_20radius"
                             android:paddingHorizontal="4dp"
                             android:paddingVertical="3dp"
-                            android:visibility="@{recordVM.uiState.singleFloor? View.GONE : View.VISIBLE}"
+                            android:visibility="@{sessionRecordViewModel.uiState.singleFloor? View.GONE : View.VISIBLE}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent">
@@ -369,12 +369,12 @@
                                 android:layout_height="wrap_content"
                                 android:background="@drawable/rect_silver2fill_nostroke_20radius"
                                 android:minHeight="0dp"
-                                android:onClick="@{() -> recordVM.selectFloor(1)}"
+                                android:onClick="@{() -> sessionRecordViewModel.selectFloor(1)}"
                                 android:outlineProvider="none"
                                 android:paddingVertical="5dp"
                                 android:text="1층"
                                 android:textColor="@color/white"
-                                app:floorBtnState="@{recordVM.uiState.firstFloorBtnState}"
+                                app:floorBtnState="@{sessionRecordViewModel.uiState.firstFloorBtnState}"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/guidline_toggle_button"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -387,12 +387,12 @@
                                 android:layout_height="wrap_content"
                                 android:background="@drawable/rect_mainfill_nostroke_20radius"
                                 android:minHeight="0dp"
-                                android:onClick="@{() -> recordVM.selectFloor(2)}"
+                                android:onClick="@{() -> sessionRecordViewModel.selectFloor(2)}"
                                 android:outlineProvider="none"
                                 android:paddingVertical="5dp"
                                 android:text="2층"
                                 android:textColor="@color/black"
-                                app:floorBtnState="@{recordVM.uiState.secondFloorBtnState}"
+                                app:floorBtnState="@{sessionRecordViewModel.uiState.secondFloorBtnState}"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toEndOf="@id/guidline_toggle_button"
@@ -407,7 +407,7 @@
                             android:layout_marginHorizontal="12dp"
                             android:layout_marginTop="16dp"
                             android:scaleType="centerCrop"
-                            app:imgUrl="@{recordVM.uiState.layoutImg}"
+                            app:imgUrl="@{sessionRecordViewModel.uiState.layoutImg}"
                             app:layout_constraintDimensionRatio="2.3:1"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -427,7 +427,7 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/iv_sector"
-                            app:list="@{recordVM.uiState.sectorNameList}"
+                            app:list="@{sessionRecordViewModel.uiState.sectorNameList}"
                             tools:listitem="@layout/item_sector_name" />
 
                         <androidx.recyclerview.widget.RecyclerView
@@ -442,7 +442,7 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/rv_sector_name"
-                            app:list="@{recordVM.uiState.gymLevelList}"
+                            app:list="@{sessionRecordViewModel.uiState.gymLevelList}"
                             tools:listitem="@layout/item_gym_level" />
 
                         <androidx.recyclerview.widget.RecyclerView
@@ -458,7 +458,7 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/rv_sector_level"
-                            app:list="@{recordVM.uiState.routeList}"
+                            app:list="@{sessionRecordViewModel.uiState.routeList}"
                             tools:listitem="@layout/item_route_image" />
 
                         <androidx.constraintlayout.widget.ConstraintLayout
@@ -467,7 +467,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginHorizontal="10dp"
                             android:layout_marginTop="20dp"
-                            android:visibility="@{recordVM.uiState.selectedSector.sectorId == -1 ? View.GONE : View.VISIBLE}"
+                            android:visibility="@{sessionRecordViewModel.uiState.selectedSector.sectorId == -1 ? View.GONE : View.VISIBLE}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/rv_sector_image">
@@ -480,9 +480,9 @@
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
-                                app:routeImgUrl="@{recordVM.uiState.selectedRoute.routeImg}"
-                                app:routeLevelColor="@{recordVM.uiState.selectedRoute.gymLevelColor}"
-                                app:routeLevelName="@{recordVM.uiState.selectedRoute.gymLevelName}">
+                                app:routeImgUrl="@{sessionRecordViewModel.uiState.selectedRoute.routeImg}"
+                                app:routeLevelColor="@{sessionRecordViewModel.uiState.selectedRoute.gymLevelColor}"
+                                app:routeLevelName="@{sessionRecordViewModel.uiState.selectedRoute.gymLevelName}">
 
                             </com.climus.climeet.presentation.customview.RouteView>
 
@@ -510,7 +510,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="10dp"
-                                    android:text="@{recordVM.challengeNumber.toString()}"
+                                    android:text="@{sessionRecordViewModel.challengeNumber.toString()}"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent" />
@@ -520,7 +520,7 @@
                                     android:layout_height="20dp"
                                     android:layout_marginEnd="10dp"
                                     android:background="@drawable/oval_lightgreyfill_nostroke_noradius"
-                                    android:onClick="@{()->recordVM.subChallengeNum()}"
+                                    android:onClick="@{()->sessionRecordViewModel.subChallengeNum()}"
                                     android:src="@drawable/ic_horizontal_line_grey9"
                                     app:layout_constraintBottom_toBottomOf="@id/tv_challenge_num"
                                     app:layout_constraintEnd_toStartOf="@id/tv_challenge_num"
@@ -531,7 +531,7 @@
                                     android:layout_height="20dp"
                                     android:layout_marginStart="10dp"
                                     android:background="@drawable/oval_lightgreyfill_nostroke_noradius"
-                                    android:onClick="@{()->recordVM.addChallengeNum()}"
+                                    android:onClick="@{()->sessionRecordViewModel.addChallengeNum()}"
                                     android:src="@drawable/ic_add_gray9"
                                     app:layout_constraintBottom_toBottomOf="@id/tv_challenge_num"
                                     app:layout_constraintStart_toEndOf="@id/tv_challenge_num"
@@ -546,10 +546,10 @@
                                 android:layout_height="35dp"
                                 android:layout_marginHorizontal="15dp"
                                 android:background="@drawable/rect_lightgrayfill_nostroke_10radius"
-                                android:onClick="@{()->recordVM.setClear()}"
+                                android:onClick="@{()->sessionRecordViewModel.setClear()}"
                                 android:text="완등했어요"
                                 android:textColor="@color/cm_grey9"
-                                app:clearBtnState="@{recordVM.uiState.clearBtnState}"
+                                app:clearBtnState="@{sessionRecordViewModel.uiState.clearBtnState}"
                                 app:layout_constraintBottom_toBottomOf="@id/select_sector"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toEndOf="@id/select_sector" />
@@ -563,8 +563,8 @@
                             android:layout_marginStart="95dp"
                             android:elevation="2dp"
                             android:src="@drawable/img_celebrate"
-                            android:visibility="@{recordVM.uiState.clearBtnState ? View.VISIBLE : View.GONE}"
-                            app:animatedAlpha="@{recordVM.alpha}"
+                            android:visibility="@{sessionRecordViewModel.uiState.clearBtnState ? View.VISIBLE : View.GONE}"
+                            app:animatedAlpha="@{sessionRecordViewModel.alpha}"
                             app:layout_constraintBottom_toBottomOf="@id/layout_main"
                             app:layout_constraintEnd_toEndOf="@id/layout_main"
                             app:layout_constraintStart_toStartOf="@id/layout_main" />
@@ -576,7 +576,7 @@
                         android:id="@+id/layout_toggle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="@{recordVM.isSelectedCrag()? View.VISIBLE : View.GONE}"
+                        android:visibility="@{sessionRecordViewModel.isGymSelected()? View.VISIBLE : View.GONE}"
                         app:layout_constraintTop_toBottomOf="@id/layout_main">
 
                         <TextView
@@ -595,9 +595,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@android:color/transparent"
-                            android:onClick="@{() -> recordVM.setRouteToggle()}"
+                            android:onClick="@{() -> sessionRecordViewModel.setRouteToggle()}"
                             android:padding="10dp"
-                            android:src="@{!recordVM.isRouteToggleOn() ? @drawable/ic_toggle_on : @drawable/ic_toggle_off}"
+                            android:src="@{!sessionRecordViewModel.isRouteToggleOn() ? @drawable/ic_toggle_on : @drawable/ic_toggle_off}"
                             android:textOff=""
                             android:textOn=""
                             app:layout_constraintBottom_toBottomOf="@id/tv_route_record_more"
@@ -608,7 +608,7 @@
                             android:id="@+id/layout_toggle_list"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:visibility="@{recordVM.isRouteToggleOn() ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{sessionRecordViewModel.isRouteToggleOn() ? View.VISIBLE : View.GONE}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/tv_route_record_more">
@@ -626,7 +626,7 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
                                 tools:itemCount="3"
-                                tools:listitem="@layout/item_timer_route_record" />
+                                tools:listitem="@layout/item_session_route_record" />
 
                             <androidx.constraintlayout.widget.ConstraintLayout
                                 android:id="@+id/layout_no_route"
@@ -634,7 +634,7 @@
                                 android:layout_height="83dp"
                                 android:layout_marginTop="15dp"
                                 android:background="@drawable/rect_grey8fill_nostroke_10radius"
-                                android:visibility="@{recordVM.itemsLiveData.isEmpty() ? View.VISIBLE : View.GONE}"
+                                android:visibility="@{sessionRecordViewModel.itemsLiveData.isEmpty() ? View.VISIBLE : View.GONE}"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent">

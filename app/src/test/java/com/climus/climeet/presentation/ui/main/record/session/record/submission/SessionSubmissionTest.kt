@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.timer.setrecord
+package com.climus.climeet.presentation.ui.main.record.session.record
 
 import android.content.SharedPreferences
 import androidx.arch.core.executor.ArchTaskExecutor
@@ -6,10 +6,11 @@ import androidx.arch.core.executor.TaskExecutor
 import com.climus.climeet.app.App
 import com.climus.climeet.data.local.ClimbingRecordData
 import com.climus.climeet.data.model.BaseState
-import com.climus.climeet.data.model.request.CreateTimerClimbingRecordRequest
+import com.climus.climeet.data.model.request.CreateClimbingRecordRequest
 import com.climus.climeet.data.model.response.GetGymFilteringKeyResponse
 import com.climus.climeet.data.model.response.GetGymRouteInfoResponse
 import com.climus.climeet.data.repository.MainRepository
+import com.climus.climeet.presentation.ui.main.record.session.record.SessionRecordViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -37,10 +38,10 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class TimerRecordSubmissionViewModelTest {
+class SessionSubmissionTest {
     private val dispatcher = StandardTestDispatcher()
     private val repository = mockk<MainRepository>(relaxed = true)
-    private val request = CreateTimerClimbingRecordRequest(1, "2026-09-21", "01:02:03", 5, emptyList())
+    private val request = CreateClimbingRecordRequest(1, "2026-09-21", "01:02:03", 5, emptyList())
 
     @Before
     fun setUp() {
@@ -70,10 +71,10 @@ class TimerRecordSubmissionViewModelTest {
     @Test
     fun successfulPost_submit_clearsDraftAndNavigatesOnce() =
         runTest(dispatcher) {
-            coEvery { repository.finalizeTimerClimbingRecord(1, "01:02:03") } returns request
-            coEvery { repository.createTimerClimbingRecord(request) } returns BaseState.Success("".toResponseBody())
-            val viewModel = SetTimerClimbingRecordViewModel(repository)
-            val effects = mutableListOf<TimerSubmissionEffect>()
+            coEvery { repository.finalizeSessionRecord(1, "01:02:03") } returns request
+            coEvery { repository.createClimbingRecord(request) } returns BaseState.Success("".toResponseBody())
+            val viewModel = SessionRecordViewModel(repository)
+            val effects = mutableListOf<SessionSubmissionEffect>()
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
                 viewModel.submissionEffect.collect(effects::add)
             }
@@ -82,21 +83,21 @@ class TimerRecordSubmissionViewModelTest {
             viewModel.submitRecord(3_723_000L)
             advanceUntilIdle()
 
-            assertEquals(TimerSubmissionState.Succeeded, viewModel.submissionState.value)
-            assertEquals(listOf(TimerSubmissionEffect.NavigateToComplete), effects)
-            coVerify(exactly = 1) { repository.clearTimerClimbingRecordDraft() }
+            assertEquals(SessionSubmissionState.Succeeded, viewModel.submissionState.value)
+            assertEquals(listOf(SessionSubmissionEffect.NavigateToComplete), effects)
+            coVerify(exactly = 1) { repository.clearSessionDraft() }
 
             viewModel.acknowledgeSubmissionSuccess()
             advanceUntilIdle()
-            assertEquals(TimerSubmissionState.Draft, viewModel.submissionState.value)
+            assertEquals(SessionSubmissionState.Draft, viewModel.submissionState.value)
         }
 
     @Test
     fun failedPost_submit_preservesDraftAndBlocksSecondPost() =
         runTest(dispatcher) {
-            coEvery { repository.finalizeTimerClimbingRecord(1, "01:02:03") } returns request
-            coEvery { repository.createTimerClimbingRecord(request) } returns BaseState.Error("server error", "500")
-            val viewModel = SetTimerClimbingRecordViewModel(repository)
+            coEvery { repository.finalizeSessionRecord(1, "01:02:03") } returns request
+            coEvery { repository.createClimbingRecord(request) } returns BaseState.Error("server error", "500")
+            val viewModel = SessionRecordViewModel(repository)
             advanceUntilIdle()
 
             viewModel.submitRecord(3_723_000L)
@@ -104,28 +105,28 @@ class TimerRecordSubmissionViewModelTest {
             viewModel.submitRecord(3_723_000L)
             advanceUntilIdle()
 
-            assertTrue(viewModel.submissionState.value is TimerSubmissionState.Preserved)
-            coVerify(exactly = 1) { repository.createTimerClimbingRecord(request) }
-            coVerify(exactly = 0) { repository.clearTimerClimbingRecordDraft() }
+            assertTrue(viewModel.submissionState.value is SessionSubmissionState.Preserved)
+            coVerify(exactly = 1) { repository.createClimbingRecord(request) }
+            coVerify(exactly = 0) { repository.clearSessionDraft() }
         }
 
     @Test
     fun duplicateInput_whileSubmitting_sendsSinglePost() =
         runTest(dispatcher) {
-            coEvery { repository.finalizeTimerClimbingRecord(1, "01:02:03") } returns request
-            coEvery { repository.createTimerClimbingRecord(request) } coAnswers {
+            coEvery { repository.finalizeSessionRecord(1, "01:02:03") } returns request
+            coEvery { repository.createClimbingRecord(request) } coAnswers {
                 delay(800)
                 BaseState.Success("".toResponseBody())
             }
-            val viewModel = SetTimerClimbingRecordViewModel(repository)
+            val viewModel = SessionRecordViewModel(repository)
             advanceUntilIdle()
 
             repeat(10) { viewModel.submitRecord(3_723_000L) }
             runCurrent()
-            assertEquals(TimerSubmissionState.Submitting, viewModel.submissionState.value)
+            assertEquals(SessionSubmissionState.Submitting, viewModel.submissionState.value)
             advanceUntilIdle()
 
-            coVerify(exactly = 1) { repository.createTimerClimbingRecord(request) }
+            coVerify(exactly = 1) { repository.createClimbingRecord(request) }
         }
 
     @Test
@@ -134,12 +135,12 @@ class TimerRecordSubmissionViewModelTest {
             val mutationStarted = CompletableDeferred<Unit>()
             val releaseMutation = CompletableDeferred<Unit>()
             val order = mutableListOf<String>()
-            coEvery { repository.finalizeTimerClimbingRecord(1, "01:02:03") } coAnswers {
+            coEvery { repository.finalizeSessionRecord(1, "01:02:03") } coAnswers {
                 order += "finalize"
                 request
             }
-            coEvery { repository.createTimerClimbingRecord(request) } returns BaseState.Success("".toResponseBody())
-            val controller = TimerRecordSubmissionController(repository)
+            coEvery { repository.createClimbingRecord(request) } returns BaseState.Success("".toResponseBody())
+            val controller = SessionSubmissionController(repository)
 
             val mutation = launch {
                 controller.mutateDraft {
@@ -153,42 +154,42 @@ class TimerRecordSubmissionViewModelTest {
             val submission = launch { controller.submit(3_723_000L) }
             runCurrent()
 
-            coVerify(exactly = 0) { repository.finalizeTimerClimbingRecord(any(), any()) }
+            coVerify(exactly = 0) { repository.finalizeSessionRecord(any(), any()) }
             releaseMutation.complete(Unit)
             mutation.join()
             submission.join()
 
             assertEquals(listOf("mutation-start", "mutation-end", "finalize"), order)
-            coVerify(exactly = 1) { repository.createTimerClimbingRecord(request) }
+            coVerify(exactly = 1) { repository.createClimbingRecord(request) }
         }
 
     @Test
     fun failedPost_recreatedViewModel_restoresPreservedDraftWithoutResending() =
         runTest(dispatcher) {
-            coEvery { repository.finalizeTimerClimbingRecord(1, "01:02:03") } returns request
-            coEvery { repository.createTimerClimbingRecord(request) } returns BaseState.Error("server error", "500")
-            val firstViewModel = SetTimerClimbingRecordViewModel(repository)
+            coEvery { repository.finalizeSessionRecord(1, "01:02:03") } returns request
+            coEvery { repository.createClimbingRecord(request) } returns BaseState.Error("server error", "500")
+            val firstViewModel = SessionRecordViewModel(repository)
             advanceUntilIdle()
 
             firstViewModel.submitRecord(3_723_000L)
             advanceUntilIdle()
             coEvery { repository.getRecord(1) } returns savedRecord(time = "01:02:03")
 
-            val recreatedViewModel = SetTimerClimbingRecordViewModel(repository)
+            val recreatedViewModel = SessionRecordViewModel(repository)
             advanceUntilIdle()
             recreatedViewModel.submitRecord(3_723_000L)
             advanceUntilIdle()
 
-            assertTrue(recreatedViewModel.submissionState.value is TimerSubmissionState.Preserved)
-            coVerify(exactly = 1) { repository.createTimerClimbingRecord(request) }
+            assertTrue(recreatedViewModel.submissionState.value is SessionSubmissionState.Preserved)
+            coVerify(exactly = 1) { repository.createClimbingRecord(request) }
         }
 
     @Test
-    fun finalizedDraft_restore_formatsDurationForTimerDisplay() =
+    fun finalizedDraft_restore_formatsDurationForStopwatchDisplay() =
         runTest(dispatcher) {
             coEvery { repository.getRecord(1) } returns savedRecord(time = "00:01:19")
 
-            val viewModel = SetTimerClimbingRecordViewModel(repository)
+            val viewModel = SessionRecordViewModel(repository)
             advanceUntilIdle()
 
             assertEquals(79_000L, viewModel.restoredElapsedTimeMillis.value)
@@ -201,10 +202,10 @@ class TimerRecordSubmissionViewModelTest {
             coEvery { repository.getRecord(1) } returns savedRecord(time = "")
             every { App.sharedPreferences.getLong("pauseTime", 0L) } returns 79_000L
 
-            val viewModel = SetTimerClimbingRecordViewModel(repository)
+            val viewModel = SessionRecordViewModel(repository)
             advanceUntilIdle()
 
-            assertEquals(TimerSubmissionState.Draft, viewModel.submissionState.value)
+            assertEquals(SessionSubmissionState.Draft, viewModel.submissionState.value)
             assertEquals(79_000L, viewModel.restoredElapsedTimeMillis.value)
             assertEquals("01:19", viewModel.restoredDuration.value)
         }
@@ -212,26 +213,26 @@ class TimerRecordSubmissionViewModelTest {
     @Test
     fun localSnapshotFailure_submit_returnsToDraftWithoutPosting() =
         runTest(dispatcher) {
-            coEvery { repository.finalizeTimerClimbingRecord(1, "01:02:03") } throws IllegalStateException("disk")
-            val viewModel = SetTimerClimbingRecordViewModel(repository)
+            coEvery { repository.finalizeSessionRecord(1, "01:02:03") } throws IllegalStateException("disk")
+            val viewModel = SessionRecordViewModel(repository)
             advanceUntilIdle()
 
             viewModel.submitRecord(3_723_000L)
             advanceUntilIdle()
 
-            assertEquals(TimerSubmissionState.Draft, viewModel.submissionState.value)
-            coVerify(exactly = 0) { repository.createTimerClimbingRecord(any()) }
-            coVerify(exactly = 0) { repository.clearTimerClimbingRecordDraft() }
+            assertEquals(SessionSubmissionState.Draft, viewModel.submissionState.value)
+            coVerify(exactly = 0) { repository.createClimbingRecord(any()) }
+            coVerify(exactly = 0) { repository.clearSessionDraft() }
         }
 
     @Test
     fun localClearFailure_afterSuccessfulPost_preservesDraftWithoutNavigation() =
         runTest(dispatcher) {
-            coEvery { repository.finalizeTimerClimbingRecord(1, "01:02:03") } returns request
-            coEvery { repository.createTimerClimbingRecord(request) } returns BaseState.Success("".toResponseBody())
-            coEvery { repository.clearTimerClimbingRecordDraft() } throws IllegalStateException("disk")
-            val viewModel = SetTimerClimbingRecordViewModel(repository)
-            val effects = mutableListOf<TimerSubmissionEffect>()
+            coEvery { repository.finalizeSessionRecord(1, "01:02:03") } returns request
+            coEvery { repository.createClimbingRecord(request) } returns BaseState.Success("".toResponseBody())
+            coEvery { repository.clearSessionDraft() } throws IllegalStateException("disk")
+            val viewModel = SessionRecordViewModel(repository)
+            val effects = mutableListOf<SessionSubmissionEffect>()
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
                 viewModel.submissionEffect.collect(effects::add)
             }
@@ -240,16 +241,16 @@ class TimerRecordSubmissionViewModelTest {
             viewModel.submitRecord(3_723_000L)
             advanceUntilIdle()
 
-            assertTrue(viewModel.submissionState.value is TimerSubmissionState.Preserved)
-            assertTrue(TimerSubmissionEffect.NavigateToComplete !in effects)
+            assertTrue(viewModel.submissionState.value is SessionSubmissionState.Preserved)
+            assertTrue(SessionSubmissionEffect.NavigateToComplete !in effects)
         }
 
     @Test
     fun preservedDraft_confirmDiscard_clearsDraftAndEmitsDiscardOnce() =
         runTest(dispatcher) {
             coEvery { repository.getRecord(1) } returns savedRecord(time = "01:02:03")
-            val viewModel = SetTimerClimbingRecordViewModel(repository)
-            val effects = mutableListOf<TimerSubmissionEffect>()
+            val viewModel = SessionRecordViewModel(repository)
+            val effects = mutableListOf<SessionSubmissionEffect>()
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
                 viewModel.submissionEffect.collect(effects::add)
             }
@@ -258,18 +259,18 @@ class TimerRecordSubmissionViewModelTest {
             viewModel.discardPreservedDraft()
             advanceUntilIdle()
 
-            assertEquals(TimerSubmissionState.Draft, viewModel.submissionState.value)
-            assertEquals(listOf(TimerSubmissionEffect.DraftDiscarded), effects)
-            coVerify(exactly = 1) { repository.clearTimerClimbingRecordDraft() }
+            assertEquals(SessionSubmissionState.Draft, viewModel.submissionState.value)
+            assertEquals(listOf(SessionSubmissionEffect.DraftDiscarded), effects)
+            coVerify(exactly = 1) { repository.clearSessionDraft() }
         }
 
     @Test
     fun cancellation_afterSnapshot_rethrowsWithoutErrorEffect() =
         runTest(dispatcher) {
-            coEvery { repository.finalizeTimerClimbingRecord(1, "01:02:03") } returns request
-            coEvery { repository.createTimerClimbingRecord(request) } throws CancellationException("cancelled")
-            val controller = TimerRecordSubmissionController(repository)
-            val effects = mutableListOf<TimerSubmissionEffect>()
+            coEvery { repository.finalizeSessionRecord(1, "01:02:03") } returns request
+            coEvery { repository.createClimbingRecord(request) } throws CancellationException("cancelled")
+            val controller = SessionSubmissionController(repository)
+            val effects = mutableListOf<SessionSubmissionEffect>()
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
                 controller.effect.collect(effects::add)
             }
@@ -281,7 +282,7 @@ class TimerRecordSubmissionViewModelTest {
                 // expected
             }
 
-            assertTrue(controller.state.value is TimerSubmissionState.Preserved)
+            assertTrue(controller.state.value is SessionSubmissionState.Preserved)
             assertTrue(effects.isEmpty())
         }
 
@@ -302,10 +303,10 @@ class TimerRecordSubmissionViewModelTest {
             )
             coEvery { repository.getGymRouteInfoList(1, any()) } returns
                 BaseState.Success(GetGymRouteInfoResponse(page = 0, hasNext = false, result = emptyList()))
-            val viewModel = SetTimerClimbingRecordViewModel(repository)
+            val viewModel = SessionRecordViewModel(repository)
             advanceUntilIdle()
 
-            viewModel.selectedCrag(1, "테스트 암장")
+            viewModel.selectGym(1, "테스트 암장")
             advanceUntilIdle()
             assertTrue(viewModel.isCatalogRetryAvailable.value)
 

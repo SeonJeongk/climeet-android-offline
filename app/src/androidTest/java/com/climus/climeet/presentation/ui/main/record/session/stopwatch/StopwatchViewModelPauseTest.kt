@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.timer.stopwatch
+package com.climus.climeet.presentation.ui.main.record.session.stopwatch
 
 import android.content.Context
 import android.content.Intent
@@ -11,7 +11,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class TimerViewModelPauseTest {
+class StopwatchViewModelPauseTest {
     @Test
     fun pauseBroadcast_updatesElapsedAndPauseTimeFromSameSnapshot() {
         val context = ApplicationProvider.getApplicationContext<Context>()
@@ -19,11 +19,11 @@ class TimerViewModelPauseTest {
         var pauseTime: Long? = null
 
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
-            val viewModel = TimerViewModel()
+            val viewModel = StopwatchViewModel()
             viewModel.registerReceiver(context)
             try {
                 LocalBroadcastManager.getInstance(context).sendBroadcastSync(
-                    Intent(TimerViewModel.STOPWATCH_UPDATE).apply {
+                    Intent(StopwatchViewModel.STOPWATCH_UPDATE).apply {
                         putExtra("elapsedTime", 123_456L)
                         putExtra("pauseTime", 123_456L)
                         putExtra("pauseState", "yes")

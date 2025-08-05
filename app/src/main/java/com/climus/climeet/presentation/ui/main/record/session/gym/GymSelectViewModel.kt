@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.timer.stopwatch.selectcrag
+package com.climus.climeet.presentation.ui.main.record.session.gym
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,47 +22,47 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class CragNameUiState(
+data class GymSearchUiState(
     var searchList: List<SearchCragUiData> = emptyList(),
     val progressState: Boolean = false,
     val emptyResultState: Boolean = false,
     val emptyTextState: Boolean = false,
 )
 
-sealed class CragSelectEvent {
+sealed class GymSelectEvent {
     data class NavigateToBack(
         val id: Long,
         val name: String,
-    ) : CragSelectEvent()
+    ) : GymSelectEvent()
 
     data class ShowToastMessage(
         val msg: String,
-    ) : CragSelectEvent()
+    ) : GymSelectEvent()
 }
 
 @HiltViewModel
-class TimerCragSelectBottomSheetViewModel @Inject constructor(
+class GymSelectViewModel @Inject constructor(
     private val repository: MainRepository,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(CragNameUiState())
-    val uiState: StateFlow<CragNameUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(GymSearchUiState())
+    val uiState: StateFlow<GymSearchUiState> = _uiState.asStateFlow()
 
-    private val _event = MutableSharedFlow<CragSelectEvent>()
-    val event: SharedFlow<CragSelectEvent> = _event.asSharedFlow()
+    private val _event = MutableSharedFlow<GymSelectEvent>()
+    val event: SharedFlow<GymSelectEvent> = _event.asSharedFlow()
 
     private var curJob: Job? = null
 
     val keyword = MutableStateFlow("")
 
-    private val _selectedCrag = MutableLiveData<SearchCragUiData?>()
-    val selectedCrag: MutableLiveData<SearchCragUiData?> get() = _selectedCrag
+    private val _selectedGym = MutableLiveData<SearchCragUiData?>()
+    val selectedGym: MutableLiveData<SearchCragUiData?> get() = _selectedGym
 
     fun selectItem(item: SearchCragUiData) {
-        _selectedCrag.value = item
+        _selectedGym.value = item
     }
 
     fun resetItem() {
-        _selectedCrag.value = null
+        _selectedGym.value = null
     }
 
     init {
@@ -126,7 +126,7 @@ class TimerCragSelectBottomSheetViewModel @Inject constructor(
                                         emptyTextState = false,
                                     )
                                 }
-                                _event.emit(CragSelectEvent.ShowToastMessage(result.msg))
+                                _event.emit(GymSelectEvent.ShowToastMessage(result.msg))
                             }
                         }
                     }
@@ -148,11 +148,11 @@ class TimerCragSelectBottomSheetViewModel @Inject constructor(
     }
 
     fun navigateToBack(
-        cragId: Long,
-        cragName: String,
+        gymId: Long,
+        gymName: String,
     ) {
         viewModelScope.launch {
-            _event.emit(CragSelectEvent.NavigateToBack(cragId, cragName))
+            _event.emit(GymSelectEvent.NavigateToBack(gymId, gymName))
         }
     }
 }

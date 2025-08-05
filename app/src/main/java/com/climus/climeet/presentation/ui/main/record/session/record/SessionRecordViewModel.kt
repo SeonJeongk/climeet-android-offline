@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.timer.setrecord
+package com.climus.climeet.presentation.ui.main.record.session.record
 
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
@@ -23,7 +23,16 @@ import com.climus.climeet.presentation.ui.main.global.selectsector.model.Selecte
 import com.climus.climeet.presentation.ui.main.global.toGymLevelUiData
 import com.climus.climeet.presentation.ui.main.global.toRouteUiData
 import com.climus.climeet.presentation.ui.main.global.toSectorNameUiData
-import com.climus.climeet.presentation.util.formatTimerTime
+import com.climus.climeet.presentation.ui.main.record.session.record.SessionRouteCatalogLoader
+import com.climus.climeet.presentation.ui.main.record.session.record.SessionDraftStore
+import com.climus.climeet.presentation.ui.main.record.session.record.recoverStopwatch
+import com.climus.climeet.presentation.ui.main.record.session.record.restoreRouteItems
+import com.climus.climeet.presentation.ui.main.record.session.record.summarizeSessionDraft
+import com.climus.climeet.presentation.ui.main.record.session.record.adjustedRecordCount
+import com.climus.climeet.presentation.ui.main.record.session.record.closestLevelName
+import com.climus.climeet.presentation.ui.main.record.session.record.SessionSubmissionController
+import com.climus.climeet.presentation.ui.main.record.session.record.SessionSubmissionState
+import com.climus.climeet.presentation.util.formatStopwatchTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -37,7 +46,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-data class CreateRecordUiState(
+data class SessionRecordUiState(
     val isSingleFloor: Boolean = false,
     val curFloor: Int = 0,
     val layoutImg: String? = "",
@@ -54,25 +63,25 @@ data class CreateRecordUiState(
     val clearBtnState: Boolean = false,
 )
 
-sealed class CreateRecordEvent {
+sealed class SessionRecordEvent {
     data class ShowToastMessage(
         val msg: String,
-    ) : CreateRecordEvent()
+    ) : SessionRecordEvent()
 }
 
 @HiltViewModel
-class SetTimerClimbingRecordViewModel @Inject constructor(
+class SessionRecordViewModel @Inject constructor(
     private val repository: MainRepository,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(CreateRecordUiState())
-    val uiState: StateFlow<CreateRecordUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(SessionRecordUiState())
+    val uiState: StateFlow<SessionRecordUiState> = _uiState.asStateFlow()
 
-    private val _event = MutableSharedFlow<CreateRecordEvent>()
-    val event: SharedFlow<CreateRecordEvent> = _event.asSharedFlow()
+    private val _event = MutableSharedFlow<SessionRecordEvent>()
+    val event: SharedFlow<SessionRecordEvent> = _event.asSharedFlow()
 
-    private val submissionController = TimerRecordSubmissionController(repository)
-    private val draftStore = TimerRecordDraftStore(repository)
-    private val catalogLoader = TimerRouteCatalogLoader(repository)
+    private val submissionController = SessionSubmissionController(repository)
+    private val draftStore = SessionDraftStore(repository)
+    private val catalogLoader = SessionRouteCatalogLoader(repository)
     val submissionState = submissionController.state
     val submissionEffect = submissionController.effect
     val isCatalogRetryAvailable = MutableStateFlow(false)
@@ -83,15 +92,15 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     val items: StateFlow<List<RouteUiData>> = _items.asStateFlow()
     val itemsLiveData: LiveData<List<RouteUiData>> = _items.asLiveData()
 
-    var cragId: Long = 0
-    var cragName: String = ""
-    var apiCheck: Boolean = false
+    var gymId: Long = 0
+    var gymName: String = ""
+    private var isCatalogRequestStarted: Boolean = false
 
     private var sectorNameList = listOf<SectorNameUiData>()
     private var gymLevelList = listOf<GymLevelUiData>()
 
-    val isSelectedCrag = MutableStateFlow(false)
-    private val selectedCragEvent = MutableLiveData<Pair<Long, String>>()
+    val isGymSelected = MutableStateFlow(false)
+    private val selectedGymData = MutableLiveData<Pair<Long, String>>()
 
     private val _challengeNumber = MutableLiveData(0)
     val challengeNumber: LiveData<Int> = _challengeNumber
@@ -109,9 +118,9 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         addSource(totalComplete) { recalculateAvgRate() }
     }
 
-    val updateRecord = MutableLiveData(false)
-    val isRestart = MutableLiveData(false)
-    val resetView = MutableLiveData(false)
+    val routeRecordsChanged = MutableLiveData(false)
+    val isRestoringDraft = MutableLiveData(false)
+    val draftDetailsRestored = MutableLiveData(false)
     private var isSecondFloorExist: Boolean = false
 
     private var maxFloor = 0
@@ -151,39 +160,39 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     fun restoreDraft() {
         viewModelScope.launch {
             val draft = submissionController.restoreDraft() ?: return@launch
-            cragId = draft.gymId
-            cragName = draft.gymName
-            val recoveredTimer = recoverTimer(draft.time, sharedPreferences.getLong(PAUSE_TIME, 0L))
-            restoredElapsedTimeMillis.value = recoveredTimer?.elapsedTimeMillis
-            restoredDuration.value = recoveredTimer?.displayDuration
-            restoreSelectedCrag(draft.gymId, draft.gymName)
+            gymId = draft.gymId
+            gymName = draft.gymName
+            val recoveredStopwatch = recoverStopwatch(draft.time, sharedPreferences.getLong(PAUSE_TIME, 0L))
+            restoredElapsedTimeMillis.value = recoveredStopwatch?.elapsedTimeMillis
+            restoredDuration.value = recoveredStopwatch?.displayDuration
+            restoreSelectedGym(draft.gymId, draft.gymName)
         }
     }
 
-    fun restoreSelectedCrag(
+    fun restoreSelectedGym(
         id: Long,
         name: String,
     ) {
         if (id <= 0L || name.isBlank()) return
-        isRestart.value = true
-        if (apiCheck && cragId == id) {
-            getClimbingData()
+        isRestoringDraft.value = true
+        if (isCatalogRequestStarted && gymId == id) {
+            restoreRouteRecords()
         } else {
-            selectedCrag(id, name)
+            selectGym(id, name)
         }
     }
 
     fun submitRecord(elapsedTimeMillis: Long) {
-        if (submissionState.value != TimerSubmissionState.Draft) return
+        if (submissionState.value != SessionSubmissionState.Draft) return
         restoredElapsedTimeMillis.value = elapsedTimeMillis
-        restoredDuration.value = formatTimerTime(elapsedTimeMillis)
+        restoredDuration.value = formatStopwatchTime(elapsedTimeMillis)
         viewModelScope.launch {
             submissionController.submit(elapsedTimeMillis)
         }
     }
 
     fun discardPreservedDraft() {
-        if (submissionState.value !is TimerSubmissionState.Preserved) return
+        if (submissionState.value !is SessionSubmissionState.Preserved) return
         viewModelScope.launch {
             if (submissionController.discardPreservedDraft()) {
                 resetAtStop()
@@ -198,61 +207,65 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     }
 
     fun retryCatalog() {
-        if (!isCatalogRetryAvailable.value || cragId <= 0L) return
-        apiCheck = false
-        selectedCrag(cragId, cragName)
+        if (!isCatalogRetryAvailable.value || gymId <= 0L) return
+        isCatalogRequestStarted = false
+        selectGym(gymId, gymName)
+    }
+
+    fun prepareGymChange() {
+        isCatalogRequestStarted = false
     }
 
     private fun mutateDraft(block: suspend () -> Unit) {
-        if (submissionState.value != TimerSubmissionState.Draft) return
+        if (submissionState.value != SessionSubmissionState.Draft) return
         viewModelScope.launch {
             submissionController.mutateDraft(block)
         }
     }
 
     private fun setTotalValue() {
-        totalRoute.value = sharedPreferences.getString(TOP_CHALLENGE, "--")
-        totalComplete.value = sharedPreferences.getString(TOP_COMPLETE, "--")
-        avgLevel.value = sharedPreferences.getString(TOP_LEVEL, "--")
+        totalRoute.value = sharedPreferences.getString(PREF_TOTAL_ATTEMPTS, "--")
+        totalComplete.value = sharedPreferences.getString(PREF_TOTAL_COMPLETIONS, "--")
+        avgLevel.value = sharedPreferences.getString(PREF_AVERAGE_LEVEL, "--")
     }
 
-    private fun getClimbingData() {
+    private fun restoreRouteRecords() {
         viewModelScope.launch(Dispatchers.IO) {
             val routeDataList = repository.getAllRoute()
 
             if (_items.value.isEmpty()) {
                 val restoredItems = restoreRouteItems(routeDataList, firstFloorRouteList + secondFloorRouteList)
                 withContext(Dispatchers.Main) {
-                    isSelectedCrag.value = true
-                    val summary = summarizeTimerDraft(routeDataList)
+                    isGymSelected.value = true
+                    val summary = summarizeSessionDraft(routeDataList)
                     totalRoute.value = summary.routeCount
                     totalComplete.value = summary.completedCount
                     _items.value = restoredItems
                 }
                 sharedPreferences.edit {
-                    putString(TOP_CHALLENGE, totalRoute.value)
-                    putString(TOP_COMPLETE, totalComplete.value)
+                    putString(PREF_TOTAL_ATTEMPTS, totalRoute.value)
+                    putString(PREF_TOTAL_COMPLETIONS, totalComplete.value)
                 }
                 refreshAverageLevel()
-                resetView.postValue(true)
+                draftDetailsRestored.postValue(true)
             }
         }
     }
 
-    fun selectedCrag(
+    fun selectGym(
         id: Long,
         name: String,
     ) {
-        if (!apiCheck) {
-            selectedCragEvent.value = Pair(id, name)
-            cragId = id
-            cragName = name
-            getCragInfo(cragId)
-            apiCheck = true
+        if (!isCatalogRequestStarted) {
+            selectedGymData.value = Pair(id, name)
+            gymId = id
+            gymName = name
+            loadGymCatalog(gymId)
+            isCatalogRequestStarted = true
         }
     }
 
-    private fun getCragInfo(id: Long) {
+    private fun loadGymCatalog(id: Long) {
         viewModelScope.launch {
             repository.getGymFilteringKey(id).let {
                 when (it) {
@@ -284,18 +297,18 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
                             }
                             maxFloor = 2
                             isSecondFloorExist = true
-                            if (!loadFloorInfo(2, publish = false)) return@let
+                            if (!fetchFloorRoutes(2, publish = false)) return@let
                         }
-                        if (loadFloorInfo(1, publish = true) && isRestart.value == true) {
-                            isRestart.value = false
-                            getClimbingData()
+                        if (fetchFloorRoutes(1, publish = true) && isRestoringDraft.value == true) {
+                            isRestoringDraft.value = false
+                            restoreRouteRecords()
                         }
                     }
 
                     is BaseState.Error -> {
-                        apiCheck = false
+                        isCatalogRequestStarted = false
                         isCatalogRetryAvailable.value = true
-                        _event.emit(CreateRecordEvent.ShowToastMessage(CATALOG_RETRY_MESSAGE))
+                        _event.emit(SessionRecordEvent.ShowToastMessage(CATALOG_RETRY_MESSAGE))
                     }
                 }
             }
@@ -320,20 +333,20 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
                 selectedRoute = RouteUiData {},
             )
         }
-        setFloorInfo(floor)
+        loadFloorRoutes(floor)
     }
 
-    private fun setFloorInfo(floor: Int) {
+    private fun loadFloorRoutes(floor: Int) {
         viewModelScope.launch {
-            loadFloorInfo(floor, publish = true)
+            fetchFloorRoutes(floor, publish = true)
         }
     }
 
-    private suspend fun loadFloorInfo(
+    private suspend fun fetchFloorRoutes(
         floor: Int,
         publish: Boolean,
     ): Boolean =
-        when (val result = catalogLoader.load(cragId, floor)) {
+        when (val result = catalogLoader.load(gymId, floor)) {
             is BaseState.Success -> {
                 val routes = result.body.map { data -> data.toRouteUiData(::selectRoute) }
                 isCatalogRetryAvailable.value = false
@@ -352,21 +365,21 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
             }
 
             is BaseState.Error -> {
-                apiCheck = false
+                isCatalogRequestStarted = false
                 isCatalogRetryAvailable.value = true
-                _event.emit(CreateRecordEvent.ShowToastMessage(CATALOG_RETRY_MESSAGE))
+                _event.emit(SessionRecordEvent.ShowToastMessage(CATALOG_RETRY_MESSAGE))
                 false
             }
         }
 
-    private fun getRouteList(
+    private fun loadFilteredRoutes(
         floor: Int,
         sectorId: Long? = null,
         difficulty: Int? = null,
     ) {
-        cragId = selectedCragEvent.value?.first ?: run { 0 }
+        gymId = selectedGymData.value?.first ?: run { 0 }
         viewModelScope.launch {
-            catalogLoader.load(cragId, floor, sectorId, difficulty).let {
+            catalogLoader.load(gymId, floor, sectorId, difficulty).let {
                 when (it) {
                     is BaseState.Success -> {
                         isCatalogRetryAvailable.value = false
@@ -381,7 +394,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
 
                     is BaseState.Error -> {
                         isCatalogRetryAvailable.value = true
-                        _event.emit(CreateRecordEvent.ShowToastMessage(CATALOG_RETRY_MESSAGE))
+                        _event.emit(SessionRecordEvent.ShowToastMessage(CATALOG_RETRY_MESSAGE))
                     }
                 }
             }
@@ -399,7 +412,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
             )
         }
 
-        getRouteList(
+        loadFilteredRoutes(
             uiState.value.curFloor,
             item.sectorId,
             if (uiState.value.selectedLevel.difficulty != -1) uiState.value.selectedLevel.difficulty else null,
@@ -417,7 +430,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
             )
         }
 
-        getRouteList(
+        loadFilteredRoutes(
             uiState.value.curFloor,
             if (uiState.value.selectedSector.sectorId != -1L) uiState.value.selectedSector.sectorId else null,
             item.difficulty,
@@ -441,7 +454,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     }
 
     fun addChallengeNum() {
-        if (submissionState.value != TimerSubmissionState.Draft) return
+        if (submissionState.value != SessionSubmissionState.Draft) return
         _challengeNumber.value = (_challengeNumber.value ?: 0) + 1
         _items.value = _items.value.map {
             if (it.routeId ==
@@ -458,7 +471,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     }
 
     fun subChallengeNum() {
-        if (submissionState.value != TimerSubmissionState.Draft) return
+        if (submissionState.value != SessionSubmissionState.Draft) return
         val currentValue = _challengeNumber.value ?: 0
         var check = false
         if (currentValue > 0) {
@@ -493,7 +506,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     }
 
     fun setClear() {
-        if (submissionState.value != TimerSubmissionState.Draft) return
+        if (submissionState.value != SessionSubmissionState.Draft) return
         _uiState.update { state ->
             state.copy(clearBtnState = !state.clearBtnState)
         }
@@ -529,7 +542,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
         id: Long,
         num: Int,
     ) {
-        if (submissionState.value != TimerSubmissionState.Draft) return
+        if (submissionState.value != SessionSubmissionState.Draft) return
         _items.value = _items.value.map {
             if (it.routeId == id) {
                 if (uiState.value.selectedRoute.routeId == it.routeId) {
@@ -546,7 +559,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     }
 
     fun itemDecrease(id: Long) {
-        if (submissionState.value != TimerSubmissionState.Draft) return
+        if (submissionState.value != SessionSubmissionState.Draft) return
         var check = false
         _items.value = _items.value.map {
             if (it.routeId == id && it.challengeNum > 0) {
@@ -580,7 +593,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     }
 
     private fun removeItem(id: Long) {
-        if (submissionState.value != TimerSubmissionState.Draft) return
+        if (submissionState.value != SessionSubmissionState.Draft) return
         val itemToRemove = _items.value.find { it.routeId == id }
         if (itemToRemove != null) {
             deleteRouteRecord(itemToRemove, itemToRemove.clearBtnState)
@@ -593,7 +606,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     }
 
     fun setBtnState(id: Long) {
-        if (submissionState.value != TimerSubmissionState.Draft) return
+        if (submissionState.value != SessionSubmissionState.Draft) return
         _items.value = _items.value.map {
             if (it.routeId == id) {
                 if (uiState.value.selectedRoute.routeId == it.routeId) {
@@ -626,23 +639,23 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     }
 
     fun resetAtStop() {
-        _uiState.value = CreateRecordUiState()
+        _uiState.value = SessionRecordUiState()
         _items.value = emptyList()
-        cragId = 0
-        cragName = ""
+        gymId = 0
+        gymName = ""
         restoredDuration.value = null
         restoredElapsedTimeMillis.value = null
         totalRoute.value = "--"
         totalComplete.value = "--"
         avgLevel.value = "--"
         sharedPreferences.edit {
-            putString(TOP_CHALLENGE, "--")
-            putString(TOP_COMPLETE, "--")
-            putString(TOP_LEVEL, "--")
-            remove("cragId")
-            remove("cragName")
+            putString(PREF_TOTAL_ATTEMPTS, "--")
+            putString(PREF_TOTAL_COMPLETIONS, "--")
+            putString(PREF_AVERAGE_LEVEL, "--")
+            remove("gymId")
+            remove("gymName")
         }
-        apiCheck = false
+        isCatalogRequestStarted = false
         isCatalogRetryAvailable.value = false
         isSecondFloorExist = false
         firstFloorRouteList = emptyList()
@@ -652,12 +665,12 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     private fun saveRouteRecord(item: RouteUiData) {
         mutateDraft {
             if (draftStore.saveRoute(item)) {
-                updateRecord.postValue(!(updateRecord.value ?: false))
+                routeRecordsChanged.postValue(!(routeRecordsChanged.value ?: false))
                 refreshAverageLevel()
             }
         }
 
-        updateTotalCount(totalRoute, TOP_CHALLENGE, true)
+        updateTotalCount(totalRoute, PREF_TOTAL_ATTEMPTS, true)
     }
 
     private fun setRoomChallengeNum(
@@ -666,7 +679,7 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     ) {
         mutateDraft {
             if (draftStore.changeAttempt(item, if (plus) 1 else -1)) {
-                updateRecord.postValue(!(updateRecord.value ?: false))
+                routeRecordsChanged.postValue(!(routeRecordsChanged.value ?: false))
             }
         }
     }
@@ -677,12 +690,12 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     ) {
         mutateDraft {
             if (draftStore.setCompleted(item, complete)) {
-                updateRecord.postValue(!(updateRecord.value ?: false))
+                routeRecordsChanged.postValue(!(routeRecordsChanged.value ?: false))
                 refreshAverageLevel()
             }
         }
 
-        updateTotalCount(totalComplete, TOP_COMPLETE, complete)
+        updateTotalCount(totalComplete, PREF_TOTAL_COMPLETIONS, complete)
     }
 
     private fun deleteRouteRecord(
@@ -691,13 +704,13 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
     ) {
         mutateDraft {
             if (draftStore.delete(item)) {
-                updateRecord.postValue(!(updateRecord.value ?: false))
+                routeRecordsChanged.postValue(!(routeRecordsChanged.value ?: false))
                 refreshAverageLevel()
             }
         }
 
-        if (updateTotalCount(totalRoute, TOP_CHALLENGE, false) && isCompleted) {
-            updateTotalCount(totalComplete, TOP_COMPLETE, false)
+        if (updateTotalCount(totalRoute, PREF_TOTAL_ATTEMPTS, false) && isCompleted) {
+            updateTotalCount(totalComplete, PREF_TOTAL_COMPLETIONS, false)
         }
     }
 
@@ -726,24 +739,14 @@ class SetTimerClimbingRecordViewModel @Inject constructor(
             gymLevelList.map { it.difficulty to it.levelName },
         ) ?: "--"
         avgLevel.postValue(name)
-        sharedPreferences.edit { putString(TOP_LEVEL, name) }
+        sharedPreferences.edit { putString(PREF_AVERAGE_LEVEL, name) }
     }
 
     companion object {
-        const val TOP_CHALLENGE = "timerChallenge"
-        const val TOP_COMPLETE = "timerComplete"
-        const val TOP_LEVEL = "timerLevel"
+        const val PREF_TOTAL_ATTEMPTS = "timerChallenge"
+        const val PREF_TOTAL_COMPLETIONS = "timerComplete"
+        const val PREF_AVERAGE_LEVEL = "timerLevel"
         private const val PAUSE_TIME = "pauseTime"
         private const val CATALOG_RETRY_MESSAGE = "암장 정보를 불러오지 못했습니다. 암장 이름을 눌러 다시 시도해주세요."
     }
 }
-
-internal fun adjustedRecordCount(
-    current: String,
-    increase: Boolean,
-): String =
-    if (increase) {
-        if (current == "--") "1" else (current.toInt() + 1).toString()
-    } else {
-        if (current == "1" || current == "0") "--" else (current.toInt() - 1).toString()
-    }

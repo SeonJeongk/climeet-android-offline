@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.timer.setrecord
+package com.climus.climeet.presentation.ui.main.record.session.record
 
 import com.climus.climeet.data.local.ClimbingRecordData
 import com.climus.climeet.data.local.RouteRecordData
@@ -6,7 +6,7 @@ import com.climus.climeet.data.repository.MainRepository
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
 import kotlin.math.roundToInt
 
-internal class TimerRecordDraftStore(
+internal class SessionDraftStore(
     private val repository: MainRepository,
 ) {
     suspend fun saveClimbingDraft(record: ClimbingRecordData): Boolean {

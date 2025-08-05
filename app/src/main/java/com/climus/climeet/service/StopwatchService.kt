@@ -16,13 +16,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.climus.climeet.R
 import com.climus.climeet.presentation.ui.main.MainActivity
-import com.climus.climeet.presentation.util.formatTimerTime
+import com.climus.climeet.presentation.util.formatStopwatchTime
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Timer
 import java.util.TimerTask
 
 @AndroidEntryPoint
-class TimerService : Service() {
+class StopwatchService : Service() {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
 
@@ -47,13 +47,13 @@ class TimerService : Service() {
 
         when (command) {
             "START" -> {
-                startTimer(intent.getLongExtra(EXTRA_INITIAL_ELAPSED_TIME, 0L))
+                startStopwatch(intent.getLongExtra(EXTRA_INITIAL_ELAPSED_TIME, 0L))
                 val notification = createNotification(elapsedTime)
                 startForeground(1, notification)
             }
 
-            "PAUSE" -> pauseTimer()
-            "RESTART" -> restartTimer()
+            "PAUSE" -> pauseStopwatch()
+            "RESTART" -> restartStopwatch()
         }
 
         return START_STICKY
@@ -69,7 +69,7 @@ class TimerService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        stopTimer()
+        stopStopwatch()
     }
 
     private fun createNotificationChannelAndGroup() {
@@ -94,17 +94,17 @@ class TimerService : Service() {
     }
 
     private fun createNotification(elapsedTime: Long): Notification {
-        val timeFormat = formatTimerTime(elapsedTime)
+        val timeFormat = formatStopwatchTime(elapsedTime)
 
-        val timerIntent = Intent(this, MainActivity::class.java).apply {
+        val contentIntent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putExtra(MainActivity.EXTRA_SHOW_TIMER, true)
+            putExtra(MainActivity.EXTRA_SHOW_CLIMBING_SESSION, true)
         }
 
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
             this,
             0,
-            timerIntent,
+            contentIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
@@ -118,14 +118,14 @@ class TimerService : Service() {
         }
 
         if (isPaused) {
-            val restartIntent = Intent(this, TimerService::class.java).apply {
+            val restartIntent = Intent(this, StopwatchService::class.java).apply {
                 putExtra("command", "RESTART")
             }
             val restartPendingIntent: PendingIntent =
                 PendingIntent.getService(this, 0, restartIntent, PendingIntent.FLAG_MUTABLE)
             notification.addAction(R.drawable.ic_notification, "재시작", restartPendingIntent)
         } else {
-            val pauseIntent = Intent(this, TimerService::class.java).apply {
+            val pauseIntent = Intent(this, StopwatchService::class.java).apply {
                 putExtra("command", "PAUSE")
             }
             val pausePendingIntent: PendingIntent =
@@ -136,7 +136,7 @@ class TimerService : Service() {
         return notification.build()
     }
 
-    private fun setTimer() {
+    private fun scheduleTicks() {
         if (!isPaused) {
             startTime = System.currentTimeMillis()
         }
@@ -152,7 +152,7 @@ class TimerService : Service() {
 
                         val intent = Intent("StopwatchUpdate")
                         intent.putExtra("elapsedTime", elapsedTime)
-                        LocalBroadcastManager.getInstance(this@TimerService).sendBroadcast(intent)
+                        LocalBroadcastManager.getInstance(this@StopwatchService).sendBroadcast(intent)
 
                         startTime = System.currentTimeMillis()
                     }
@@ -163,10 +163,10 @@ class TimerService : Service() {
         }
     }
 
-    private fun startTimer(initialElapsedTime: Long) {
+    private fun startStopwatch(initialElapsedTime: Long) {
         elapsedTime = initialElapsedTime.coerceAtLeast(0L)
         pauseTime = elapsedTime
-        setTimer()
+        scheduleTicks()
         isStart = true
         isPaused = false
         isRestart = false
@@ -181,10 +181,10 @@ class TimerService : Service() {
         editor.putLong(PAUSE_TIME, elapsedTime)
         editor.apply()
 
-        serviceRunning.postValue(true)
+        hasStartedInProcess.postValue(true)
     }
 
-    private fun pauseTimer() {
+    private fun pauseStopwatch() {
         isStart = false
         isPaused = true
         isRestart = false
@@ -202,7 +202,7 @@ class TimerService : Service() {
         intent.putExtra("elapsedTime", elapsedTime)
         intent.putExtra("pauseTime", pauseTime)
         intent.putExtra("pauseState", "yes")
-        LocalBroadcastManager.getInstance(this@TimerService).sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(this@StopwatchService).sendBroadcast(intent)
 
         editor.putLong("pauseTime", pauseTime)
         editor.putBoolean(KEY_IS_START, isStart)
@@ -213,17 +213,17 @@ class TimerService : Service() {
         editor.apply()
     }
 
-    private fun restartTimer() {
+    private fun restartStopwatch() {
         isStart = false
         isPaused = false
         isRestart = true
         isStopped = false
         isRunning = true
-        setTimer()
+        scheduleTicks()
 
         val intent = Intent("StopwatchUpdate")
         intent.putExtra("pauseState", "no")
-        LocalBroadcastManager.getInstance(this@TimerService).sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(this@StopwatchService).sendBroadcast(intent)
 
         editor.putString("pauseTimeFormat", "00:00")
         editor.putBoolean(KEY_IS_START, isStart)
@@ -234,7 +234,7 @@ class TimerService : Service() {
         editor.apply()
     }
 
-    private fun stopTimer() {
+    private fun stopStopwatch() {
         isStart = false
         isPaused = false
         isRestart = false
@@ -244,7 +244,7 @@ class TimerService : Service() {
 
         val intent = Intent("StopwatchUpdate")
         intent.putExtra("elapsedTime", 0L)
-        LocalBroadcastManager.getInstance(this@TimerService).sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(this@StopwatchService).sendBroadcast(intent)
 
         editor.putBoolean(KEY_IS_START, isStart)
         editor.putBoolean(KEY_IS_PAUSE, isPaused)
@@ -260,12 +260,12 @@ class TimerService : Service() {
         private const val GROUP_ID = "exercise_record_group"
 
         /**
-         * 앱이 실행된 뒤 타이머 서비스가 시작됐는지 나타냅니다.
+         * 앱이 실행된 뒤 스톱워치 서비스가 시작됐는지 나타냅니다.
          *
          * 앱이 완전히 종료됐다가 다시 실행되면 `null`로 돌아갑니다.
          * 이때 화면은 기기에 저장된 운동 기록을 복구합니다.
          */
-        val serviceRunning = MutableLiveData<Boolean>()
+        val hasStartedInProcess = MutableLiveData<Boolean>()
         const val PAUSE_TIME = "pauseTime"
         const val KEY_IS_START = "isStart"
         const val KEY_IS_PAUSE = "isPause"

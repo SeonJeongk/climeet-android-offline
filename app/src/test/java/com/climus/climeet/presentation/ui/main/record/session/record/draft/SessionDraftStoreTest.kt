@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.timer.setrecord
+package com.climus.climeet.presentation.ui.main.record.session.record
 
 import com.climus.climeet.data.local.ClimbingRecordData
 import com.climus.climeet.data.local.RouteRecordData
@@ -12,9 +12,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class TimerRecordDraftStoreTest {
+class SessionDraftStoreTest {
     private val repository = mockk<MainRepository>(relaxed = true)
-    private val store = TimerRecordDraftStore(repository)
+    private val store = SessionDraftStore(repository)
 
     @Test
     fun finalizedDraft_saveClimbingDraft_doesNotOverwritePreservedRecord() =

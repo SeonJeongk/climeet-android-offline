@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.timer.setrecord
+package com.climus.climeet.presentation.ui.main.record.session.record
 
 import com.climus.climeet.data.local.RouteRecordData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
@@ -7,7 +7,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class TimerDraftRecoveryTest {
+class SessionDraftRecoveryTest {
     @Test
     fun savedRoutes_restore_preservesCountsCompletionAndAttempt() {
         val records = listOf(
@@ -19,7 +19,7 @@ class TimerDraftRecoveryTest {
             RouteUiData(routeId = 20, sectorId = 1) {},
         )
 
-        val summary = summarizeTimerDraft(records)
+        val summary = summarizeSessionDraft(records)
         val restoredRoutes = restoreRouteItems(records, catalog)
 
         assertEquals("2", summary.routeCount)

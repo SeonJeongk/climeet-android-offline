@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.timer.setrecord
+package com.climus.climeet.presentation.ui.main.record.session.record
 
 import com.climus.climeet.data.local.RouteRecordData
 import com.climus.climeet.data.local.completedAverageDifficulty
@@ -6,7 +6,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-class TimerRecordDifficultyPolicyTest {
+class SessionDifficultyPolicyTest {
     @Test
     fun incompleteAndLegacyRoutes_calculateAverage_usesCompletedZeroToTwelveOnly() {
         val routes = listOf(

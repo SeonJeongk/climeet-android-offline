@@ -1,9 +1,9 @@
-package com.climus.climeet.presentation.ui.main.record.timer.setrecord
+package com.climus.climeet.presentation.ui.main.record.session.record
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class RecordCountTest {
+class SessionRecordCountPolicyTest {
     @Test
     fun emptyDisplay_incrementThenDecrement_preservesTransitions() {
         var count = "--"

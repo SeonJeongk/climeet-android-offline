@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.timer.stopwatch
+package com.climus.climeet.presentation.ui.main.record.session.stopwatch
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -10,12 +10,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.climus.climeet.app.App.Companion.sharedPreferences
-import com.climus.climeet.presentation.util.formatTimerTime
+import com.climus.climeet.presentation.util.formatStopwatchTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class TimerViewModel @Inject constructor() : ViewModel() {
+class StopwatchViewModel @Inject constructor() : ViewModel() {
     private val _time = MutableLiveData<Long>().apply { value = 0L }
     val time: LiveData<Long> get() = _time
     var pauseState = MutableLiveData<String>()
@@ -44,11 +44,11 @@ class TimerViewModel @Inject constructor() : ViewModel() {
     }
 
     val timeFormat: LiveData<String> = time.map { elapsedTime ->
-        formatTimerTime(elapsedTime)
+        formatStopwatchTime(elapsedTime)
     }
 
     val pauseTimeFormat: LiveData<String> = pauseTime.map { pauseTime ->
-        formatTimerTime(pauseTime)
+        formatStopwatchTime(pauseTime)
     }
 
     fun restoreElapsedTime(elapsedTimeMillis: Long) {

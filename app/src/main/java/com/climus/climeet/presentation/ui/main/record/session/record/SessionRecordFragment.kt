@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.timer.setrecord
+package com.climus.climeet.presentation.ui.main.record.session.record
 
 import android.os.Bundle
 import android.view.View
@@ -6,26 +6,27 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.climus.climeet.R
 import com.climus.climeet.app.App.Companion.sharedPreferences
-import com.climus.climeet.databinding.FragmentTimerRecordBinding
+import com.climus.climeet.databinding.FragmentSessionRecordBinding
 import com.climus.climeet.presentation.base.BaseFragment
 import com.climus.climeet.presentation.customview.NoticePopup
 import com.climus.climeet.presentation.ui.main.global.selectsector.adapter.GymLevelAdapter
 import com.climus.climeet.presentation.ui.main.global.selectsector.adapter.RouteImageAdapter
 import com.climus.climeet.presentation.ui.main.global.selectsector.adapter.SectorNameAdapter
-import com.climus.climeet.presentation.ui.main.record.timer.TimerMainViewModel
-import com.climus.climeet.presentation.ui.main.record.timer.stopwatch.TimerViewModel
-import com.climus.climeet.presentation.ui.main.record.timer.stopwatch.selectcrag.TimerCragSelectBottomSheetViewModel
+import com.climus.climeet.presentation.ui.main.record.session.SessionPagerViewModel
+import com.climus.climeet.presentation.ui.main.record.session.gym.GymSelectViewModel
+import com.climus.climeet.presentation.ui.main.record.session.record.SessionRouteAdapter
+import com.climus.climeet.presentation.ui.main.record.session.stopwatch.StopwatchViewModel
 
-class SetTimerClimbingRecordFragment : BaseFragment<FragmentTimerRecordBinding>(R.layout.fragment_timer_record) {
-    private val viewModel: SetTimerClimbingRecordViewModel by activityViewModels()
-    private val timerVM: TimerViewModel by activityViewModels()
-    private val cragSelectVM: TimerCragSelectBottomSheetViewModel by activityViewModels()
-    private val mainVM: TimerMainViewModel by activityViewModels()
+class SessionRecordFragment : BaseFragment<FragmentSessionRecordBinding>(R.layout.fragment_session_record) {
+    private val viewModel: SessionRecordViewModel by activityViewModels()
+    private val stopwatchViewModel: StopwatchViewModel by activityViewModels()
+    private val gymSelectViewModel: GymSelectViewModel by activityViewModels()
+    private val sessionPagerViewModel: SessionPagerViewModel by activityViewModels()
 
-    private lateinit var routeItemAdapter: ClimbingRecordAdapter
+    private lateinit var routeItemAdapter: SessionRouteAdapter
 
-    private var cragId: Long = 0L
-    private var cragName: String = ""
+    private var gymId: Long = 0L
+    private var gymName: String = ""
 
     override fun onViewCreated(
         view: View,
@@ -34,27 +35,27 @@ class SetTimerClimbingRecordFragment : BaseFragment<FragmentTimerRecordBinding>(
         super.onViewCreated(view, savedInstanceState)
 
         binding.vm = viewModel
-        routeItemAdapter = ClimbingRecordAdapter(viewModel)
+        routeItemAdapter = SessionRouteAdapter(viewModel)
 
         binding.ivCelebrate.bringToFront()
 
         setRecyclerView()
-        timerObserve()
+        observeStopwatchTime()
         initClickListener()
         initEventObserve()
         initRouteObserve()
-        setCragName()
+        observeSelectedGym()
     }
 
     override fun onResume() {
         super.onResume()
-        val restoredCragId = sharedPreferences.getLong("cragId", 0L)
-        val restoredCragName = sharedPreferences.getString("cragName", getString(R.string.timer_crag_set_inform))
-        binding.tvTitle.text = restoredCragName
-        if (restoredCragId > 0L && restoredCragName != null) {
-            cragId = restoredCragId
-            cragName = restoredCragName
-            viewModel.restoreSelectedCrag(restoredCragId, restoredCragName)
+        val restoredGymId = sharedPreferences.getLong("gymId", 0L)
+        val restoredGymName = sharedPreferences.getString("gymName", getString(R.string.session_gym_select_prompt))
+        binding.tvTitle.text = restoredGymName
+        if (restoredGymId > 0L && restoredGymName != null) {
+            gymId = restoredGymId
+            gymName = restoredGymName
+            viewModel.restoreSelectedGym(restoredGymId, restoredGymName)
         }
     }
 
@@ -68,8 +69,8 @@ class SetTimerClimbingRecordFragment : BaseFragment<FragmentTimerRecordBinding>(
         binding.rvSectorImage.itemAnimator = null
     }
 
-    private fun timerObserve() {
-        timerVM.timeFormat.observe(
+    private fun observeStopwatchTime() {
+        stopwatchViewModel.timeFormat.observe(
             viewLifecycleOwner,
             Observer { timeFormat ->
                 binding.tvTime.text = timeFormat
@@ -78,14 +79,14 @@ class SetTimerClimbingRecordFragment : BaseFragment<FragmentTimerRecordBinding>(
     }
 
     private fun initClickListener() {
-        binding.layoutSelectCrag.setOnClickListener {
-            if (timerVM.isStop.value == false) {
+        binding.layoutSelectGym.setOnClickListener {
+            if (stopwatchViewModel.isStop.value == false) {
                 NoticePopup.make(it, "운동중에는 암장을 바꿀 수 없어요!").show()
             }
         }
 
         binding.layoutIdcTime.setOnClickListener {
-            mainVM.moveToStopwatch()
+            sessionPagerViewModel.moveToStopwatch()
         }
     }
 
@@ -95,16 +96,16 @@ class SetTimerClimbingRecordFragment : BaseFragment<FragmentTimerRecordBinding>(
         }
     }
 
-    private fun setCragName() {
-        cragSelectVM.selectedCrag.observe(
+    private fun observeSelectedGym() {
+        gymSelectViewModel.selectedGym.observe(
             viewLifecycleOwner,
-            Observer { cragData ->
-                if (cragData != null) {
-                    cragId = cragData.id
-                    cragName = cragData.name
+            Observer { gym ->
+                if (gym != null) {
+                    gymId = gym.id
+                    gymName = gym.name
 
-                    binding.tvTitle.text = cragName
-                    viewModel.selectedCrag(cragId, cragName)
+                    binding.tvTitle.text = gymName
+                    viewModel.selectGym(gymId, gymName)
                 }
             },
         )
@@ -114,7 +115,7 @@ class SetTimerClimbingRecordFragment : BaseFragment<FragmentTimerRecordBinding>(
         repeatOnStarted {
             viewModel.event.collect {
                 when (it) {
-                    is CreateRecordEvent.ShowToastMessage -> showToastMessage(it.msg)
+                    is SessionRecordEvent.ShowToastMessage -> showToastMessage(it.msg)
                 }
             }
         }

@@ -10,8 +10,8 @@ import com.climus.climeet.data.local.completedAverageDifficulty
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.request.AddShortsCommentRequest
 import com.climus.climeet.data.model.request.ClimbingRecord
+import com.climus.climeet.data.model.request.CreateClimbingRecordRequest
 import com.climus.climeet.data.model.request.CreateGymProfileReviewRequest
-import com.climus.climeet.data.model.request.CreateTimerClimbingRecordRequest
 import com.climus.climeet.data.model.request.GetGymRouteInfoRequest
 import com.climus.climeet.data.model.request.GymServiceUpdateRequest
 import com.climus.climeet.data.model.request.ImgUrlRequest
@@ -210,9 +210,9 @@ class MainRepositoryImpl @Inject constructor(
             api.uploadShorts(video, body)
         }
 
-    override suspend fun createTimerClimbingRecord(body: CreateTimerClimbingRecordRequest): BaseState<ResponseBody> =
+    override suspend fun createClimbingRecord(body: CreateClimbingRecordRequest): BaseState<ResponseBody> =
         runRemote {
-            api.createTimerClimbingRecord(body)
+            api.createClimbingRecord(body)
         }
 
     override suspend fun getGymProfile(gymId: Long): BaseState<GetGymProfileResponse> =
@@ -315,16 +315,16 @@ class MainRepositoryImpl @Inject constructor(
 
     override suspend fun getRecord(id: Int): ClimbingRecordData? = climbingRecordDao.getRecord(id)
 
-    override suspend fun finalizeTimerClimbingRecord(
+    override suspend fun finalizeSessionRecord(
         id: Int,
         time: String,
-    ): CreateTimerClimbingRecordRequest? =
+    ): CreateClimbingRecordRequest? =
         climbingDatabase.withTransaction {
             val record = climbingRecordDao.getRecord(id) ?: return@withTransaction null
             val routes = routeRecordDao.getAllRoute()
             val averageDifficulty = completedAverageDifficulty(routes) ?: NO_COMPLETION_AVERAGE_FALLBACK
             climbingRecordDao.update(record.copy(time = time, avgDifficulty = averageDifficulty))
-            CreateTimerClimbingRecordRequest(
+            CreateClimbingRecordRequest(
                 gymId = record.gymId,
                 date = record.date,
                 time = time,
@@ -335,7 +335,7 @@ class MainRepositoryImpl @Inject constructor(
             )
         }
 
-    override suspend fun clearTimerClimbingRecordDraft() {
+    override suspend fun clearSessionDraft() {
         climbingDatabase.withTransaction {
             routeRecordDao.deleteAllRoute()
             climbingRecordDao.deleteAllRecord()

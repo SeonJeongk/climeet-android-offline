@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 private val recordTimeFormatter = DateTimeFormatter.ofPattern("a hh:mm", Locale.ENGLISH)
 
 // 화면·알림·서버 전송에서 같은 경과시간 계산과 숫자 형식을 사용합니다.
-internal fun formatTimerTime(
+internal fun formatStopwatchTime(
     elapsedTimeMillis: Long,
     alwaysShowHours: Boolean = false,
 ): String {
@@ -23,8 +23,8 @@ internal fun formatTimerTime(
     }
 }
 
-internal fun parseTimerTime(timerTime: String): Long? {
-    val parts = timerTime.split(':')
+internal fun parseStopwatchTime(stopwatchTime: String): Long? {
+    val parts = stopwatchTime.split(':')
     if (parts.size !in 2..3) return null
 
     val values = parts.map { part -> part.toLongOrNull() ?: return null }

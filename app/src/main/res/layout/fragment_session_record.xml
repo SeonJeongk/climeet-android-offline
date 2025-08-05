@@ -9,7 +9,7 @@
 
         <variable
             name="vm"
-            type="com.climus.climeet.presentation.ui.main.record.timer.setrecord.SetTimerClimbingRecordViewModel" />
+            type="com.climus.climeet.presentation.ui.main.record.session.record.SessionRecordViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -30,7 +30,7 @@
 
                 <!--    암장 선택    -->
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_select_crag"
+                    android:id="@+id/layout_select_gym"
                     android:layout_width="246dp"
                     android:layout_height="35dp"
                     android:layout_marginTop="30dp"
@@ -59,7 +59,7 @@
                         android:ellipsize="end"
                         android:maxWidth="200dp"
                         android:maxLines="1"
-                        android:text="@string/timer_crag_set_inform"
+                        android:text="@string/session_gym_select_prompt"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/iv_map"
@@ -75,7 +75,7 @@
                     android:layout_marginTop="25dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_select_crag">
+                    app:layout_constraintTop_toBottomOf="@id/layout_select_gym">
 
                     <TextView
                         android:id="@+id/tv_route_record"
@@ -330,7 +330,7 @@
                         android:id="@+id/layout_toggle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="@{vm.isSelectedCrag()? View.VISIBLE : View.GONE}"
+                        android:visibility="@{vm.isGymSelected()? View.VISIBLE : View.GONE}"
                         app:layout_constraintTop_toBottomOf="@id/layout_main">
 
                         <TextView
@@ -380,7 +380,7 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
                                 tools:itemCount="3"
-                                tools:listitem="@layout/item_timer_route_record" />
+                                tools:listitem="@layout/item_session_route_record" />
 
                             <androidx.constraintlayout.widget.ConstraintLayout
                                 android:id="@+id/layout_no_route"

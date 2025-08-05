@@ -101,24 +101,24 @@
         android:label="SearchCragFragment" />
 
     <fragment
-        android:id="@+id/timer_fragment"
-        android:name="com.climus.climeet.presentation.ui.main.record.timer.stopwatch.TimerFragment"
-        android:label="TimerFragment" >
+        android:id="@+id/stopwatch_fragment"
+        android:name="com.climus.climeet.presentation.ui.main.record.session.stopwatch.StopwatchFragment"
+        android:label="StopwatchFragment" >
         <action
-            android:id="@+id/action_timer_fragment_to_timerCragSelectBottomSheetFragment"
-            app:destination="@id/timerCragSelectBottomSheetFragment" />
+            android:id="@+id/action_stopwatch_fragment_to_gymSelectBottomSheetFragment"
+            app:destination="@id/gymSelectBottomSheetFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/timerCragSelectBottomSheetFragment"
-        android:name="com.climus.climeet.presentation.ui.main.record.timer.stopwatch.selectcrag.TimerCragSelectBottomSheetFragment"
-        android:label="TimerCragSelectBottomSheetFragment">
+        android:id="@+id/gymSelectBottomSheetFragment"
+        android:name="com.climus.climeet.presentation.ui.main.record.session.gym.GymSelectBottomSheetFragment"
+        android:label="GymSelectBottomSheetFragment">
     </fragment>
 
     <fragment
-        android:id="@+id/set_timer_climbing_record_fragment"
-        android:name="com.climus.climeet.presentation.ui.main.record.timer.setrecord.SetTimerClimbingRecordFragment"
-        android:label="SetTimerClimbingRecordFragment" />
+        android:id="@+id/session_record_fragment"
+        android:name="com.climus.climeet.presentation.ui.main.record.session.record.SessionRecordFragment"
+        android:label="SessionRecordFragment" />
 
     <fragment
         android:id="@+id/calendar_fragment"
@@ -158,9 +158,9 @@
         android:label="ShortsBottomSheetFragment" />
 
     <fragment
-        android:id="@+id/timerMainFragment"
-        android:name="com.climus.climeet.presentation.ui.main.record.timer.TimerMainFragment"
-        android:label="TimerMainFragment" />
+        android:id="@+id/climbingSessionFragment"
+        android:name="com.climus.climeet.presentation.ui.main.record.session.ClimbingSessionFragment"
+        android:label="ClimbingSessionFragment" />
 
     <dialog
         android:id="@+id/uploadBottomSheetFragment"
@@ -236,8 +236,8 @@
             android:id="@+id/action_record_fragment_to_createClimbingRecordFragment"
             app:destination="@id/create_climbing_record_fragment" />
         <action
-            android:id="@+id/action_record_fragment_to_timerMainFragment"
-            app:destination="@id/timerMainFragment" />
+            android:id="@+id/action_record_fragment_to_climbingSessionFragment"
+            app:destination="@id/climbingSessionFragment" />
     </fragment>
 
     <action

@@ -1,11 +1,11 @@
-package com.climus.climeet.presentation.ui.main.record.timer.setrecord
+package com.climus.climeet.presentation.ui.main.record.session.record
 
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.request.GetGymRouteInfoRequest
 import com.climus.climeet.data.model.response.RouteItem
 import com.climus.climeet.data.repository.MainRepository
 
-internal class TimerRouteCatalogLoader(
+internal class SessionRouteCatalogLoader(
     private val repository: MainRepository,
 ) {
     suspend fun load(
