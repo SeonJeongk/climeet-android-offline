@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.session.record
+package com.climus.climeet.presentation.ui.main.record.session.record.policy
 
 import kotlin.math.abs
 

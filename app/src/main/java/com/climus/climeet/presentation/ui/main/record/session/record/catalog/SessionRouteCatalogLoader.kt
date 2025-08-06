@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.session.record
+package com.climus.climeet.presentation.ui.main.record.session.record.catalog
 
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.request.GetGymRouteInfoRequest

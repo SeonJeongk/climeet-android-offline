@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.session.record
+package com.climus.climeet.presentation.ui.main.record.session.record.policy
 
 import com.climus.climeet.data.local.RouteRecordData
 import com.climus.climeet.data.local.completedAverageDifficulty

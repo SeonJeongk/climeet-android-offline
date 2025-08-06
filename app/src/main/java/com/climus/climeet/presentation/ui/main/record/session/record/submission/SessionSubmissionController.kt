@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.session.record
+package com.climus.climeet.presentation.ui.main.record.session.record.submission
 
 import com.climus.climeet.data.local.ClimbingRecordData
 import com.climus.climeet.data.model.BaseState

@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.session.record
+package com.climus.climeet.presentation.ui.main.record.session.record.draft
 
 import com.climus.climeet.data.local.RouteRecordData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData

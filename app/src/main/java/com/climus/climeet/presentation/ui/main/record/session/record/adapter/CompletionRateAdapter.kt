@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.session.record
+package com.climus.climeet.presentation.ui.main.record.session.record.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

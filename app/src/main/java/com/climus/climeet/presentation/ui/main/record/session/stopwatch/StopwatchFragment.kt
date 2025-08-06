@@ -25,10 +25,10 @@ import com.climus.climeet.presentation.ui.main.record.model.LevelItemForAvg
 import com.climus.climeet.presentation.ui.main.record.session.gym.GymSelectBottomSheetFragment
 import com.climus.climeet.presentation.ui.main.record.session.gym.GymSelectViewModel
 import com.climus.climeet.presentation.ui.main.record.session.record.SessionRecordViewModel
-import com.climus.climeet.presentation.ui.main.record.session.record.CompletionRateAdapter
-import com.climus.climeet.presentation.ui.main.record.session.record.SessionRouteAdapter
-import com.climus.climeet.presentation.ui.main.record.session.record.SessionSubmissionEffect
-import com.climus.climeet.presentation.ui.main.record.session.record.SessionSubmissionState
+import com.climus.climeet.presentation.ui.main.record.session.record.adapter.CompletionRateAdapter
+import com.climus.climeet.presentation.ui.main.record.session.record.adapter.SessionRouteAdapter
+import com.climus.climeet.presentation.ui.main.record.session.record.submission.SessionSubmissionEffect
+import com.climus.climeet.presentation.ui.main.record.session.record.submission.SessionSubmissionState
 import com.climus.climeet.service.StopwatchService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers

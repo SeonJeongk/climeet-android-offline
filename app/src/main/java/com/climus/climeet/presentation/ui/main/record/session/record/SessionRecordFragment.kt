@@ -14,7 +14,7 @@ import com.climus.climeet.presentation.ui.main.global.selectsector.adapter.Route
 import com.climus.climeet.presentation.ui.main.global.selectsector.adapter.SectorNameAdapter
 import com.climus.climeet.presentation.ui.main.record.session.SessionPagerViewModel
 import com.climus.climeet.presentation.ui.main.record.session.gym.GymSelectViewModel
-import com.climus.climeet.presentation.ui.main.record.session.record.SessionRouteAdapter
+import com.climus.climeet.presentation.ui.main.record.session.record.adapter.SessionRouteAdapter
 import com.climus.climeet.presentation.ui.main.record.session.stopwatch.StopwatchViewModel
 
 class SessionRecordFragment : BaseFragment<FragmentSessionRecordBinding>(R.layout.fragment_session_record) {

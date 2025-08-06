@@ -1,4 +1,4 @@
-package com.climus.climeet.presentation.ui.main.record.session.record
+package com.climus.climeet.presentation.ui.main.record.session.record.submission
 
 import android.content.SharedPreferences
 import androidx.arch.core.executor.ArchTaskExecutor
