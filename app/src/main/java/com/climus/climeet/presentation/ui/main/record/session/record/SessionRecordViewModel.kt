@@ -169,6 +169,7 @@ class SessionRecordViewModel @Inject constructor(
         }
     }
 
+    /** 저장된 암장의 catalog를 준비한 뒤 Room의 route 기록을 화면 항목에 다시 연결합니다. */
     fun restoreSelectedGym(
         id: Long,
         name: String,

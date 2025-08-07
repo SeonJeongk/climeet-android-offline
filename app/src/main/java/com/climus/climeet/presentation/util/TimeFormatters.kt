@@ -7,7 +7,11 @@ import java.util.concurrent.TimeUnit
 
 private val recordTimeFormatter = DateTimeFormatter.ofPattern("a hh:mm", Locale.ENGLISH)
 
-// 화면·알림·서버 전송에서 같은 경과시간 계산과 숫자 형식을 사용합니다.
+/**
+ * 경과 시간을 화면·알림·서버 전송에서 사용하는 문자열로 변환합니다.
+ *
+ * 한 시간 미만은 `MM:ss`로 표시합니다. 시간이 있거나 [alwaysShowHours]가 `true`이면 `HH:mm:ss`를 사용합니다.
+ */
 internal fun formatStopwatchTime(
     elapsedTimeMillis: Long,
     alwaysShowHours: Boolean = false,
@@ -23,6 +27,11 @@ internal fun formatStopwatchTime(
     }
 }
 
+/**
+ * `MM:ss` 또는 `HH:mm:ss` 형식의 경과 시간을 millisecond로 변환합니다.
+ *
+ * 분과 초가 0부터 59 범위를 벗어나거나 계산 결과가 넘치면 `null`을 반환합니다.
+ */
 internal fun parseStopwatchTime(stopwatchTime: String): Long? {
     val parts = stopwatchTime.split(':')
     if (parts.size !in 2..3) return null

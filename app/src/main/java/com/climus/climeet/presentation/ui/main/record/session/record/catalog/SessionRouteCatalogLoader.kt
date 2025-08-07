@@ -5,6 +5,11 @@ import com.climus.climeet.data.model.request.GetGymRouteInfoRequest
 import com.climus.climeet.data.model.response.RouteItem
 import com.climus.climeet.data.repository.MainRepository
 
+/**
+ * 선택한 암장의 route catalog를 마지막 페이지까지 불러옵니다.
+ *
+ * 중간 페이지에서 실패하면 일부 목록을 성공으로 반환하지 않고 해당 오류를 그대로 반환합니다.
+ */
 internal class SessionRouteCatalogLoader(
     private val repository: MainRepository,
 ) {

@@ -13,11 +13,13 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
+/** 운동 draft의 수정 가능 여부와 제출 진행 단계를 나타냅니다. */
 sealed interface SessionSubmissionState {
     data object Draft : SessionSubmissionState
 
     data object Submitting : SessionSubmissionState
 
+    /** 종료 snapshot은 확정됐지만 서버 반영 여부를 안전하게 확인할 수 없어 수정과 재전송을 막은 상태입니다. */
     data class Preserved(
         val message: String,
     ) : SessionSubmissionState
@@ -25,6 +27,7 @@ sealed interface SessionSubmissionState {
     data object Succeeded : SessionSubmissionState
 }
 
+/** 제출 상태 변경에 따라 화면에서 한 번만 처리할 동작입니다. */
 sealed interface SessionSubmissionEffect {
     data class ShowMessage(
         val message: String,
@@ -39,7 +42,8 @@ sealed interface SessionSubmissionEffect {
  * 운동 기록을 수정하고 서버로 보내는 순서를 관리합니다.
  *
  * 한 번에 한 작업만 처리해 전송 중인 기록이 바뀌지 않게 합니다.
- * 전송에 성공하면 기기 기록을 삭제하고, 실패하면 다음 실행에서 복구할 수 있도록 남깁니다.
+ * 전송에 성공하면 기기 기록을 삭제합니다. 종료 snapshot을 확정한 뒤 실패하면 서버 중복을 피하기 위해
+ * 보존 상태로 전환하고 자동 재전송을 막습니다.
  */
 internal class SessionSubmissionController(
     private val repository: MainRepository,
@@ -51,6 +55,7 @@ internal class SessionSubmissionController(
     private val effects = Channel<SessionSubmissionEffect>(Channel.BUFFERED)
     val effect = effects.receiveAsFlow()
 
+    /** 종료 시간이 비어 있으면 수정 가능한 draft로, 값이 있으면 보존 기록으로 복원합니다. */
     suspend fun restoreDraft(): ClimbingRecordData? =
         mutationMutex.withLock {
             val draft = repository.getRecord(RECORD_ID) ?: return@withLock null
