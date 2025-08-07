@@ -1,6 +1,6 @@
 package com.climus.climeet.data.contract
 
-import com.climus.climeet.data.model.request.CreateTimerClimbingRecordRequest
+import com.climus.climeet.data.model.request.CreateClimbingRecordRequest
 import com.climus.climeet.data.model.request.GetGymRouteInfoRequest
 import com.climus.climeet.data.remote.MainApi
 import com.google.gson.Gson
@@ -53,10 +53,10 @@ class MainApiFixtureIntegrationTest {
                 assertFalse(routes.result.map { it.routeId }.hasDuplicates())
 
                 val recordRequest = gson.fromJson(
-                    fixture("create-timer-climbing-record-request.json"),
-                    CreateTimerClimbingRecordRequest::class.java,
+                    fixture("create-climbing-record-request.json"),
+                    CreateClimbingRecordRequest::class.java,
                 )
-                val recordResponse = api.createTimerClimbingRecord(recordRequest)
+                val recordResponse = api.createClimbingRecord(recordRequest)
                 assertEquals(200, recordResponse.code())
                 assertNotNull(recordResponse.body())
                 assertEquals(0L, recordResponse.body()!!.contentLength())
@@ -77,7 +77,7 @@ class MainApiFixtureIntegrationTest {
                 assertEquals("POST", recordHttpRequest.method)
                 assertEquals("/api/climbing-records", recordHttpRequest.path)
                 assertEquals(
-                    JsonParser().parse(fixture("create-timer-climbing-record-request.json")),
+                    JsonParser().parse(fixture("create-climbing-record-request.json")),
                     JsonParser().parse(recordHttpRequest.body.readUtf8()),
                 )
             }

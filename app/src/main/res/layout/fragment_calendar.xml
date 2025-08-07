@@ -217,7 +217,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
                     android:background="@android:color/transparent"
-                    android:onClick="@{() -> vm.navigateToTimerMain()}"
+                    android:onClick="@{() -> vm.navigateToClimbingSession()}"
                     android:src="@drawable/oval_mainfill_nostroke_noradius"
                     android:visibility="@{vm.isToday ? View.VISIBLE : View.INVISIBLE}"
                     app:layout_constraintBottom_toBottomOf="@id/btn_add"

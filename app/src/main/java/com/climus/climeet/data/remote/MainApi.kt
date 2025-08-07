@@ -1,8 +1,8 @@
 package com.climus.climeet.data.remote
 
 import com.climus.climeet.data.model.request.AddShortsCommentRequest
+import com.climus.climeet.data.model.request.CreateClimbingRecordRequest
 import com.climus.climeet.data.model.request.CreateGymProfileReviewRequest
-import com.climus.climeet.data.model.request.CreateTimerClimbingRecordRequest
 import com.climus.climeet.data.model.request.GetGymRouteInfoRequest
 import com.climus.climeet.data.model.request.GymServiceUpdateRequest
 import com.climus.climeet.data.model.request.ImgUrlRequest
@@ -216,8 +216,8 @@ interface MainApi {
     ): Response<ResponseBody>
 
     @POST("/api/climbing-records")
-    suspend fun createTimerClimbingRecord(
-        @Body params: CreateTimerClimbingRecordRequest,
+    suspend fun createClimbingRecord(
+        @Body params: CreateClimbingRecordRequest,
     ): Response<ResponseBody>
 
     @GET("/api/gyms/{gymId}")

@@ -10,20 +10,20 @@ import androidx.room.Update
 @Dao
 interface ClimbingRecordDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(climbingRecord: ClimbingRecordData)
+    suspend fun insert(climbingRecord: ClimbingRecordData)
 
     @Update
-    fun update(climbingRecord: ClimbingRecordData)
+    suspend fun update(climbingRecord: ClimbingRecordData)
 
     @Delete
-    fun delete(climbingRecord: ClimbingRecordData)
+    suspend fun delete(climbingRecord: ClimbingRecordData)
 
     @Query("DELETE FROM climbing_record")
-    fun deleteAllRecord()
+    suspend fun deleteAllRecord()
 
     @Query("SELECT * FROM climbing_record")
-    fun getAllRecord(): List<ClimbingRecordData>
+    suspend fun getAllRecord(): List<ClimbingRecordData>
 
     @Query("SELECT * FROM climbing_record WHERE id = :id")
-    fun getRecord(id: Int): ClimbingRecordData
+    suspend fun getRecord(id: Int): ClimbingRecordData?
 }

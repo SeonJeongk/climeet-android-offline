@@ -4,8 +4,8 @@ import com.climus.climeet.data.local.ClimbingRecordData
 import com.climus.climeet.data.local.RouteRecordData
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.request.AddShortsCommentRequest
+import com.climus.climeet.data.model.request.CreateClimbingRecordRequest
 import com.climus.climeet.data.model.request.CreateGymProfileReviewRequest
-import com.climus.climeet.data.model.request.CreateTimerClimbingRecordRequest
 import com.climus.climeet.data.model.request.GetGymRouteInfoRequest
 import com.climus.climeet.data.model.request.GymServiceUpdateRequest
 import com.climus.climeet.data.model.request.ImgUrlRequest
@@ -169,7 +169,7 @@ interface MainRepository {
 
     suspend fun updateGymRouteVersion(body: UpdateGymRouteVersionRequest): BaseState<ResponseBody>
 
-    suspend fun createTimerClimbingRecord(body: CreateTimerClimbingRecordRequest): BaseState<ResponseBody>
+    suspend fun createClimbingRecord(body: CreateClimbingRecordRequest): BaseState<ResponseBody>
 
     suspend fun getGymProfile(gymId: Long): BaseState<GetGymProfileResponse>
 
@@ -273,46 +273,56 @@ interface MainRepository {
         size: Int,
     ): BaseState<GetMyShortsCommentsResponse>
 
-    // -------- RoomDB ClimbingRecordDao 암장 정보 ----------
-    fun insert(climbingRecordData: ClimbingRecordData)
+    suspend fun insert(climbingRecordData: ClimbingRecordData)
 
-    fun update(climbingRecordData: ClimbingRecordData)
+    suspend fun update(climbingRecordData: ClimbingRecordData)
 
-    fun delete(climbingRecordData: ClimbingRecordData)
+    suspend fun delete(climbingRecordData: ClimbingRecordData)
 
-    fun deleteAllRecord()
+    suspend fun deleteAllRecord()
 
-    fun getAllRecord(): List<ClimbingRecordData>
+    suspend fun getAllRecord(): List<ClimbingRecordData>
 
-    fun getRecord(id: Int): ClimbingRecordData
+    suspend fun getRecord(id: Int): ClimbingRecordData?
 
-    // ------ RoomDB RouteRecordDao 루트 기록 정보 ---------
-    fun insert(routeRecord: RouteRecordData)
+    /**
+     * 운동 종료 시간을 저장하고 현재 루트 기록을 서버 전송용 값으로 묶습니다.
+     *
+     * 두 작업은 함께 처리되며, 저장된 운동 기록이 없으면 `null`을 반환합니다.
+     */
+    suspend fun finalizeSessionRecord(
+        id: Int,
+        time: String,
+    ): CreateClimbingRecordRequest?
 
-    fun update(routeRecord: RouteRecordData)
+    suspend fun clearSessionDraft()
 
-    fun delete(routeRecord: RouteRecordData)
+    suspend fun insert(routeRecord: RouteRecordData)
 
-    fun deleteAllRoute()
+    suspend fun update(routeRecord: RouteRecordData)
 
-    fun deleteById(id: Int)
+    suspend fun delete(routeRecord: RouteRecordData)
 
-    fun getAllRoute(): List<RouteRecordData>
+    suspend fun deleteAllRoute()
 
-    fun getRouteById(id: Int): RouteRecordData
+    suspend fun deleteById(id: Int)
 
-    fun findExistRoute(
+    suspend fun getAllRoute(): List<RouteRecordData>
+
+    suspend fun getRouteById(id: Int): RouteRecordData
+
+    suspend fun findExistRoute(
         sectorId: Long,
         routeId: Long,
     ): RouteRecordData?
 
-    fun getAverageDifficultyOfCompleted(): Double?
+    suspend fun getAverageDifficultyOfCompleted(): Double?
 
-    fun getAllLevelRecord(): List<RouteRecordData>
+    suspend fun getAllLevelRecord(): List<RouteRecordData>
 
-    fun getSuccessCount(level: String): Int
+    suspend fun getSuccessCount(level: String): Int
 
-    fun getAttemptCount(level: String): Int
+    suspend fun getAttemptCount(level: String): Int
 
     suspend fun getGymListToFollow(
         gymname: String,

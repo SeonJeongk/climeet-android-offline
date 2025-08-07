@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="com.climus.climeet.presentation.ui.main.record.session.gym.GymSelectViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:context="presentation.ui.main.record.session.gym.GymSelectBottomSheetFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="550dp">
+
+            <TextView
+                android:id="@+id/tv_title"
+                style="@style/TextRegularSemiBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="암장 검색"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/view_line"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="15dp"
+                android:background="#484C4F"
+                app:layout_constraintTop_toBottomOf="@id/tv_title" />
+
+            <EditText
+                android:id="@+id/et_gym_name"
+                style="@style/TextRegular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/rect_grey7fill_nostroke_32radius"
+                android:hint="암장의 이름, 지역"
+                android:inputType="text"
+                android:paddingHorizontal="45dp"
+                android:paddingVertical="10dp"
+                android:singleLine="true"
+                android:text="@={vm.keyword}"
+                android:textColorHint="@color/cm_grey3"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_line" />
+
+            <ImageView
+                android:id="@+id/iv_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:src="@drawable/ic_search"
+                app:layout_constraintBottom_toBottomOf="@id/et_gym_name"
+                app:layout_constraintStart_toStartOf="@id/et_gym_name"
+                app:layout_constraintTop_toTopOf="@id/et_gym_name" />
+
+            <ImageButton
+                android:id="@+id/btn_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
+                android:background="@android:color/transparent"
+                android:onClick="@{() -> vm.deleteKeyword()}"
+                android:src="@drawable/ic_delete"
+                app:layout_constraintBottom_toBottomOf="@id/et_gym_name"
+                app:layout_constraintEnd_toEndOf="@id/et_gym_name"
+                app:layout_constraintTop_toTopOf="@id/et_gym_name" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_search_gym"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="15dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constrainedHeight="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_gym_name"
+                tools:listitem="@layout/item_session_gym_search" />
+
+            <ProgressBar
+                android:id="@+id/pb_loading"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_marginTop="70dp"
+                android:visibility="@{vm.uiState.progressState? View.VISIBLE : View.INVISIBLE}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/et_gym_name" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_search_none"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="60dp"
+                android:visibility="@{vm.uiState.emptyResultState? View.VISIBLE : View.INVISIBLE}"
+                app:layout_constraintStart_toStartOf="@id/iv_search"
+                app:layout_constraintTop_toBottomOf="@id/et_gym_name">
+
+                <ImageView
+                    android:id="@+id/iv_none"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_search2"
+                    app:layout_constraintBottom_toTopOf="@id/tv_none"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_none"
+                    style="@style/TextRegular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center"
+                    android:text="@string/session_gym_search_empty_message"
+                    android:textColor="@color/cm_grey6"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/iv_none" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

@@ -1,6 +1,6 @@
 package com.climus.climeet.data.contract
 
-import com.climus.climeet.data.model.request.CreateTimerClimbingRecordRequest
+import com.climus.climeet.data.model.request.CreateClimbingRecordRequest
 import com.climus.climeet.data.model.request.GetGymRouteInfoRequest
 import com.climus.climeet.data.model.response.GetGymFilteringKeyResponse
 import com.climus.climeet.data.model.response.GetGymRouteInfoResponse
@@ -107,8 +107,8 @@ class MainApiContractTest {
 
     @Test
     fun recordRequestFixture_roundTrip_preservesRequestBody() {
-        val json = fixture("create-timer-climbing-record-request.json")
-        val request = gson.fromJson(json, CreateTimerClimbingRecordRequest::class.java)
+        val json = fixture("create-climbing-record-request.json")
+        val request = gson.fromJson(json, CreateClimbingRecordRequest::class.java)
 
         assertEquals(1L, request.gymId)
         assertEquals("2026-08-12", request.date)
@@ -121,7 +121,7 @@ class MainApiContractTest {
     @Test
     fun recordSuccessFixture_readContract_returns200WithEmptyBody() {
         val contract = JsonParser()
-            .parse(fixture("create-timer-climbing-record-success.json"))
+            .parse(fixture("create-climbing-record-success.json"))
             .asJsonObject
 
         assertEquals(200, contract["statusCode"].asInt)
@@ -168,8 +168,8 @@ class MainApiContractTest {
         assertTrue(route.parameterAnnotations[1].any { it is Body })
 
         val record = MainApi::class.java.getDeclaredMethod(
-            "createTimerClimbingRecord",
-            CreateTimerClimbingRecordRequest::class.java,
+            "createClimbingRecord",
+            CreateClimbingRecordRequest::class.java,
             kotlin.coroutines.Continuation::class.java,
         )
         assertEquals(
@@ -177,7 +177,7 @@ class MainApiContractTest {
             requireNotNull(record.getAnnotation(POST::class.java)).value,
         )
         assertTrue(record.parameterAnnotations[0].any { it is Body })
-        assertTrue(record.genericParameterTypes[0].typeName.endsWith("CreateTimerClimbingRecordRequest"))
+        assertTrue(record.genericParameterTypes[0].typeName.endsWith("CreateClimbingRecordRequest"))
     }
 
     private fun fixture(name: String): String = fixtureBytes(name).toString(Charsets.UTF_8)

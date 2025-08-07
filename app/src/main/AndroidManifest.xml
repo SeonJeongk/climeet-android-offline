@@ -50,7 +50,7 @@
 
         <!--  스톱워치 notification 서비스  -->
         <service
-            android:name=".service.TimerService"
+            android:name=".service.StopwatchService"
             android:enabled="true"
             android:foregroundServiceType="dataSync"
             android:exported="true"/>

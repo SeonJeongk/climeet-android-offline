@@ -36,7 +36,7 @@ sealed class CalendarEvent {
         val msg: String,
     ) : CalendarEvent()
 
-    data object NavigateToTimerMain : CalendarEvent()
+    data object NavigateToClimbingSession : CalendarEvent()
 
     data class ShowPermissionDialog(
         val msg: String,
@@ -165,12 +165,12 @@ class CalendarViewModel @Inject constructor(
         }
     }
 
-    fun navigateToTimerMain() {
+    fun navigateToClimbingSession() {
         val areNotificationsEnabled = notificationManager.areNotificationsEnabled()
 
         if (areNotificationsEnabled) {
             viewModelScope.launch {
-                _event.emit(CalendarEvent.NavigateToTimerMain)
+                _event.emit(CalendarEvent.NavigateToClimbingSession)
             }
         } else {
             // 알림 권한이 허용되지 않았을 때 처리, 필요에 따라 수정

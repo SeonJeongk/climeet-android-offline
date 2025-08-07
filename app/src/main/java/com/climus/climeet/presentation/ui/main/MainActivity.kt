@@ -60,6 +60,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         initEventObserve()
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
     private fun setBnv() {
         binding.mainBnv.itemIconTintList = null
 
@@ -83,23 +89,28 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                 R.id.popularShortsFragment,
                 R.id.popularCragsFragment,
                 R.id.popularRoutesFragment,
-                R.id.set_timer_climbing_record_fragment,
+                R.id.session_record_fragment,
                 R.id.calendar_fragment,
-                R.id.timerMainFragment,
+                R.id.climbingSessionFragment,
                 R.id.record_fragment,
                 -> View.VISIBLE
                 else -> View.INVISIBLE
             }
         }
 
-        handleIntent()
+        handleIntent(intent)
     }
 
     // 알림창을 눌렀을 때 스톱워치 화면이 보여지게 설정하는 함수
-    private fun handleIntent() {
-        if (intent.hasExtra("showTimerFragment")) {
-            navController.navigate(R.id.record_fragment)
+    private fun handleIntent(targetIntent: Intent?) {
+        if (targetIntent?.getBooleanExtra(EXTRA_SHOW_CLIMBING_SESSION, false) != true) return
+
+        targetIntent.removeExtra(EXTRA_SHOW_CLIMBING_SESSION)
+        binding.mainBnv.menu.findItem(R.id.record_fragment).isChecked = true
+        if (navController.currentDestination?.id == R.id.climbingSessionFragment) {
+            navController.popBackStack(R.id.climbingSessionFragment, inclusive = true)
         }
+        navController.navigate(R.id.climbingSessionFragment)
     }
 
     private fun initEventObserve() {
@@ -270,5 +281,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                 }
             }
         }
+    }
+
+    companion object {
+        const val EXTRA_SHOW_CLIMBING_SESSION = "showClimbingSession"
     }
 }

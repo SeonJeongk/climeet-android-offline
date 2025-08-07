@@ -96,7 +96,7 @@ class CalendarFragment : BaseFragment<FragmentCalendarBinding>(R.layout.fragment
                     }
 
                     is CalendarEvent.ShowToastMessage -> showToastMessage(it.msg)
-                    is CalendarEvent.NavigateToTimerMain -> findNavController().toTimerMain()
+                    is CalendarEvent.NavigateToClimbingSession -> findNavController().toClimbingSession()
                     is CalendarEvent.ShowPermissionDialog -> showPermissionSnackBar(binding.snackGuide, it.msg)
                 }
             }
@@ -196,8 +196,8 @@ class CalendarFragment : BaseFragment<FragmentCalendarBinding>(R.layout.fragment
         }
     }
 
-    private fun NavController.toTimerMain() {
-        val action = RecordFragmentDirections.actionRecordFragmentToTimerMainFragment()
+    private fun NavController.toClimbingSession() {
+        val action = RecordFragmentDirections.actionRecordFragmentToClimbingSessionFragment()
         navigate(action)
     }
 }

@@ -10,7 +10,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.request.ClimbingRecord
-import com.climus.climeet.data.model.request.CreateTimerClimbingRecordRequest
+import com.climus.climeet.data.model.request.CreateClimbingRecordRequest
 import com.climus.climeet.data.model.request.GetGymRouteInfoRequest
 import com.climus.climeet.data.repository.MainRepository
 import com.climus.climeet.presentation.customview.DeleteDialog
@@ -482,7 +482,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
 
         val gymId = selectedCragEvent.value.first
 
-        val requestBody = CreateTimerClimbingRecordRequest(
+        val requestBody = CreateClimbingRecordRequest(
             gymId = gymId,
             date = CreateRecordData.selectedDate.toString(),
             time = getTimeDiff().toString(),
@@ -493,7 +493,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-            repository.createTimerClimbingRecord(requestBody).let {
+            repository.createClimbingRecord(requestBody).let {
                 when (it) {
                     is BaseState.Success -> {
                         _event.emit(CreateClimbingRecordEvent.ClimbingComplete)

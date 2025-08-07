@@ -2,6 +2,7 @@ package com.climus.climeet.presentation.customview
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.ImageView
@@ -55,8 +56,9 @@ class RouteView @JvmOverloads constructor(
     fun setRouteLevelColor(color: String?) {
         color?.let {
             if (it.isNotBlank()) {
-                routeBorderView.backgroundTintList = ColorStateList.valueOf(it.toColorInt())
-                routeLevelName.setTextColor(it.toColorInt())
+                val levelColor = it.toColorInt()
+                routeBorderView.backgroundTintList = ColorStateList.valueOf(levelColor)
+                routeLevelName.setTextColor(if (levelColor == Color.BLACK) Color.WHITE else levelColor)
             } else {
                 routeBorderView.backgroundTintList =
                     ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
