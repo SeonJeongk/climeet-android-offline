@@ -32,6 +32,22 @@ val testServerUrl = providers.gradleProperty("testServerUrl").orNull?.also { url
     }
 }
 
+val benchmarkServerUrl = providers.gradleProperty("benchmarkServerUrl").orNull?.trim()?.removeSurrounding("\"")
+
+val validateBenchmarkServerUrl by tasks.registering {
+    doLast {
+        val url = requireNotNull(benchmarkServerUrl) {
+            "benchmarkServerUrl is required for benchmark builds"
+        }
+        require(url.startsWith("http://") || url.startsWith("https://")) {
+            "benchmarkServerUrl must use http:// or https://"
+        }
+        require(url.endsWith('/')) {
+            "benchmarkServerUrl must end with a trailing slash"
+        }
+    }
+}
+
 fun buildConfigString(value: String): String = "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
 
 plugins {
@@ -80,6 +96,17 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
+            )
+        }
+        create("benchmark") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            isDebuggable = false
+            matchingFallbacks += listOf("release")
+            buildConfigField(
+                "String",
+                "BASE_API_URL",
+                buildConfigString(benchmarkServerUrl ?: "https://example.invalid/"),
             )
         }
     }
@@ -143,6 +170,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    add("benchmarkImplementation", "androidx.profileinstaller:profileinstaller:1.4.1")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation("io.mockk:mockk:1.13.7")
@@ -212,4 +240,10 @@ dependencies {
 
     // MPAndroidChart
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+}
+
+tasks.configureEach {
+    if (name != "validateBenchmarkServerUrl" && name.contains("Benchmark", ignoreCase = true)) {
+        dependsOn(validateBenchmarkServerUrl)
+    }
 }
