@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from aggregate_evidence import COLUMNS, build_result, nearest_rank
+from aggregate_evidence import COLUMNS, V2_COLUMNS, build_result, nearest_rank
 
 
 class AggregateEvidenceTest(unittest.TestCase):
@@ -34,6 +34,41 @@ class AggregateEvidenceTest(unittest.TestCase):
             self.assertEqual(300, group["metrics"]["durationMs"]["p90"])
             self.assertEqual(0.5, group["successRate"])
 
+    def test_v2_keeps_failures_in_denominator_and_partitions_timing_by_outcome(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "samples.csv"
+            with path.open("w", newline="", encoding="utf-8") as stream:
+                writer = csv.DictWriter(stream, fieldnames=V2_COLUMNS)
+                writer.writeheader()
+                writer.writerow(self.v2_row(1, "success", "true", "true", "", 100))
+                writer.writerow(self.v2_row(2, "blocking_error", "false", "false", "offline", ""))
+                writer.writerow(self.v2_row(3, "false_content", "true", "false", "state_mismatch", 1))
+
+            result = build_result([path])
+            group = result["groups"][0]
+
+            self.assertEqual(2, result["schemaVersion"])
+            self.assertEqual(3, group["validAppAttemptCount"])
+            self.assertEqual(0.666667, group["successRate"])
+            self.assertEqual(1, group["correctnessPassCount"])
+            self.assertEqual(100, group["metricsByOutcome"]["success"]["time_to_expected_state_ms"]["p95"])
+            self.assertIsNone(group["metricsByOutcome"]["blocking_error"]["time_to_expected_state_ms"]["p95"])
+            self.assertIsNone(group["metricsByOutcome"]["false_content"]["time_to_expected_state_ms"]["p95"])
+
+    def test_v2_requires_both_s3_phases_for_each_iteration(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "samples.csv"
+            with path.open("w", newline="", encoding="utf-8") as stream:
+                writer = csv.DictWriter(stream, fieldnames=V2_COLUMNS)
+                writer.writeheader()
+                row = self.v2_row(1, "preserved_draft", "false", "true", "offline", 200)
+                row["scenario"] = "S3"
+                row["phase"] = "offline"
+                writer.writerow(row)
+
+            with self.assertRaisesRegex(ValueError, "one offline and one reconnect"):
+                build_result([path])
+
     @staticmethod
     def row(index, valid, reason, duration, outcome):
         return {
@@ -47,6 +82,34 @@ class AggregateEvidenceTest(unittest.TestCase):
             "requestBodyBytes": 10,
             "responseBodyBytes": 20,
             "outcome": outcome,
+        }
+
+    @staticmethod
+    def v2_row(index, outcome, flow_success, correctness_pass, failure_category, duration):
+        return {
+            "run_index": index,
+            "scenario": "S1",
+            "condition": "clean",
+            "phase": "single",
+            "outcome": outcome,
+            "flow_success": flow_success,
+            "correctness_pass": correctness_pass,
+            "false_success": "false",
+            "failure_category": failure_category,
+            "state_mismatch_count": 0 if correctness_pass == "true" else 1,
+            "time_to_first_usable_ms": duration,
+            "time_to_expected_state_ms": duration,
+            "blocking_loading_ms": "",
+            "finish_to_actionable_ms": "",
+            "reconnect_to_server_record_ms": "",
+            "request_count": 2,
+            "duplicate_request_count": 0,
+            "response_body_bytes": 20,
+            "automatic_retry_count": 0,
+            "manual_retry_count": 0,
+            "blocking_error_count": 1 if outcome == "blocking_error" else 0,
+            "local_record_loss_count": 0,
+            "server_duplicate_count": 0,
         }
 
 
