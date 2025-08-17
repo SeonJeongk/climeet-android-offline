@@ -14,9 +14,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.bumptech.glide.Glide
 import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentLevelDetailBinding
+import com.climus.climeet.presentation.bindingadapters.setClimberProfileImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -173,11 +173,7 @@ class GymProfileLevelDetailFragment : Fragment() {
 
                         rankingList.take(iterationCount)
                             .forEachIndexed { i, bestLevelClimberResponse ->
-                                if (bestLevelClimberResponse.profileImageUrl != null) {
-                                    Glide.with(binding.root)
-                                        .load(bestLevelClimberResponse.profileImageUrl)
-                                        .into(profileImgList[i])
-                                }
+                                profileImgList[i].setClimberProfileImage(bestLevelClimberResponse.profileImageUrl)
                                 if (i < 3) {
                                     rankList[i].text = bestLevelClimberResponse.ranking.toString()
                                     rankList[i].visibility = View.VISIBLE

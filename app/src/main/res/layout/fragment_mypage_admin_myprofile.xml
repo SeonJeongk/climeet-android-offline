@@ -86,7 +86,7 @@
                         android:id="@+id/iv_gym_profile"
                         android:layout_width="73dp"
                         android:layout_height="73dp"
-                        app:imgUrl="@{svm.uiState.gymProfileImageUrl}"
+                        app:gymProfileImgUrl="@{svm.uiState.gymProfileImageUrl}"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:src="@drawable/img_crag" />

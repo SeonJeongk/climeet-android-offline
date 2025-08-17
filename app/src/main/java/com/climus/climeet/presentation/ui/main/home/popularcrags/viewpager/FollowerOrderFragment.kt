@@ -13,9 +13,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.bumptech.glide.Glide
 import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentFollowerOrderBinding
+import com.climus.climeet.presentation.bindingadapters.setGymProfileImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -170,11 +170,7 @@ class FollowerOrderFragment : Fragment() {
                         val iterationCount = minOf(cragList.size, 9)
 
                         cragList.take(iterationCount).forEachIndexed { i, bestFollowGymResponse ->
-                            if (bestFollowGymResponse.profileImageUrl != null) {
-                                Glide.with(binding.root)
-                                    .load(bestFollowGymResponse.profileImageUrl)
-                                    .into(profileImgList[i])
-                            }
+                            profileImgList[i].setGymProfileImage(bestFollowGymResponse.profileImageUrl)
                             if (i < 3) {
                                 rankList[i].text = bestFollowGymResponse.ranking.toString()
                                 rankList[i].visibility = View.VISIBLE

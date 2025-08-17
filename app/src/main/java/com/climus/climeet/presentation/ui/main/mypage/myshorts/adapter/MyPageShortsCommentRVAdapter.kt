@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.climus.climeet.databinding.ItemMypageShortsCommentBinding
+import com.climus.climeet.presentation.bindingadapters.setClimberProfileImage
 import com.climus.climeet.presentation.ui.main.mypage.myshorts.model.MyPageShortsCommentUiData
 import com.climus.climeet.presentation.ui.main.mypage.myshorts.viewpager.MyPageMyShortsCommentViewModel
 
@@ -49,11 +49,7 @@ class ShortsCommentViewHolder(
             viewModel.navigateToShortsPlayer(item.shortsId)
         }
 
-        if (item.profileImage != null) {
-            Glide.with(binding.root.context)
-                .load(item.profileImage)
-                .into(binding.cvImage)
-        }
+        binding.cvImage.setClimberProfileImage(item.profileImage)
 
         binding.tvComment.text = item.content
         binding.tvDate.text = item.createdAt

@@ -17,9 +17,9 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentShortsCommentBottomSheetBinding
+import com.climus.climeet.presentation.bindingadapters.setClimberProfileImage
 import com.climus.climeet.presentation.ui.main.shorts.adapter.ShortsCommentAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -132,9 +132,7 @@ class ShortsCommentBottomSheetFragment : BottomSheetDialogFragment() {
 
                     is ShortsCommentBottomSheetEvent.StartAddSubComment -> focusEditText(it.nick)
                     is ShortsCommentBottomSheetEvent.SetMyProfile -> {
-                        Glide.with(requireContext())
-                            .load(it.url)
-                            .into(binding.ivProfile)
+                        binding.ivProfile.setClimberProfileImage(it.url)
                     }
                 }
             }

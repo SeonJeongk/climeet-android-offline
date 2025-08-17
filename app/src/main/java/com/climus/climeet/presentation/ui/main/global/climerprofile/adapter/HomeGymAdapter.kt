@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.climus.climeet.databinding.ItemHomeGymBinding
+import com.climus.climeet.presentation.bindingadapters.setGymProfileImage
 import com.climus.climeet.presentation.ui.main.global.climerprofile.model.ProfileHomeGymUiData
 import com.climus.climeet.presentation.util.DefaultDiffUtil
 
@@ -35,11 +35,7 @@ class HomeGymViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: ProfileHomeGymUiData) {
         binding.item = item
-        if (item.profileImg != null) {
-            Glide.with(binding.root.context)
-                .load(item.profileImg)
-                .into(binding.cragProfileArea)
-        }
+        binding.cragProfileArea.setGymProfileImage(item.profileImg)
         binding.root.setOnClickListener {
             item.onClickListener(item.gymId)
         }

@@ -3,9 +3,9 @@ package com.climus.climeet.presentation.ui.main.home.recycler.homegym
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.climus.climeet.data.model.response.UserHomeGymSimpleResponse
 import com.climus.climeet.databinding.ItemHomeGymBinding
+import com.climus.climeet.presentation.bindingadapters.setGymProfileImage
 import com.climus.climeet.presentation.ui.main.global.toProfileHomeGymUiData
 import kotlin.math.min
 
@@ -42,11 +42,7 @@ class HomeGymRVAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(homeGym: UserHomeGymSimpleResponse) {
             binding.item = homeGym.toProfileHomeGymUiData(itemClickAction)
-            if (homeGym.gymProfileUrl != null) {
-                Glide.with(binding.root.context)
-                    .load(homeGym.gymProfileUrl)
-                    .into(binding.cragProfileArea)
-            }
+            binding.cragProfileArea.setGymProfileImage(homeGym.gymProfileUrl)
         }
     }
 }

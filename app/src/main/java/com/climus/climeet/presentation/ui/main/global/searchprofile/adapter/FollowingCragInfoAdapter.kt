@@ -4,10 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.climus.climeet.data.model.response.RouteSimpleInfo
 import com.climus.climeet.data.model.response.UserHomeGymDetailResponse
 import com.climus.climeet.databinding.ItemHomegymRouteBinding
+import com.climus.climeet.presentation.bindingadapters.setGymProfileImage
 
 class FollowingCragInfoAdapter(
     private var followingCrags: List<UserHomeGymDetailResponse>,
@@ -46,9 +46,7 @@ class FollowingCragInfoAdapter(
 
         fun bind(gym: UserHomeGymDetailResponse) {
             binding.tvHomgymName.text = gym.gymName
-            Glide.with(binding.root.context)
-                .load(gym.gymProfileUrl)
-                .into(binding.ivCragProfileArea)
+            binding.ivCragProfileArea.setGymProfileImage(gym.gymProfileUrl)
 
             setupRouteRecyclerView(gym.routeSimpleInfos, gym.gymName)
         }

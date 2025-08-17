@@ -18,7 +18,7 @@
             android:layout_height="62dp"
             android:layout_marginTop="10dp"
             android:visibility="invisible"
-            android:src="@drawable/oval_lightgreyfill_nostroke_noradius"
+            android:src="@drawable/img_profile"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -80,7 +80,7 @@
             android:layout_height="50dp"
             android:layout_marginStart="20dp"
             android:visibility="invisible"
-            android:src="@drawable/oval_lightgreyfill_nostroke_noradius"
+            android:src="@drawable/img_profile"
             app:layout_constraintBottom_toBottomOf="@+id/iv_level_ranking1"
             app:layout_constraintEnd_toStartOf="@+id/iv_level_ranking1"
             app:layout_constraintStart_toStartOf="parent" />
@@ -140,7 +140,7 @@
             android:layout_height="50dp"
             android:layout_marginEnd="20dp"
             android:visibility="invisible"
-            android:src="@drawable/oval_lightgreyfill_nostroke_noradius"
+            android:src="@drawable/img_profile"
             app:layout_constraintBottom_toBottomOf="@+id/iv_level_ranking1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/iv_level_ranking1" />
@@ -201,7 +201,7 @@
             android:layout_marginStart="30dp"
             android:visibility="invisible"
             android:layout_marginTop="40dp"
-            android:src="@drawable/oval_lightgreyfill_nostroke_noradius"
+            android:src="@drawable/img_profile"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_level_ranking2" />
 
@@ -245,7 +245,7 @@
             android:layout_height="40dp"
             android:layout_marginEnd="10dp"
             android:layout_marginTop="40dp"
-            android:src="@drawable/oval_lightgreyfill_nostroke_noradius"
+            android:src="@drawable/img_profile"
             android:visibility="invisible"
             app:layout_constraintEnd_toStartOf="@+id/tv_level_ranking5_nickname"
             app:layout_constraintTop_toBottomOf="@+id/tv_level_ranking2" />
@@ -291,7 +291,7 @@
             android:layout_height="40dp"
             android:layout_marginStart="30dp"
             android:layout_marginTop="15dp"
-            android:src="@drawable/oval_lightgreyfill_nostroke_noradius"
+            android:src="@drawable/img_profile"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/iv_level_ranking4" />
 
@@ -335,7 +335,7 @@
             android:layout_height="40dp"
             android:layout_marginEnd="10dp"
             android:layout_marginTop="15dp"
-            android:src="@drawable/oval_lightgreyfill_nostroke_noradius"
+            android:src="@drawable/img_profile"
             android:visibility="invisible"
             app:layout_constraintEnd_toStartOf="@+id/tv_level_ranking7_nickname"
             app:layout_constraintTop_toBottomOf="@+id/iv_level_ranking5" />
@@ -382,7 +382,7 @@
             android:layout_marginStart="30dp"
             android:layout_marginTop="15dp"
             android:visibility="invisible"
-            android:src="@drawable/oval_lightgreyfill_nostroke_noradius"
+            android:src="@drawable/img_profile"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/iv_level_ranking6" />
 
@@ -426,7 +426,7 @@
             android:layout_height="40dp"
             android:layout_marginEnd="10dp"
             android:layout_marginTop="15dp"
-            android:src="@drawable/oval_lightgreyfill_nostroke_noradius"
+            android:src="@drawable/img_profile"
             android:visibility="invisible"
             app:layout_constraintEnd_toStartOf="@+id/tv_level_ranking9_nickname"
             app:layout_constraintTop_toBottomOf="@+id/iv_level_ranking7" />

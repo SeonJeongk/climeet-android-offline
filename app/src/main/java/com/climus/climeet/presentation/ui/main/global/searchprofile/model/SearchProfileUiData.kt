@@ -5,6 +5,7 @@ data class SearchProfileUiData(
     val imgUrl: String = "",
     val name: String = "",
     val keyword: String = "",
+    val isGym: Boolean,
     var followers: Int = 0,
     var isFollowing: Boolean,
     val navigateToProfile: (Long) -> Unit,

@@ -15,10 +15,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.climus.climeet.MainNavDirections
 import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentCompleteClimbingBinding
+import com.climus.climeet.presentation.bindingadapters.setClimberProfileImage
 import com.climus.climeet.presentation.ui.main.home.viewpager.ranking.CompleteClimbingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -105,13 +105,9 @@ class CompleteClimbingFragment : Fragment() {
                         val iterationCount = minOf(rankingList.size, 3)
 
                         rankingList.take(iterationCount).forEachIndexed { i, bestClearClimberResponse ->
-                            if (bestClearClimberResponse.profileImageUrl != null) {
-                                Glide.with(binding.root)
-                                    .load(bestClearClimberResponse.profileImageUrl)
-                                    .into(profileImgList[i])
-                                profileImgList[i].setOnClickListener {
-                                    navigateToClimberProfile(bestClearClimberResponse.userId)
-                                }
+                            profileImgList[i].setClimberProfileImage(bestClearClimberResponse.profileImageUrl)
+                            profileImgList[i].setOnClickListener {
+                                navigateToClimberProfile(bestClearClimberResponse.userId)
                             }
                             rankList[i].text = bestClearClimberResponse.ranking.toString()
                             nicknameList[i].text = bestClearClimberResponse.profileName

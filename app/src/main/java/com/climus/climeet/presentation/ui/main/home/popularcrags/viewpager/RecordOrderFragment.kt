@@ -13,9 +13,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.bumptech.glide.Glide
 import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentRecordOrderBinding
+import com.climus.climeet.presentation.bindingadapters.setGymProfileImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -170,11 +170,7 @@ class RecordOrderFragment : Fragment() {
                         val iterationCount = minOf(cragList.size, 9)
 
                         cragList.take(iterationCount).forEachIndexed { i, bestRecordGymResponse ->
-                            if (bestRecordGymResponse.profileImageUrl != null) {
-                                Glide.with(binding.root)
-                                    .load(bestRecordGymResponse.profileImageUrl)
-                                    .into(profileImgList[i])
-                            }
+                            profileImgList[i].setGymProfileImage(bestRecordGymResponse.profileImageUrl)
                             if (i < 3) {
                                 rankList[i].text = bestRecordGymResponse.ranking.toString()
                                 rankList[i].visibility = View.VISIBLE
