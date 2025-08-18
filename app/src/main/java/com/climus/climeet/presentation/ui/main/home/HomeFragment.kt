@@ -3,6 +3,7 @@ package com.climus.climeet.presentation.ui.main.home
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.fragment.app.activityViewModels
@@ -13,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.climus.climeet.R
 import com.climus.climeet.app.App.Companion.sharedPreferences
-import com.climus.climeet.data.model.response.BannerDetailInfoResponse
 import com.climus.climeet.data.model.response.BestFollowGymSimpleResponse
 import com.climus.climeet.data.model.response.BestRecordGymDetailInfoResponse
 import com.climus.climeet.data.model.response.BestRouteDetailInfoResponse
@@ -42,7 +42,10 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     private val viewModel: HomeViewModel by viewModels()
-    private var vpBanner: List<BannerDetailInfoResponse> = emptyList()
+    private val bannerImages = listOf(
+        R.drawable.img_home_banner_new_gym,
+        R.drawable.img_gym_background,
+    )
     private var recyclerHomeGym: List<UserHomeGymSimpleResponse> = emptyList()
     private var recyclerShorts: List<ShortsThumbnailUiData> = emptyList()
     private var followOrderRecyclerCrag: List<BestFollowGymSimpleResponse> = emptyList()
@@ -56,7 +59,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getBannerListBetweenDates()
+        setupIntroduceBanner(bannerImages)
         viewModel.getGymRankingOrderFollowCount()
         viewModel.getGymRankingListOrderSelectionCount()
         viewModel.getRouteRankingOrderSelectionCount()
@@ -86,11 +89,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         repeatOnStarted {
             viewModel.let { vm ->
                 vm.uiState.collect { uiState ->
-                    uiState.bannerList.let { bannerList ->
-                        vpBanner = bannerList
-                        setupIntroduceBanner(vpBanner)
-                    }
-
                     uiState.homegymList.let { homegymList ->
                         recyclerHomeGym = homegymList
                         setupHomeGymList()
@@ -220,11 +218,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         findNavController().navigate(action)
     }
 
-    private fun setupIntroduceBanner(vpBanner: List<BannerDetailInfoResponse>) {
+    private fun setupIntroduceBanner(
+        @DrawableRes bannerImages: List<Int>,
+    ) {
         val bannerAdapter = BannerVPAdapter(this)
 
-        for (bannerInfo in vpBanner) {
-            val bannerFragment = BannerFragment(bannerInfo)
+        for (bannerImage in bannerImages) {
+            val bannerFragment = BannerFragment(bannerImage)
             bannerAdapter.addFragment(bannerFragment)
         }
 
