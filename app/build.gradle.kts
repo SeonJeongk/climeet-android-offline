@@ -60,6 +60,12 @@ plugins {
     id("io.gitlab.arturbosch.detekt")
 }
 
+kapt {
+    arguments {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
+}
+
 if (file("google-services.json").isFile) {
     apply(plugin = "com.google.gms.google-services")
 }
