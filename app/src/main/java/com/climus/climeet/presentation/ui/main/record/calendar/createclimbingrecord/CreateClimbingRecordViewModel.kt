@@ -11,9 +11,13 @@ import androidx.lifecycle.viewModelScope
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.request.ClimbingRecord
 import com.climus.climeet.data.model.request.CreateClimbingRecordRequest
-import com.climus.climeet.data.model.request.GetGymRouteInfoRequest
 import com.climus.climeet.data.repository.MainRepository
+import com.climus.climeet.data.repository.route.RouteCatalogKey
+import com.climus.climeet.data.repository.route.RouteCatalogRepository
+import com.climus.climeet.data.repository.route.RouteCatalogState
+import com.climus.climeet.data.repository.route.RouteFilter
 import com.climus.climeet.presentation.customview.DeleteDialog
+import com.climus.climeet.presentation.ui.main.global.keptIn
 import com.climus.climeet.presentation.ui.main.global.selectsector.FloorBtnState
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.GymLevelUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
@@ -26,6 +30,7 @@ import com.climus.climeet.presentation.ui.main.record.model.CreateRecordData
 import com.climus.climeet.presentation.util.formatRecordTimeRange
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -76,6 +81,7 @@ sealed class CreateClimbingRecordEvent {
 @HiltViewModel
 class CreateClimbingRecordViewModel @Inject constructor(
     private val repository: MainRepository,
+    private val routeCatalogRepository: RouteCatalogRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CreateClimbingRecordUiState())
     val uiState: StateFlow<CreateClimbingRecordUiState> = _uiState.asStateFlow()
@@ -106,6 +112,9 @@ class CreateClimbingRecordViewModel @Inject constructor(
 
     var cragId: Long = 0
     var cragName: String = ""
+    private var catalogJob: Job? = null
+    private var catalogKey: RouteCatalogKey? = null
+    private val routeFilter = MutableStateFlow(RouteFilter(1))
 
     val defaultCrag = Pair<Long, String>(0, "클라이밍 암장을 선택해주세요")
     val isSelectedCrag = MutableStateFlow(false)
@@ -166,6 +175,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
             val day = date.dayOfMonth
             datePickText.value = "${year}년 ${month}월 ${day}일 $koreanDayOfWeek"
         }
+        if (cragId > 0L) loadCatalog()
     }
 
     fun setTime() {
@@ -186,43 +196,8 @@ class CreateClimbingRecordViewModel @Inject constructor(
     }
 
     fun getCragInfo(id: Long) {
-        viewModelScope.launch {
-            repository.getGymFilteringKey(id).let {
-                when (it) {
-                    is BaseState.Success -> {
-                        sectorNameList = it.body.sectorList.map { data ->
-                            data.toSectorNameUiData(::selectSectorName)
-                        }
-
-                        gymLevelList = it.body.difficultyList.map { data ->
-                            data.toGymLevelUiData(::selectGymLevel)
-                        }
-
-                        if (it.body.maxFloor == 1) {
-                            _uiState.update { state ->
-                                state.copy(
-                                    isSingleFloor = true,
-                                    layoutImg = it.body.layoutImageUrl,
-                                )
-                            }
-                        } else {
-                            _uiState.update { state ->
-                                state.copy(
-                                    isSingleFloor = false,
-                                    layoutImg = it.body.layoutImageUrl,
-                                )
-                            }
-                        }
-
-                        setFloorInfo(1)
-                    }
-
-                    is BaseState.Error -> {
-                        _event.emit(CreateClimbingRecordEvent.ShowToastMessage(it.msg))
-                    }
-                }
-            }
-        }
+        if (id <= 0L) return
+        loadCatalog()
     }
 
     fun selectFloor(floor: Int) {
@@ -240,6 +215,8 @@ class CreateClimbingRecordViewModel @Inject constructor(
                 sectorNameList = sectorNameList.filter {
                     it.floor == floor
                 },
+                selectedSector = SectorNameUiData {},
+                selectedLevel = GymLevelUiData {},
                 selectedRoute = RouteUiData {},
             )
         }
@@ -247,28 +224,7 @@ class CreateClimbingRecordViewModel @Inject constructor(
     }
 
     private fun setFloorInfo(floor: Int) {
-        viewModelScope.launch {
-            repository.getGymRouteInfoList(cragId, GetGymRouteInfoRequest(0, 10, floor)).let {
-                when (it) {
-                    is BaseState.Success -> {
-                        _uiState.update { state ->
-                            state.copy(
-                                sectorNameList = sectorNameList.filter { data -> data.floor == floor },
-                                gymLevelList = gymLevelList,
-                                routeList = it.body.result.map { data ->
-                                    data.toRouteUiData(::selectRoute)
-                                },
-                                curFloor = 1,
-                            )
-                        }
-                    }
-
-                    is BaseState.Error -> {
-                        _event.emit(CreateClimbingRecordEvent.ShowToastMessage(it.msg))
-                    }
-                }
-            }
-        }
+        routeFilter.value = RouteFilter(floor)
     }
 
     private fun getRouteList(
@@ -276,33 +232,66 @@ class CreateClimbingRecordViewModel @Inject constructor(
         sectorId: Long? = null,
         difficulty: Int? = null,
     ) {
-        viewModelScope.launch {
-            repository.getGymRouteInfoList(
-                cragId,
-                GetGymRouteInfoRequest(
-                    0,
-                    10,
-                    floor,
-                    sectorId,
-                    difficulty,
-                ),
-            ).let {
-                when (it) {
-                    is BaseState.Success -> {
-                        _uiState.update { state ->
-                            state.copy(
-                                routeList = it.body.result.map { data ->
-                                    data.toRouteUiData(::selectRoute)
-                                },
-                            )
-                        }
+        routeFilter.value = RouteFilter(floor, sectorId, difficulty)
+    }
+
+    /** 같은 암장·날짜를 다시 고르면 현재 층과 필터를 유지한 채 다시 구독합니다. */
+    private fun loadCatalog() {
+        val key = RouteCatalogKey(cragId, selectedDate.value)
+        if (key != catalogKey) clearCatalog()
+        catalogKey = key
+        catalogJob?.cancel()
+        catalogJob = viewModelScope.launch {
+            routeCatalogRepository.observe(key, routeFilter).collect { state ->
+                when (state) {
+                    RouteCatalogState.Loading -> Unit
+                    is RouteCatalogState.Failed -> {
+                        _event.emit(CreateClimbingRecordEvent.ShowToastMessage(state.error.msg))
                     }
 
-                    is BaseState.Error -> {
-                        _event.emit(CreateClimbingRecordEvent.ShowToastMessage(it.msg))
-                    }
+                    is RouteCatalogState.Content -> renderCatalog(state)
                 }
             }
+        }
+    }
+
+    /** 다른 암장이나 날짜의 루트로 기록하지 않도록 이전 목록과 선택을 지웁니다. */
+    private fun clearCatalog() {
+        sectorNameList = emptyList()
+        gymLevelList = emptyList()
+        routeFilter.value = RouteFilter(1)
+        _uiState.update {
+            it.copy(
+                curFloor = 1,
+                firstFloorBtnState = FloorBtnState.FloorSelected,
+                secondFloorBtnState = FloorBtnState.FloorUnSelected,
+                sectorNameList = emptyList(),
+                gymLevelList = emptyList(),
+                routeList = emptyList(),
+                selectedSector = SectorNameUiData {},
+                selectedLevel = GymLevelUiData {},
+                selectedRoute = RouteUiData {},
+            )
+        }
+    }
+
+    private fun renderCatalog(state: RouteCatalogState.Content) {
+        val filter = state.filter
+        sectorNameList = state.catalog.sectors.map { it.toSectorNameUiData(::selectSectorName) }
+        gymLevelList = state.catalog.difficulties.map { it.toGymLevelUiData(::selectGymLevel) }
+        val routes = state.catalog.routes.map { it.toRouteUiData(::selectRoute) }
+        _uiState.update { uiState ->
+            uiState.copy(
+                isSingleFloor = state.catalog.maxFloor == 1,
+                layoutImg = state.catalog.layoutImageUrl,
+                curFloor = filter.floor,
+                sectorNameList = sectorNameList.filter { it.floor == filter.floor }.map {
+                    it.copy(isSelected = it.sectorId == filter.sectorId)
+                },
+                gymLevelList = gymLevelList.map { it.copy(isSelected = it.difficulty == filter.difficulty) },
+                routeList = routes,
+                selectedRoute = uiState.selectedRoute.keptIn(routes),
+            )
         }
     }
 
