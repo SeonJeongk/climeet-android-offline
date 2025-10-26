@@ -11,6 +11,9 @@ import com.climus.climeet.data.model.response.UserFollowSimpleResponse
 import com.climus.climeet.data.model.response.UserFollowerInfoResponse
 import com.climus.climeet.data.model.response.UserFollowingInfoResponse
 import com.climus.climeet.data.model.response.UserHomeGymSimpleResponse
+import com.climus.climeet.data.repository.route.CachedRoute
+import com.climus.climeet.data.repository.route.RouteDifficulty
+import com.climus.climeet.data.repository.route.RouteSector
 import com.climus.climeet.presentation.ui.main.global.climerprofile.model.ProfileHomeGymUiData
 import com.climus.climeet.presentation.ui.main.global.searchprofile.model.SearchProfileUiData
 import com.climus.climeet.presentation.ui.main.global.searchprofile.model.UserFollowingUiData
@@ -56,6 +59,42 @@ fun RouteItem.toRouteUiData(onClickListener: (RouteUiData) -> Unit): RouteUiData
         onClickListener = onClickListener,
     )
 }
+
+fun RouteSector.toSectorNameUiData(onClickListener: (SectorNameUiData) -> Unit) =
+    SectorNameUiData(
+        sectorId = sectorId,
+        name = name,
+        floor = floor,
+        onClickListener = onClickListener,
+    )
+
+fun RouteDifficulty.toGymLevelUiData(onClickListener: (GymLevelUiData) -> Unit) =
+    GymLevelUiData(
+        levelName = gymDifficultyName.toLevelDisplayName(),
+        levelColor = gymDifficultyColor,
+        difficulty = difficulty,
+        onClickListener = onClickListener,
+    )
+
+/** 데이터가 교체되어 목록에서 사라진 루트는 선택을 해제합니다. */
+fun RouteUiData.keptIn(routes: List<RouteUiData>): RouteUiData =
+    if (routes.any { it.routeId == routeId }) this else RouteUiData {}
+
+private fun String.toLevelDisplayName() = if (this == "V0") "VB" else this
+
+fun CachedRoute.toRouteUiData(onClickListener: (RouteUiData) -> Unit): RouteUiData =
+    RouteUiData(
+        routeId = routeId,
+        sectorId = sectorId,
+        sectorName = sectorName,
+        difficulty = difficulty,
+        gymLevelName = gymDifficultyName.toLevelDisplayName(),
+        gymLevelColor = gymDifficultyColor,
+        climeetLevelName = climeetDifficultyName.toLevelDisplayName(),
+        routeImg = routeImageUrl,
+        holdImg = Constants.holdColor[holdColor] ?: R.drawable.ic_white_hold,
+        onClickListener = onClickListener,
+    )
 
 fun GymListToFollowItem.toSearchProfileUiData(
     keyword: String,

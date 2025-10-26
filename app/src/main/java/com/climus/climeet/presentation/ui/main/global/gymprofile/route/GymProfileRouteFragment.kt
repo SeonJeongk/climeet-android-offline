@@ -66,7 +66,8 @@ class GymProfileRouteFragment : BaseFragment<FragmentGymProfileRouteBinding>(R.l
         repeatOnStarted {
             viewModel.uiState.collect { state ->
                 val loadState = state.loadState
-                binding.progressRoutes.visibility = if (loadState is RouteLoadState.Loading) View.VISIBLE else View.GONE
+                binding.progressRoutes.visibility =
+                    if (loadState is RouteLoadState.Loading || state.isRefreshing) View.VISIBLE else View.GONE
                 binding.btnRetryRoutes.visibility =
                     if (loadState is RouteLoadState.RetryableError) View.VISIBLE else View.GONE
                 val message = when (loadState) {
