@@ -2,9 +2,11 @@ package com.climus.climeet.presentation.ui.main.global.selectsector
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.climus.climeet.data.model.BaseState
-import com.climus.climeet.data.model.request.GetGymRouteInfoRequest
-import com.climus.climeet.data.repository.MainRepository
+import com.climus.climeet.data.repository.route.RouteCatalogKey
+import com.climus.climeet.data.repository.route.RouteCatalogRepository
+import com.climus.climeet.data.repository.route.RouteCatalogState
+import com.climus.climeet.data.repository.route.RouteFilter
+import com.climus.climeet.presentation.ui.main.global.keptIn
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.GymLevelUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.SectorNameUiData
@@ -13,6 +15,7 @@ import com.climus.climeet.presentation.ui.main.global.toGymLevelUiData
 import com.climus.climeet.presentation.ui.main.global.toRouteUiData
 import com.climus.climeet.presentation.ui.main.global.toSectorNameUiData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -21,6 +24,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 data class SelectSectorBottomSheetUiState(
@@ -61,7 +65,7 @@ sealed class SelectSectorBottomSheetEvent {
 
 @HiltViewModel
 class SelectSectorBottomSheetViewModel @Inject constructor(
-    private val repository: MainRepository,
+    private val repository: RouteCatalogRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SelectSectorBottomSheetUiState())
     val uiState: StateFlow<SelectSectorBottomSheetUiState> = _uiState.asStateFlow()
@@ -74,6 +78,8 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
 
     var cragId: Long = 0
     var cragName: String = ""
+    private var catalogJob: Job? = null
+    private val routeFilter = MutableStateFlow(RouteFilter(1))
 
     fun setCragInfo(
         id: Long,
@@ -91,43 +97,8 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
     }
 
     private fun getCragInfo(id: Long) {
-        viewModelScope.launch {
-            repository.getGymFilteringKey(id).let {
-                when (it) {
-                    is BaseState.Success -> {
-                        sectorNameList = it.body.sectorList.map { data ->
-                            data.toSectorNameUiData(::selectSectorName)
-                        }
-
-                        gymLevelList = it.body.difficultyList.map { data ->
-                            data.toGymLevelUiData(::selectGymLevel)
-                        }
-
-                        if (it.body.maxFloor == 1) {
-                            _uiState.update { state ->
-                                state.copy(
-                                    isSingleFloor = true,
-                                    layoutImg = it.body.layoutImageUrl,
-                                )
-                            }
-                        } else {
-                            _uiState.update { state ->
-                                state.copy(
-                                    isSingleFloor = false,
-                                    layoutImg = it.body.layoutImageUrl,
-                                )
-                            }
-                        }
-
-                        setFloorInfo(1)
-                    }
-
-                    is BaseState.Error -> {
-                        _event.emit(SelectSectorBottomSheetEvent.ShowToastMessage(it.msg))
-                    }
-                }
-            }
-        }
+        if (id <= 0L) return
+        observeCatalog(1, restart = true)
     }
 
     fun selectFloor(floor: Int) {
@@ -152,28 +123,7 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
     }
 
     private fun setFloorInfo(floor: Int) {
-        viewModelScope.launch {
-            repository.getGymRouteInfoList(cragId, GetGymRouteInfoRequest(0, 10, floor)).let {
-                when (it) {
-                    is BaseState.Success -> {
-                        _uiState.update { state ->
-                            state.copy(
-                                sectorNameList = sectorNameList.filter { data -> data.floor == floor },
-                                gymLevelList = gymLevelList,
-                                routeList = it.body.result.map { data ->
-                                    data.toRouteUiData(::selectRoute)
-                                },
-                                curFloor = 1,
-                            )
-                        }
-                    }
-
-                    is BaseState.Error -> {
-                        _event.emit(SelectSectorBottomSheetEvent.ShowToastMessage(it.msg))
-                    }
-                }
-            }
-        }
+        observeCatalog(floor)
     }
 
     private fun getRouteList(
@@ -181,33 +131,50 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
         sectorId: Long? = null,
         difficulty: Int? = null,
     ) {
-        viewModelScope.launch {
-            repository.getGymRouteInfoList(
-                cragId,
-                GetGymRouteInfoRequest(
-                    0,
-                    10,
-                    floor,
-                    sectorId,
-                    difficulty,
-                ),
-            ).let {
-                when (it) {
-                    is BaseState.Success -> {
-                        _uiState.update { state ->
-                            state.copy(
-                                routeList = it.body.result.map { data ->
-                                    data.toRouteUiData(::selectRoute)
-                                },
-                            )
-                        }
+        observeCatalog(floor, sectorId, difficulty)
+    }
+
+    private fun observeCatalog(
+        floor: Int,
+        sectorId: Long? = null,
+        difficulty: Int? = null,
+        restart: Boolean = false,
+    ) {
+        routeFilter.value = RouteFilter(floor, sectorId, difficulty)
+        if (!restart) return
+        val key = RouteCatalogKey(cragId, LocalDate.now())
+        catalogJob?.cancel()
+        catalogJob = viewModelScope.launch {
+            repository.observe(key, routeFilter).collect { state ->
+                when (state) {
+                    RouteCatalogState.Loading -> Unit
+                    is RouteCatalogState.Failed -> {
+                        _event.emit(SelectSectorBottomSheetEvent.ShowToastMessage(state.error.msg))
                     }
 
-                    is BaseState.Error -> {
-                        _event.emit(SelectSectorBottomSheetEvent.ShowToastMessage(it.msg))
-                    }
+                    is RouteCatalogState.Content -> renderCatalog(state)
                 }
             }
+        }
+    }
+
+    private fun renderCatalog(state: RouteCatalogState.Content) {
+        val filter = state.filter
+        sectorNameList = state.catalog.sectors.map { it.toSectorNameUiData(::selectSectorName) }
+        gymLevelList = state.catalog.difficulties.map { it.toGymLevelUiData(::selectGymLevel) }
+        val routes = state.catalog.routes.map { it.toRouteUiData(::selectRoute) }
+        _uiState.update { uiState ->
+            uiState.copy(
+                isSingleFloor = state.catalog.maxFloor == 1,
+                layoutImg = state.catalog.layoutImageUrl,
+                curFloor = filter.floor,
+                sectorNameList = sectorNameList.filter { it.floor == filter.floor }.map {
+                    it.copy(isSelected = it.sectorId == filter.sectorId)
+                },
+                gymLevelList = gymLevelList.map { it.copy(isSelected = it.difficulty == filter.difficulty) },
+                routeList = routes,
+                selectedRoute = uiState.selectedRoute.keptIn(routes),
+            )
         }
     }
 
