@@ -6,7 +6,6 @@ import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.request.AddShortsCommentRequest
 import com.climus.climeet.data.model.request.CreateClimbingRecordRequest
 import com.climus.climeet.data.model.request.CreateGymProfileReviewRequest
-import com.climus.climeet.data.model.request.GetGymRouteInfoRequest
 import com.climus.climeet.data.model.request.GymServiceUpdateRequest
 import com.climus.climeet.data.model.request.ImgUrlRequest
 import com.climus.climeet.data.model.request.NotificationUpdateRequest
@@ -27,11 +26,9 @@ import com.climus.climeet.data.model.response.GetAnnouncementResponse
 import com.climus.climeet.data.model.response.GetClimberPrivacySettingResponse
 import com.climus.climeet.data.model.response.GetClimberProfileStatisticsResponse
 import com.climus.climeet.data.model.response.GetClimberProfileTargetGymStatisticsResponse
-import com.climus.climeet.data.model.response.GetGymFilteringKeyResponse
 import com.climus.climeet.data.model.response.GetGymListToFollowResponse
 import com.climus.climeet.data.model.response.GetGymProfileResponse
 import com.climus.climeet.data.model.response.GetGymProfileReviewResponse
-import com.climus.climeet.data.model.response.GetGymRouteInfoResponse
 import com.climus.climeet.data.model.response.GetGymSkillDistributionResponse
 import com.climus.climeet.data.model.response.GetMyShortsCommentsResponse
 import com.climus.climeet.data.model.response.GetMyStatsTargetGymMonthResponse
@@ -153,19 +150,7 @@ interface MainRepository {
 
     suspend fun unFollowGym(gymId: Long): BaseState<ResponseBody>
 
-    suspend fun getGymFilteringKey(gymId: Long): BaseState<GetGymFilteringKeyResponse>
-
-    suspend fun getGymFilteringKeyTime(
-        gymId: Long,
-        timePoint: String,
-    ): BaseState<GetGymFilteringKeyResponse>
-
     suspend fun getGymRouteFindingData(timePoint: String): BaseState<GetRouteFindingData>
-
-    suspend fun getGymRouteInfoList(
-        gymId: Long,
-        body: GetGymRouteInfoRequest,
-    ): BaseState<GetGymRouteInfoResponse>
 
     suspend fun updateGymRouteVersion(body: UpdateGymRouteVersionRequest): BaseState<ResponseBody>
 
