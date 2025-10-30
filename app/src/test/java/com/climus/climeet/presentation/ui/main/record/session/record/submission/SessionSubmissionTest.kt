@@ -7,9 +7,13 @@ import com.climus.climeet.app.App
 import com.climus.climeet.data.local.ClimbingRecordData
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.request.CreateClimbingRecordRequest
-import com.climus.climeet.data.model.response.GetGymFilteringKeyResponse
-import com.climus.climeet.data.model.response.GetGymRouteInfoResponse
 import com.climus.climeet.data.repository.MainRepository
+import com.climus.climeet.data.repository.route.Freshness
+import com.climus.climeet.data.repository.route.RouteCatalog
+import com.climus.climeet.data.repository.route.RouteCatalogKey
+import com.climus.climeet.data.repository.route.RouteCatalogRepository
+import com.climus.climeet.data.repository.route.RouteCatalogState
+import com.climus.climeet.data.repository.route.RouteFilter
 import com.climus.climeet.presentation.ui.main.record.session.record.SessionRecordViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -21,6 +25,8 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -36,6 +42,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
+import java.time.LocalDate
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SessionSubmissionTest {
@@ -289,21 +296,8 @@ class SessionSubmissionTest {
     @Test
     fun catalogFailure_retryCatalog_reissuesRequestWithoutRecreatingViewModel() =
         runTest(dispatcher) {
-            coEvery { repository.getGymFilteringKey(1) } returnsMany listOf(
-                BaseState.Error("server error", "500"),
-                BaseState.Success(
-                    GetGymFilteringKeyResponse(
-                        difficultyList = emptyList(),
-                        maxFloor = 1,
-                        gymId = 1,
-                        sectorList = emptyList(),
-                        timePoint = "2026-09-21",
-                    ),
-                ),
-            )
-            coEvery { repository.getGymRouteInfoList(1, any()) } returns
-                BaseState.Success(GetGymRouteInfoResponse(page = 0, hasNext = false, result = emptyList()))
-            val viewModel = SessionRecordViewModel(repository)
+            val routeRepository = RetryRouteCatalogRepository()
+            val viewModel = SessionRecordViewModel(repository, routeRepository)
             advanceUntilIdle()
 
             viewModel.selectGym(1, "테스트 암장")
@@ -314,7 +308,25 @@ class SessionSubmissionTest {
             advanceUntilIdle()
 
             assertEquals(false, viewModel.isCatalogRetryAvailable.value)
-            coVerify(exactly = 2) { repository.getGymFilteringKey(1) }
+            assertEquals(2, routeRepository.observeCount)
+        }
+
+    @Test
+    fun restoredDraft_catalogKey_usesDraftDateUntilStop() =
+        runTest(dispatcher) {
+            coEvery { repository.getRecord(1) } returns savedRecord("00:10")
+            val routeRepository = RetryRouteCatalogRepository(alwaysFail = true)
+            val viewModel = SessionRecordViewModel(repository, routeRepository)
+            viewModel.restoreDraft()
+            advanceUntilIdle()
+
+            assertEquals(LocalDate.parse("2026-09-21"), routeRepository.observedKeys.last().queryDate)
+
+            viewModel.resetAtStop()
+            viewModel.selectGym(1, "테스트 암장")
+            advanceUntilIdle()
+
+            assertEquals(LocalDate.now(), routeRepository.observedKeys.last().queryDate)
         }
 
     private fun savedRecord(time: String) =
@@ -325,4 +337,33 @@ class SessionSubmissionTest {
             date = "2026-09-21",
             time = time,
         )
+}
+
+private class RetryRouteCatalogRepository(
+    private val alwaysFail: Boolean = false,
+) : RouteCatalogRepository {
+    var observeCount = 0
+    val observedKeys = mutableListOf<RouteCatalogKey>()
+
+    override fun observe(
+        key: RouteCatalogKey,
+        filter: Flow<RouteFilter>,
+    ): Flow<RouteCatalogState> =
+        flow {
+            observeCount++
+            observedKeys += key
+            if (alwaysFail || observeCount == 1) {
+                emit(RouteCatalogState.Failed(BaseState.Error("server error", "500")))
+            } else {
+                emit(
+                    RouteCatalogState.Content(
+                        RouteCatalog(1, null, key.queryDate.toString(), emptyList(), emptyList(), emptyList()),
+                        RouteFilter(0),
+                        Freshness.FRESH,
+                        false,
+                        1L,
+                    ),
+                )
+            }
+        }
 }

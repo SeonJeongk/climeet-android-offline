@@ -12,9 +12,14 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.climus.climeet.app.App.Companion.sharedPreferences
 import com.climus.climeet.data.local.ClimbingRecordData
-import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.repository.MainRepository
+import com.climus.climeet.data.repository.route.RouteCatalog
+import com.climus.climeet.data.repository.route.RouteCatalogKey
+import com.climus.climeet.data.repository.route.RouteCatalogRepository
+import com.climus.climeet.data.repository.route.RouteCatalogState
+import com.climus.climeet.data.repository.route.RouteFilter
 import com.climus.climeet.presentation.customview.DeleteDialog
+import com.climus.climeet.presentation.ui.main.global.keptIn
 import com.climus.climeet.presentation.ui.main.global.selectsector.FloorBtnState
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.GymLevelUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
@@ -23,7 +28,6 @@ import com.climus.climeet.presentation.ui.main.global.selectsector.model.Selecte
 import com.climus.climeet.presentation.ui.main.global.toGymLevelUiData
 import com.climus.climeet.presentation.ui.main.global.toRouteUiData
 import com.climus.climeet.presentation.ui.main.global.toSectorNameUiData
-import com.climus.climeet.presentation.ui.main.record.session.record.catalog.SessionRouteCatalogLoader
 import com.climus.climeet.presentation.ui.main.record.session.record.draft.SessionDraftStore
 import com.climus.climeet.presentation.ui.main.record.session.record.draft.recoverStopwatch
 import com.climus.climeet.presentation.ui.main.record.session.record.draft.restoreRouteItems
@@ -35,15 +39,19 @@ import com.climus.climeet.presentation.ui.main.record.session.record.submission.
 import com.climus.climeet.presentation.util.formatStopwatchTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 import javax.inject.Inject
 
 data class SessionRecordUiState(
@@ -69,10 +77,20 @@ sealed class SessionRecordEvent {
     ) : SessionRecordEvent()
 }
 
+private object EmptyRouteCatalogRepository : RouteCatalogRepository {
+    override fun observe(
+        key: RouteCatalogKey,
+        filter: Flow<RouteFilter>,
+    ) = flowOf<RouteCatalogState>(RouteCatalogState.Loading)
+}
+
 @HiltViewModel
 class SessionRecordViewModel @Inject constructor(
     private val repository: MainRepository,
+    private val routeCatalogRepository: RouteCatalogRepository,
 ) : ViewModel() {
+    constructor(repository: MainRepository) : this(repository, EmptyRouteCatalogRepository)
+
     private val _uiState = MutableStateFlow(SessionRecordUiState())
     val uiState: StateFlow<SessionRecordUiState> = _uiState.asStateFlow()
 
@@ -81,7 +99,6 @@ class SessionRecordViewModel @Inject constructor(
 
     private val submissionController = SessionSubmissionController(repository)
     private val draftStore = SessionDraftStore(repository)
-    private val catalogLoader = SessionRouteCatalogLoader(repository)
     val submissionState = submissionController.state
     val submissionEffect = submissionController.effect
     val isCatalogRetryAvailable = MutableStateFlow(false)
@@ -95,6 +112,10 @@ class SessionRecordViewModel @Inject constructor(
     var gymId: Long = 0
     var gymName: String = ""
     private var isCatalogRequestStarted: Boolean = false
+    private var catalogJob: Job? = null
+    private var catalogKey: RouteCatalogKey? = null
+    private var catalog: RouteCatalog? = null
+    private var restoredDraftDate: LocalDate? = null
 
     private var sectorNameList = listOf<SectorNameUiData>()
     private var gymLevelList = listOf<GymLevelUiData>()
@@ -162,6 +183,7 @@ class SessionRecordViewModel @Inject constructor(
             val draft = submissionController.restoreDraft() ?: return@launch
             gymId = draft.gymId
             gymName = draft.gymName
+            restoredDraftDate = runCatching { LocalDate.parse(draft.date) }.getOrNull()
             val recoveredStopwatch = recoverStopwatch(draft.time, sharedPreferences.getLong(PAUSE_TIME, 0L))
             restoredElapsedTimeMillis.value = recoveredStopwatch?.elapsedTimeMillis
             restoredDuration.value = recoveredStopwatch?.displayDuration
@@ -267,52 +289,69 @@ class SessionRecordViewModel @Inject constructor(
     }
 
     private fun loadGymCatalog(id: Long) {
-        viewModelScope.launch {
-            repository.getGymFilteringKey(id).let {
-                when (it) {
-                    is BaseState.Success -> {
-                        isCatalogRetryAvailable.value = false
-                        sectorNameList = it.body.sectorList.map { data ->
-                            data.toSectorNameUiData(::selectSectorName)
-                        }
-
-                        gymLevelList = it.body.difficultyList.map { data ->
-                            data.toGymLevelUiData(::selectGymLevel)
-                        }
-
-                        if (it.body.maxFloor == 1) {
-                            _uiState.update { state ->
-                                state.copy(
-                                    isSingleFloor = true,
-                                    layoutImg = it.body.layoutImageUrl,
-                                )
-                            }
-                            maxFloor = 1
-                            isSecondFloorExist = false
-                        } else {
-                            _uiState.update { state ->
-                                state.copy(
-                                    isSingleFloor = false,
-                                    layoutImg = it.body.layoutImageUrl,
-                                )
-                            }
-                            maxFloor = 2
-                            isSecondFloorExist = true
-                            if (!fetchFloorRoutes(2, publish = false)) return@let
-                        }
-                        if (fetchFloorRoutes(1, publish = true) && isRestoringDraft.value == true) {
-                            isRestoringDraft.value = false
-                            restoreRouteRecords()
-                        }
-                    }
-
-                    is BaseState.Error -> {
+        if (id <= 0L) return
+        // 화면이 자정을 넘겨 살아 있어도 새 기록은 오늘 카탈로그를 읽습니다.
+        val key = RouteCatalogKey(id, restoredDraftDate ?: LocalDate.now())
+        if (key != catalogKey) clearCatalog()
+        catalogKey = key
+        catalogJob?.cancel()
+        catalogJob = viewModelScope.launch {
+            routeCatalogRepository.observe(key, flowOf(RouteFilter(0))).collect { state ->
+                when (state) {
+                    RouteCatalogState.Loading -> Unit
+                    is RouteCatalogState.Failed -> {
                         isCatalogRequestStarted = false
                         isCatalogRetryAvailable.value = true
                         _event.emit(SessionRecordEvent.ShowToastMessage(CATALOG_RETRY_MESSAGE))
                     }
+
+                    is RouteCatalogState.Content -> applyCatalog(state.catalog)
                 }
             }
+        }
+    }
+
+    private fun applyCatalog(loaded: RouteCatalog) {
+        isCatalogRetryAvailable.value = false
+        // 갱신 상태만 바뀐 경우에는 사용자가 고른 층과 필터를 유지합니다.
+        if (loaded != catalog) {
+            catalog = loaded
+            sectorNameList = loaded.sectors.map { it.toSectorNameUiData(::selectSectorName) }
+            gymLevelList = loaded.difficulties.map { it.toGymLevelUiData(::selectGymLevel) }
+            maxFloor = loaded.maxFloor
+            isSecondFloorExist = loaded.maxFloor > 1
+            val allRoutes = loaded.routes.map { it.toRouteUiData(::selectRoute) }
+            firstFloorRouteList = allRoutes.filter { route ->
+                loaded.sectors.any { it.floor == 1 && it.sectorId == route.sectorId }
+            }
+            secondFloorRouteList = allRoutes.filter { route ->
+                loaded.sectors.any { it.floor == 2 && it.sectorId == route.sectorId }
+            }
+            renderCatalog(1)
+            _uiState.update { it.copy(selectedRoute = it.selectedRoute.keptIn(allRoutes)) }
+        }
+        if (isRestoringDraft.value == true) {
+            isRestoringDraft.value = false
+            restoreRouteRecords()
+        }
+    }
+
+    /** 다른 암장의 루트로 기록하지 않도록 이전 목록과 선택을 지웁니다. */
+    private fun clearCatalog() {
+        catalog = null
+        sectorNameList = emptyList()
+        gymLevelList = emptyList()
+        firstFloorRouteList = emptyList()
+        secondFloorRouteList = emptyList()
+        _uiState.update {
+            it.copy(
+                sectorNameList = emptyList(),
+                gymLevelList = emptyList(),
+                routeList = emptyList(),
+                selectedSector = SectorNameUiData {},
+                selectedLevel = GymLevelUiData {},
+                selectedRoute = RouteUiData {},
+            )
         }
     }
 
@@ -338,40 +377,8 @@ class SessionRecordViewModel @Inject constructor(
     }
 
     private fun loadFloorRoutes(floor: Int) {
-        viewModelScope.launch {
-            fetchFloorRoutes(floor, publish = true)
-        }
+        renderCatalog(floor)
     }
-
-    private suspend fun fetchFloorRoutes(
-        floor: Int,
-        publish: Boolean,
-    ): Boolean =
-        when (val result = catalogLoader.load(gymId, floor)) {
-            is BaseState.Success -> {
-                val routes = result.body.map { data -> data.toRouteUiData(::selectRoute) }
-                isCatalogRetryAvailable.value = false
-                if (floor == 1) firstFloorRouteList = routes else secondFloorRouteList = routes
-                if (publish) {
-                    _uiState.update { state ->
-                        state.copy(
-                            sectorNameList = sectorNameList.filter { data -> data.floor == floor },
-                            gymLevelList = gymLevelList,
-                            routeList = routes,
-                            curFloor = floor,
-                        )
-                    }
-                }
-                true
-            }
-
-            is BaseState.Error -> {
-                isCatalogRequestStarted = false
-                isCatalogRetryAvailable.value = true
-                _event.emit(SessionRecordEvent.ShowToastMessage(CATALOG_RETRY_MESSAGE))
-                false
-            }
-        }
 
     private fun loadFilteredRoutes(
         floor: Int,
@@ -379,26 +386,33 @@ class SessionRecordViewModel @Inject constructor(
         difficulty: Int? = null,
     ) {
         gymId = selectedGymData.value?.first ?: run { 0 }
-        viewModelScope.launch {
-            catalogLoader.load(gymId, floor, sectorId, difficulty).let {
-                when (it) {
-                    is BaseState.Success -> {
-                        isCatalogRetryAvailable.value = false
-                        _uiState.update { state ->
-                            state.copy(
-                                routeList = it.body.map { data ->
-                                    data.toRouteUiData(::selectRoute)
-                                },
-                            )
-                        }
-                    }
+        renderCatalog(floor, sectorId, difficulty)
+    }
 
-                    is BaseState.Error -> {
-                        isCatalogRetryAvailable.value = true
-                        _event.emit(SessionRecordEvent.ShowToastMessage(CATALOG_RETRY_MESSAGE))
-                    }
-                }
+    private fun renderCatalog(
+        floor: Int,
+        sectorId: Long? = null,
+        difficulty: Int? = null,
+    ) {
+        val loaded = catalog ?: return
+        val routes = loaded.routes
+            .filter { route ->
+                loaded.sectors.any { it.floor == floor && it.sectorId == route.sectorId }
             }
+            .filter { sectorId == null || it.sectorId == sectorId }
+            .filter { difficulty == null || it.difficulty == difficulty }
+            .map { it.toRouteUiData(::selectRoute) }
+        _uiState.update { state ->
+            state.copy(
+                isSingleFloor = loaded.maxFloor == 1,
+                layoutImg = loaded.layoutImageUrl,
+                sectorNameList = sectorNameList.filter { it.floor == floor }.map {
+                    it.copy(isSelected = it.sectorId == sectorId)
+                },
+                gymLevelList = gymLevelList.map { it.copy(isSelected = it.difficulty == difficulty) },
+                routeList = routes,
+                curFloor = floor,
+            )
         }
     }
 
@@ -658,6 +672,8 @@ class SessionRecordViewModel @Inject constructor(
         }
         isCatalogRequestStarted = false
         isCatalogRetryAvailable.value = false
+        catalogKey = null
+        restoredDraftDate = null
         isSecondFloorExist = false
         firstFloorRouteList = emptyList()
         secondFloorRouteList = emptyList()
