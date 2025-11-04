@@ -2,6 +2,10 @@ package com.climus.climeet.app.di
 
 import com.climus.climeet.data.repository.MainRepository
 import com.climus.climeet.data.repository.MainRepositoryImpl
+import com.climus.climeet.data.repository.homegym.HomeGymRemoteDataSource
+import com.climus.climeet.data.repository.homegym.HomeGymRepository
+import com.climus.climeet.data.repository.homegym.HomeGymRepositoryImpl
+import com.climus.climeet.data.repository.homegym.RetrofitHomeGymRemoteDataSource
 import com.climus.climeet.data.repository.route.AndroidNetworkAvailability
 import com.climus.climeet.data.repository.route.NetworkAvailability
 import com.climus.climeet.data.repository.route.RetrofitRouteCatalogRemoteDataSource
@@ -34,4 +38,10 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindRouteCatalogRepository(repository: RouteCatalogRepositoryImpl): RouteCatalogRepository
+
+    @Binds
+    abstract fun bindHomeGymRemoteDataSource(dataSource: RetrofitHomeGymRemoteDataSource): HomeGymRemoteDataSource
+
+    @Binds
+    abstract fun bindHomeGymRepository(repository: HomeGymRepositoryImpl): HomeGymRepository
 }

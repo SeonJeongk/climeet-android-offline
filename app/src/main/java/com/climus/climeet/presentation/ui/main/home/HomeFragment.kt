@@ -6,6 +6,7 @@ import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -38,6 +39,9 @@ import com.climus.climeet.presentation.ui.toSearchProfile
 import com.climus.climeet.presentation.ui.toShortsPlayer
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
@@ -92,6 +96,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                     uiState.homegymList.let { homegymList ->
                         recyclerHomeGym = homegymList
                         setupHomeGymList()
+                    }
+                    val cachedAt = uiState.homeGymReceivedAtEpochMs
+                    binding.tvHomeHomegymCacheStatus.isVisible =
+                        uiState.homeGymRefreshError != null &&
+                        cachedAt != null
+                    if (cachedAt != null) {
+                        binding.tvHomeHomegymCacheStatus.text = getString(
+                            R.string.home_gym_cached_status,
+                            HOME_GYM_TIME_FORMAT.format(Instant.ofEpochMilli(cachedAt)),
+                        )
                     }
 
                     uiState.followOrderCragList.let { cragList ->
@@ -292,7 +306,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     // 선택한 암장 프로필로 이동
     private fun navToGymProfile(gymId: Long) {
-        sharedPreferences.edit { putLong("gymId", gymId) }
+        val cachedGymName = recyclerHomeGym.firstOrNull { it.gymId == gymId }?.gymName
+        sharedPreferences.edit {
+            putLong("gymId", gymId)
+            if (cachedGymName != null) {
+                putString(CACHED_GYM_NAME_KEY, cachedGymName)
+            } else {
+                remove(CACHED_GYM_NAME_KEY)
+            }
+        }
         Log.d("gym_profile", "홈에서 암장 아이디 : $gymId")
 
         // todo 여기는 일단 구분 안해줘도 될듯!
@@ -354,5 +376,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             popularRouteRVAdapter,
             LinearLayoutManager.HORIZONTAL,
         )
+    }
+
+    private companion object {
+        const val CACHED_GYM_NAME_KEY = "cachedGymName"
+        val HOME_GYM_TIME_FORMAT: DateTimeFormatter =
+            DateTimeFormatter.ofPattern("M월 d일 HH:mm").withZone(ZoneId.systemDefault())
     }
 }

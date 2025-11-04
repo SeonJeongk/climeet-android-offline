@@ -41,6 +41,7 @@ class GymProfileFragment : BaseFragment<FragmentGymProfileBinding>(R.layout.frag
 
     private fun initCragInfo() {
         sharedPreferences.edit().putLong("gymId", gymId).apply()
+        viewModel.setCachedGymInfo(gymId, sharedPreferences.getString(CACHED_GYM_NAME_KEY, null))
         viewModel.setGymId(gymId)
     }
 
@@ -91,5 +92,9 @@ class GymProfileFragment : BaseFragment<FragmentGymProfileBinding>(R.layout.frag
                 override fun onTabReselected(tab: TabLayout.Tab?) = Unit
             },
         )
+    }
+
+    private companion object {
+        const val CACHED_GYM_NAME_KEY = "cachedGymName"
     }
 }

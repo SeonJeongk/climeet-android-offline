@@ -9,6 +9,8 @@ import androidx.room.RoomDatabase
         RouteSectorEntity::class,
         RouteDifficultyEntity::class,
         RouteEntity::class,
+        HomeGymCacheMetadataEntity::class,
+        HomeGymEntity::class,
     ],
     version = 1,
     exportSchema = true,
