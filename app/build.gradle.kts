@@ -86,6 +86,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BASE_API_URL", buildConfigString("https://example.invalid/"))
+        buildConfigField("boolean", "MEASUREMENT_MARKERS_ENABLED", "false")
     }
 
     buildTypes {
@@ -114,6 +115,7 @@ android {
                 "BASE_API_URL",
                 buildConfigString(benchmarkServerUrl ?: "https://example.invalid/"),
             )
+            buildConfigField("boolean", "MEASUREMENT_MARKERS_ENABLED", "true")
         }
     }
     compileOptions {

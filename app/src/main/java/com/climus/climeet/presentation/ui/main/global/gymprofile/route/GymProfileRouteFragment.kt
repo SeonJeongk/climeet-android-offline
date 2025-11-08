@@ -6,7 +6,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.climus.climeet.BuildConfig
 import com.climus.climeet.R
+import com.climus.climeet.data.repository.route.Freshness
 import com.climus.climeet.databinding.FragmentGymProfileRouteBinding
 import com.climus.climeet.presentation.base.BaseFragment
 import com.climus.climeet.presentation.customview.selectdate.SelectDateBottomSheet
@@ -78,9 +80,28 @@ class GymProfileRouteFragment : BaseFragment<FragmentGymProfileRouteBinding>(R.l
                 }
                 binding.tvRouteStatus.text = message
                 binding.tvRouteStatus.visibility = if (message.isEmpty()) View.GONE else View.VISIBLE
+                binding.rvSectorImage.contentDescription =
+                    if (BuildConfig.MEASUREMENT_MARKERS_ENABLED) {
+                        listOf(
+                            "catalogComplete=true",
+                            "catalogLabels=${state.routeList.joinToString(",") { it.gymLevelName }}",
+                            "routeIds=${state.routeList.joinToString(",") { it.routeId.toString() }}",
+                            "cacheFreshness=${state.cacheFreshness.name}",
+                            "staleAgeMs=${state.staleAgeMs()}",
+                        ).joinToString(";")
+                    } else {
+                        null
+                    }
             }
         }
     }
+
+    private fun GymProfileSelectSectorUiState.staleAgeMs(): String =
+        if (cacheFreshness == Freshness.STALE && cacheReceivedAtEpochMs != null) {
+            (System.currentTimeMillis() - cacheReceivedAtEpochMs).coerceAtLeast(0L).toString()
+        } else {
+            ""
+        }
 
     private fun addOnScrollListener() {
         binding.layoutScrollview.setOnScrollChangeListener { v, _, scrollY, _, _ ->
