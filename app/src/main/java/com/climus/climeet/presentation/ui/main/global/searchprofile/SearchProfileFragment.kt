@@ -3,6 +3,7 @@ package com.climus.climeet.presentation.ui.main.global.searchprofile
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.core.content.edit
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -130,9 +131,7 @@ class SearchProfileFragment : BaseFragment<FragmentSearchProfileBinding>(R.layou
     }
 
     private fun navToGymProfile(gymId: Long) {
-        App.sharedPreferences.edit()
-            .putLong("gymId", gymId)
-            .apply()
+        App.sharedPreferences.edit { putLong("gymId", gymId) }
         Log.d("gym_profile", "홈에서 암장 아이디 : $gymId")
 
         findNavController().toGymProfile(gymId)

@@ -111,8 +111,10 @@ class StopwatchFragment : BaseFragment<FragmentStopwatchBinding>(R.layout.fragme
                     val gymId = gym.id
                     val gymName = gym.name
                     val date = LocalDate.now().toString()
-                    sharedPreferences.edit().putString("gymName", gymName).apply()
-                    sharedPreferences.edit().putLong("gymId", gymId).apply()
+                    sharedPreferences.edit {
+                        putString("gymName", gymName)
+                        putLong("gymId", gymId)
+                    }
 
                     binding.tvTitle.text = gymName
                     val recordData = ClimbingRecordData(

@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.climus.climeet.R
@@ -40,7 +41,7 @@ class GymProfileFragment : BaseFragment<FragmentGymProfileBinding>(R.layout.frag
     }
 
     private fun initCragInfo() {
-        sharedPreferences.edit().putLong("gymId", gymId).apply()
+        sharedPreferences.edit { putLong("gymId", gymId) }
         viewModel.setCachedGymInfo(gymId, sharedPreferences.getString(CACHED_GYM_NAME_KEY, null))
         viewModel.setGymId(gymId)
     }
