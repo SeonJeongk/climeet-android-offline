@@ -250,8 +250,7 @@ dependencies {
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }
 
-tasks.configureEach {
-    if (name != "validateBenchmarkServerUrl" && name.contains("Benchmark", ignoreCase = true)) {
-        dependsOn(validateBenchmarkServerUrl)
-    }
+// 측정 서버 주소는 BuildConfig를 만들 때만 검사합니다. ktlint·detekt는 주소 없이 실행합니다.
+tasks.matching { it.name == "generateBenchmarkBuildConfig" }.configureEach {
+    dependsOn(validateBenchmarkServerUrl)
 }
