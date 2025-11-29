@@ -5,9 +5,9 @@ import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.climus.climeet.R
 import com.climus.climeet.databinding.ItemSearchProfileBinding
+import com.climus.climeet.presentation.bindingadapters.setClimberProfileImage
+import com.climus.climeet.presentation.bindingadapters.setGymProfileImage
 import com.climus.climeet.presentation.ui.main.global.searchprofile.model.SearchProfileUiData
 
 @Suppress("DEPRECATION")
@@ -81,10 +81,11 @@ class SearchProfileViewHolder(
             item.navigateToProfile(item.id)
         }
 
-        Glide.with(binding.root.context)
-            .load(item.imgUrl)
-            .error(R.drawable.img_profile)
-            .into(binding.ivProfile)
+        if (item.isGym) {
+            binding.ivProfile.setGymProfileImage(item.imgUrl)
+        } else {
+            binding.ivProfile.setClimberProfileImage(item.imgUrl)
+        }
 
         binding.tvCragName.text = item.name
         binding.tvCragsFollow.text = item.followers.toString()

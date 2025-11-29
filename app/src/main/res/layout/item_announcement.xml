@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="10dp"
             android:text="클밋 공식 계정"
-            app:layout_constraintEnd_toStartOf="@+id/iv_image"
+            app:layout_constraintEnd_toStartOf="@+id/cv_image"
             app:layout_constraintStart_toEndOf="@+id/iv_announce_profile"
             app:layout_constraintTop_toTopOf="@+id/iv_announce_profile" />
 

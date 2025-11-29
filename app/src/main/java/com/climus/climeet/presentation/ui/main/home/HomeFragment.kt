@@ -3,8 +3,10 @@ package com.climus.climeet.presentation.ui.main.home
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -13,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.climus.climeet.R
 import com.climus.climeet.app.App.Companion.sharedPreferences
-import com.climus.climeet.data.model.response.BannerDetailInfoResponse
 import com.climus.climeet.data.model.response.BestFollowGymSimpleResponse
 import com.climus.climeet.data.model.response.BestRecordGymDetailInfoResponse
 import com.climus.climeet.data.model.response.BestRouteDetailInfoResponse
@@ -38,11 +39,17 @@ import com.climus.climeet.presentation.ui.toSearchProfile
 import com.climus.climeet.presentation.ui.toShortsPlayer
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     private val viewModel: HomeViewModel by viewModels()
-    private var vpBanner: List<BannerDetailInfoResponse> = emptyList()
+    private val bannerImages = listOf(
+        R.drawable.img_home_banner_new_gym,
+        R.drawable.img_gym_background,
+    )
     private var recyclerHomeGym: List<UserHomeGymSimpleResponse> = emptyList()
     private var recyclerShorts: List<ShortsThumbnailUiData> = emptyList()
     private var followOrderRecyclerCrag: List<BestFollowGymSimpleResponse> = emptyList()
@@ -56,7 +63,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getBannerListBetweenDates()
+        setupIntroduceBanner(bannerImages)
         viewModel.getGymRankingOrderFollowCount()
         viewModel.getGymRankingListOrderSelectionCount()
         viewModel.getRouteRankingOrderSelectionCount()
@@ -86,14 +93,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         repeatOnStarted {
             viewModel.let { vm ->
                 vm.uiState.collect { uiState ->
-                    uiState.bannerList.let { bannerList ->
-                        vpBanner = bannerList
-                        setupIntroduceBanner(vpBanner)
-                    }
-
                     uiState.homegymList.let { homegymList ->
                         recyclerHomeGym = homegymList
                         setupHomeGymList()
+                    }
+                    val cachedAt = uiState.homeGymReceivedAtEpochMs
+                    binding.tvHomeHomegymCacheStatus.isVisible =
+                        uiState.homeGymRefreshError != null &&
+                        cachedAt != null
+                    if (cachedAt != null) {
+                        binding.tvHomeHomegymCacheStatus.text = getString(
+                            R.string.home_gym_cached_status,
+                            HOME_GYM_TIME_FORMAT.format(Instant.ofEpochMilli(cachedAt)),
+                        )
                     }
 
                     uiState.followOrderCragList.let { cragList ->
@@ -220,11 +232,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         findNavController().navigate(action)
     }
 
-    private fun setupIntroduceBanner(vpBanner: List<BannerDetailInfoResponse>) {
+    private fun setupIntroduceBanner(
+        @DrawableRes bannerImages: List<Int>,
+    ) {
         val bannerAdapter = BannerVPAdapter(this)
 
-        for (bannerInfo in vpBanner) {
-            val bannerFragment = BannerFragment(bannerInfo)
+        for (bannerImage in bannerImages) {
+            val bannerFragment = BannerFragment(bannerImage)
             bannerAdapter.addFragment(bannerFragment)
         }
 
@@ -292,7 +306,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     // 선택한 암장 프로필로 이동
     private fun navToGymProfile(gymId: Long) {
-        sharedPreferences.edit { putLong("gymId", gymId) }
+        val cachedGymName = recyclerHomeGym.firstOrNull { it.gymId == gymId }?.gymName
+        sharedPreferences.edit {
+            putLong("gymId", gymId)
+            if (cachedGymName != null) {
+                putString(CACHED_GYM_NAME_KEY, cachedGymName)
+            } else {
+                remove(CACHED_GYM_NAME_KEY)
+            }
+        }
         Log.d("gym_profile", "홈에서 암장 아이디 : $gymId")
 
         // todo 여기는 일단 구분 안해줘도 될듯!
@@ -354,5 +376,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             popularRouteRVAdapter,
             LinearLayoutManager.HORIZONTAL,
         )
+    }
+
+    private companion object {
+        const val CACHED_GYM_NAME_KEY = "cachedGymName"
+        val HOME_GYM_TIME_FORMAT: DateTimeFormatter =
+            DateTimeFormatter.ofPattern("M월 d일 HH:mm").withZone(ZoneId.systemDefault())
     }
 }

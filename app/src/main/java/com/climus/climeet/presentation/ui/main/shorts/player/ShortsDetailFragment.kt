@@ -18,10 +18,10 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
-import com.bumptech.glide.Glide
 import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentShortsDetailBinding
 import com.climus.climeet.presentation.base.BaseFragment
+import com.climus.climeet.presentation.bindingadapters.setClimberProfileImage
 import com.climus.climeet.presentation.ui.main.shorts.adapter.ShortsDetailListener
 import com.climus.climeet.presentation.ui.main.shorts.model.ShortsUiData
 import dagger.hilt.android.AndroidEntryPoint
@@ -94,10 +94,7 @@ class ShortsDetailFragment @Inject constructor(
     }
 
     private fun setImage() {
-        Glide.with(this)
-            .load(data.profileImgUrl)
-            .error(R.drawable.img_profile)
-            .into(binding.ivProfile)
+        binding.ivProfile.setClimberProfileImage(data.profileImgUrl)
     }
 
     @OptIn(UnstableApi::class)

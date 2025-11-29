@@ -38,8 +38,11 @@
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/vp_home_introduce_banner"
                 android:layout_width="match_parent"
-                android:layout_height="180dp"
+                android:layout_height="0dp"
                 android:layout_marginTop="20dp"
+                app:layout_constraintDimensionRatio="1125:540"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
             <TextView
@@ -80,8 +83,23 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView5"
+                app:layout_constraintTop_toBottomOf="@+id/tv_home_homegym_cache_status"
                 tools:listitem="@layout/item_home_gym" />
+
+            <TextView
+                android:id="@+id/tv_home_homegym_cache_status"
+                style="@style/TextSmallSemiBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/cm_grey4"
+                android:textSize="11sp"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView5"
+                tools:text="오프라인 저장 목록 · 마지막 갱신 8월 12일 14:30"
+                tools:visibility="visible" />
 
             <TextView
                 android:id="@+id/textView8"

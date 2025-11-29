@@ -12,6 +12,7 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.climus.climeet.R
@@ -24,7 +25,6 @@ import java.util.TimerTask
 @AndroidEntryPoint
 class StopwatchService : Service() {
     private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var editor: SharedPreferences.Editor
 
     private var startTime = 0L
     private var pauseTime = 0L
@@ -64,7 +64,6 @@ class StopwatchService : Service() {
         createNotificationChannelAndGroup()
 
         sharedPreferences = applicationContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        editor = sharedPreferences.edit()
     }
 
     override fun onDestroy() {
@@ -145,7 +144,7 @@ class StopwatchService : Service() {
                 object : TimerTask() {
                     override fun run() {
                         elapsedTime += System.currentTimeMillis() - startTime
-                        editor.putLong(PAUSE_TIME, elapsedTime).apply()
+                        sharedPreferences.edit { putLong(PAUSE_TIME, elapsedTime) }
                         val notification = createNotification(elapsedTime)
                         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                         notificationManager.notify(1, notification)
@@ -173,13 +172,14 @@ class StopwatchService : Service() {
         isStopped = false
         isRunning = true
 
-        editor.putBoolean(KEY_IS_START, isStart)
-        editor.putBoolean(KEY_IS_PAUSE, isPaused)
-        editor.putBoolean(KEY_IS_RESTART, isRestart)
-        editor.putBoolean(KEY_IS_STOP, isStopped)
-        editor.putBoolean(KEY_IS_RUNNING, isRunning)
-        editor.putLong(PAUSE_TIME, elapsedTime)
-        editor.apply()
+        sharedPreferences.edit {
+            putBoolean(KEY_IS_START, isStart)
+            putBoolean(KEY_IS_PAUSE, isPaused)
+            putBoolean(KEY_IS_RESTART, isRestart)
+            putBoolean(KEY_IS_STOP, isStopped)
+            putBoolean(KEY_IS_RUNNING, isRunning)
+            putLong(PAUSE_TIME, elapsedTime)
+        }
 
         hasStartedInProcess.postValue(true)
     }
@@ -204,13 +204,14 @@ class StopwatchService : Service() {
         intent.putExtra("pauseState", "yes")
         LocalBroadcastManager.getInstance(this@StopwatchService).sendBroadcast(intent)
 
-        editor.putLong("pauseTime", pauseTime)
-        editor.putBoolean(KEY_IS_START, isStart)
-        editor.putBoolean(KEY_IS_PAUSE, isPaused)
-        editor.putBoolean(KEY_IS_RESTART, isRestart)
-        editor.putBoolean(KEY_IS_STOP, isStopped)
-        editor.putBoolean(KEY_IS_RUNNING, isRunning)
-        editor.apply()
+        sharedPreferences.edit {
+            putLong("pauseTime", pauseTime)
+            putBoolean(KEY_IS_START, isStart)
+            putBoolean(KEY_IS_PAUSE, isPaused)
+            putBoolean(KEY_IS_RESTART, isRestart)
+            putBoolean(KEY_IS_STOP, isStopped)
+            putBoolean(KEY_IS_RUNNING, isRunning)
+        }
     }
 
     private fun restartStopwatch() {
@@ -225,13 +226,14 @@ class StopwatchService : Service() {
         intent.putExtra("pauseState", "no")
         LocalBroadcastManager.getInstance(this@StopwatchService).sendBroadcast(intent)
 
-        editor.putString("pauseTimeFormat", "00:00")
-        editor.putBoolean(KEY_IS_START, isStart)
-        editor.putBoolean(KEY_IS_PAUSE, isPaused)
-        editor.putBoolean(KEY_IS_RESTART, isRestart)
-        editor.putBoolean(KEY_IS_STOP, isStopped)
-        editor.putBoolean(KEY_IS_RUNNING, isRunning)
-        editor.apply()
+        sharedPreferences.edit {
+            putString("pauseTimeFormat", "00:00")
+            putBoolean(KEY_IS_START, isStart)
+            putBoolean(KEY_IS_PAUSE, isPaused)
+            putBoolean(KEY_IS_RESTART, isRestart)
+            putBoolean(KEY_IS_STOP, isStopped)
+            putBoolean(KEY_IS_RUNNING, isRunning)
+        }
     }
 
     private fun stopStopwatch() {
@@ -246,12 +248,13 @@ class StopwatchService : Service() {
         intent.putExtra("elapsedTime", 0L)
         LocalBroadcastManager.getInstance(this@StopwatchService).sendBroadcast(intent)
 
-        editor.putBoolean(KEY_IS_START, isStart)
-        editor.putBoolean(KEY_IS_PAUSE, isPaused)
-        editor.putBoolean(KEY_IS_RESTART, isRestart)
-        editor.putBoolean(KEY_IS_STOP, isStopped)
-        editor.putBoolean(KEY_IS_RUNNING, isRunning)
-        editor.apply()
+        sharedPreferences.edit {
+            putBoolean(KEY_IS_START, isStart)
+            putBoolean(KEY_IS_PAUSE, isPaused)
+            putBoolean(KEY_IS_RESTART, isRestart)
+            putBoolean(KEY_IS_STOP, isStopped)
+            putBoolean(KEY_IS_RUNNING, isRunning)
+        }
     }
 
     companion object {

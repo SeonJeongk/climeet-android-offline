@@ -2,6 +2,7 @@ package com.climus.climeet.presentation.bindingadapters
 
 import android.view.View
 import android.widget.ImageView
+import androidx.annotation.DrawableRes
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import com.bumptech.glide.Glide
@@ -12,10 +13,35 @@ fun bindProfileImg(
     imageView: ImageView,
     url: String?,
 ) {
-    Glide.with(imageView.context)
-        .load(url)
-        .error(R.drawable.img_profile)
-        .into(imageView)
+    imageView.setClimberProfileImage(url)
+}
+
+@BindingAdapter("gymProfileImgUrl")
+fun bindGymProfileImg(
+    imageView: ImageView,
+    url: String?,
+) {
+    imageView.setGymProfileImage(url)
+}
+
+fun ImageView.setClimberProfileImage(url: String?) {
+    setProfileImage(url, R.drawable.img_profile)
+}
+
+fun ImageView.setGymProfileImage(url: String?) {
+    setProfileImage(url, R.drawable.img_crag)
+}
+
+private fun ImageView.setProfileImage(
+    url: String?,
+    @DrawableRes defaultImage: Int,
+) {
+    Glide.with(context)
+        .load(url?.takeIf(String::isNotBlank))
+        .placeholder(defaultImage)
+        .fallback(defaultImage)
+        .error(defaultImage)
+        .into(this)
 }
 
 @BindingAdapter("imgUrl")

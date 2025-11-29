@@ -15,10 +15,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.climus.climeet.MainNavDirections
 import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentTimeDetailBinding
+import com.climus.climeet.presentation.bindingadapters.setClimberProfileImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -174,13 +174,9 @@ class TimeDetailFragment : Fragment() {
                         val iterationCount = minOf(rankingList.size, 9)
 
                         rankingList.take(iterationCount).forEachIndexed { i, bestTimeClimberResponse ->
-                            if (bestTimeClimberResponse.profileImageUrl != null) {
-                                Glide.with(binding.root)
-                                    .load(bestTimeClimberResponse.profileImageUrl)
-                                    .into(profileImgList[i])
-                                profileImgList[i].setOnClickListener {
-                                    navigateToClimberProfile(bestTimeClimberResponse.userId)
-                                }
+                            profileImgList[i].setClimberProfileImage(bestTimeClimberResponse.profileImageUrl)
+                            profileImgList[i].setOnClickListener {
+                                navigateToClimberProfile(bestTimeClimberResponse.userId)
                             }
                             if (i < 3) {
                                 rankList[i].text = bestTimeClimberResponse.ranking.toString()

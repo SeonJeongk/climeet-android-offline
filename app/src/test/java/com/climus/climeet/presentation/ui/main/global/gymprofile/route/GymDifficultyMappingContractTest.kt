@@ -1,15 +1,8 @@
 package com.climus.climeet.presentation.ui.main.global.gymprofile.route
 
-import com.climus.climeet.data.model.BaseState
-import com.climus.climeet.data.model.request.GetGymRouteInfoRequest
-import com.climus.climeet.data.model.response.DifficultyItem
-import com.climus.climeet.data.model.response.GetGymFilteringKeyResponse
-import com.climus.climeet.data.model.response.GetGymRouteInfoResponse
-import com.climus.climeet.data.model.response.RouteItem
-import com.climus.climeet.data.repository.MainRepository
+import com.climus.climeet.data.repository.route.CachedRoute
+import com.climus.climeet.data.repository.route.RouteDifficulty
 import com.climus.climeet.presentation.ui.main.mypage.myprofile.admin.model.LevelColorData
-import io.mockk.coEvery
-import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -29,7 +22,7 @@ class GymDifficultyMappingContractTest(
     private val colorNames: String,
 ) {
     @Test
-    fun approvedDifficultySequence_loadAndSelect_preservesDisplayAndRequestIdentity() =
+    fun approvedDifficultySequence_loadAndSelect_preservesDisplayAndIdentity() =
         runTest {
             Dispatchers.setMain(StandardTestDispatcher(testScheduler))
             try {
@@ -37,35 +30,23 @@ class GymDifficultyMappingContractTest(
                 val expectedColors = colorNames.split(" ").map { name ->
                     LevelColorData.COLORS.single { it.name == name }.color
                 }
-                val contract = expectedNames.mapIndexed { difficulty, name ->
-                    DifficultyItem(name, difficulty, expectedColors[difficulty], name)
+                val difficulties = expectedNames.mapIndexed { difficulty, name ->
+                    RouteDifficulty(difficulty, name, name, expectedColors[difficulty])
                 }
-                val requests = mutableListOf<GetGymRouteInfoRequest>()
-                val repository = mockk<MainRepository>()
-                coEvery { repository.getGymFilteringKeyTime(any(), any()) } coAnswers {
-                    BaseState.Success(GetGymFilteringKeyResponse(contract, 1, 1, "", emptyList(), secondArg()))
+                val routes = difficulties.map {
+                    CachedRoute(
+                        it.difficulty.toLong(),
+                        101,
+                        "Sector",
+                        it.climeetDifficultyName,
+                        it.difficulty,
+                        it.gymDifficultyName,
+                        it.gymDifficultyColor,
+                        "route.png",
+                        "하양",
+                    )
                 }
-                coEvery { repository.getGymRouteInfoList(1, any()) } coAnswers {
-                    val request = secondArg<GetGymRouteInfoRequest>()
-                    requests += request
-                    val routes = contract.filter { request.difficulty == null || it.difficulty == request.difficulty }
-                        .map {
-                            RouteItem(
-                                it.difficulty.toLong(),
-                                1,
-                                "Sector",
-                                it.climeetDifficultyName,
-                                it.difficulty,
-                                it.gymDifficultyName,
-                                it.gymDifficultyColor,
-                                "route.png",
-                                "하양",
-                            )
-                        }
-                    val page = routes.drop(request.page * request.size).take(request.size)
-                    val hasNext = (request.page + 1) * request.size < routes.size
-                    BaseState.Success(GetGymRouteInfoResponse(request.page, hasNext, page))
-                }
+                val repository = FakeRouteCatalogRepository(routeCatalog(difficulties, routes))
                 val viewModel = GymProfileRouteViewModel(repository)
                 viewModel.setCragInfo(1, "Synthetic gym")
                 advanceUntilIdle()
@@ -78,21 +59,18 @@ class GymDifficultyMappingContractTest(
                 for ((difficulty, filter) in filters.withIndex()) {
                     filter.onClickListener(filter)
                     advanceUntilIdle()
-                    assertEquals(difficulty, requests.last().difficulty)
                     val selected = viewModel.uiState.value.gymLevelList.filter { it.isSelected }
                     assertEquals(listOf(difficulty), selected.map { it.difficulty })
                     val route = viewModel.uiState.value.routeList.single()
                     assertEquals(expectedNames[difficulty], route.gymLevelName)
                     assertEquals(expectedNames[difficulty], route.climeetLevelName)
                 }
-                assertEquals(expectedNames.indices.toList(), requests.mapNotNull { it.difficulty })
             } finally {
                 Dispatchers.resetMain()
             }
         }
 
     companion object {
-        // 사용자 제공 5~13단계 사례와 확정된 VB·C1~C3 표기를 각각 기록합니다.
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
         fun cases(): List<Array<String>> =

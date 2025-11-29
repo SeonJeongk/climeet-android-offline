@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.climus.climeet.databinding.ItemProfileReviewBinding
+import com.climus.climeet.presentation.bindingadapters.setClimberProfileImage
 import com.climus.climeet.presentation.ui.main.global.gymprofile.model.GymReview
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -56,8 +56,6 @@ class GymReviewViewHolder(
         binding.tvName.text = item.profileName
         binding.tvReview.text = item.content
         binding.starRate.rating = item.rating
-        Glide.with(binding.root)
-            .load(item.profileImageUrl)
-            .into(binding.ivProfile)
+        binding.ivProfile.setClimberProfileImage(item.profileImageUrl)
     }
 }

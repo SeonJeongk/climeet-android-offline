@@ -14,6 +14,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -145,6 +146,7 @@ class MainApiContractTest {
             "getGymFilteringKeyTime",
             Long::class.javaPrimitiveType,
             String::class.java,
+            String::class.java,
             kotlin.coroutines.Continuation::class.java,
         )
         assertEquals(
@@ -153,6 +155,7 @@ class MainApiContractTest {
         )
         assertParameterAnnotation(filteringKeyTime, 0, Path::class.java, "gymId")
         assertParameterAnnotation(filteringKeyTime, 1, Query::class.java, "timePoint")
+        assertParameterAnnotation(filteringKeyTime, 2, Header::class.java, "If-None-Match")
 
         val route = MainApi::class.java.getDeclaredMethod(
             "getGymRouteInfoList",

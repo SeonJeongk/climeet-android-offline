@@ -15,10 +15,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.climus.climeet.MainNavDirections
 import com.climus.climeet.R
 import com.climus.climeet.databinding.FragmentLevelDetailBinding
+import com.climus.climeet.presentation.bindingadapters.setClimberProfileImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -174,13 +174,9 @@ class LevelDetailFragment : Fragment() {
                         val iterationCount = minOf(rankingList.size, 9)
 
                         rankingList.take(iterationCount).forEachIndexed { i, bestLevelClimberResponse ->
-                            if (bestLevelClimberResponse.profileImageUrl != null) {
-                                Glide.with(binding.root)
-                                    .load(bestLevelClimberResponse.profileImageUrl)
-                                    .into(profileImgList[i])
-                                profileImgList[i].setOnClickListener {
-                                    navigateToClimberProfile(bestLevelClimberResponse.userId)
-                                }
+                            profileImgList[i].setClimberProfileImage(bestLevelClimberResponse.profileImageUrl)
+                            profileImgList[i].setOnClickListener {
+                                navigateToClimberProfile(bestLevelClimberResponse.userId)
                             }
                             if (i < 3) {
                                 rankList[i].text = bestLevelClimberResponse.ranking.toString()

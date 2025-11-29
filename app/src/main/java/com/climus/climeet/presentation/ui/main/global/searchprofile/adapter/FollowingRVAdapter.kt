@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.climus.climeet.databinding.ItemFollowingBinding
+import com.climus.climeet.presentation.bindingadapters.setClimberProfileImage
 import com.climus.climeet.presentation.ui.main.global.searchprofile.model.UserFollowingUiData
 import com.climus.climeet.presentation.ui.main.mypage.follow.model.FollowClimber
 
@@ -57,11 +57,7 @@ class FollowingViewHolder(
     fun bind(following: UserFollowingUiData) {
         binding.tvFollowing.text = following.followers.toString()
 
-        if (following.imgUrl != null) {
-            Glide.with(binding.root.context)
-                .load(following.imgUrl)
-                .into(binding.followingProfileArea)
-        }
+        binding.followingProfileArea.setClimberProfileImage(following.imgUrl)
 
         binding.followingProfileArea.setOnClickListener {
             following.navigateToProfile(following.id)

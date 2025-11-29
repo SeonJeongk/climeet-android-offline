@@ -12,7 +12,6 @@ import com.climus.climeet.data.model.request.AddShortsCommentRequest
 import com.climus.climeet.data.model.request.ClimbingRecord
 import com.climus.climeet.data.model.request.CreateClimbingRecordRequest
 import com.climus.climeet.data.model.request.CreateGymProfileReviewRequest
-import com.climus.climeet.data.model.request.GetGymRouteInfoRequest
 import com.climus.climeet.data.model.request.GymServiceUpdateRequest
 import com.climus.climeet.data.model.request.ImgUrlRequest
 import com.climus.climeet.data.model.request.NotificationUpdateRequest
@@ -33,11 +32,9 @@ import com.climus.climeet.data.model.response.GetAnnouncementResponse
 import com.climus.climeet.data.model.response.GetClimberPrivacySettingResponse
 import com.climus.climeet.data.model.response.GetClimberProfileStatisticsResponse
 import com.climus.climeet.data.model.response.GetClimberProfileTargetGymStatisticsResponse
-import com.climus.climeet.data.model.response.GetGymFilteringKeyResponse
 import com.climus.climeet.data.model.response.GetGymListToFollowResponse
 import com.climus.climeet.data.model.response.GetGymProfileResponse
 import com.climus.climeet.data.model.response.GetGymProfileReviewResponse
-import com.climus.climeet.data.model.response.GetGymRouteInfoResponse
 import com.climus.climeet.data.model.response.GetGymSkillDistributionResponse
 import com.climus.climeet.data.model.response.GetMyShortsCommentsResponse
 import com.climus.climeet.data.model.response.GetMyStatsTargetGymMonthResponse
@@ -178,26 +175,8 @@ class MainRepositoryImpl @Inject constructor(
         endDate: String,
     ): BaseState<List<GetSelectDateRecordResponse>> = runRemote { api.getSelectDateRecord(startDate, endDate) }
 
-    override suspend fun getGymFilteringKey(gymId: Long): BaseState<GetGymFilteringKeyResponse> =
-        runRemote {
-            api.getGymFilteringKey(gymId)
-        }
-
-    override suspend fun getGymFilteringKeyTime(
-        gymId: Long,
-        timePoint: String,
-    ): BaseState<GetGymFilteringKeyResponse> = runRemote { api.getGymFilteringKeyTime(gymId, timePoint) }
-
     override suspend fun getGymRouteFindingData(timePoint: String): BaseState<GetRouteFindingData> =
         runRemote { api.getGymRouteFindingData(timePoint) }
-
-    override suspend fun getGymRouteInfoList(
-        gymId: Long,
-        body: GetGymRouteInfoRequest,
-    ): BaseState<GetGymRouteInfoResponse> =
-        runRemote {
-            api.getGymRouteInfoList(gymId, body)
-        }
 
     override suspend fun updateGymRouteVersion(body: UpdateGymRouteVersionRequest): BaseState<ResponseBody> =
         runRemote { api.updateGymRouteVersion(body) }

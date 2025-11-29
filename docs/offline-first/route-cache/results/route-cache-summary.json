@@ -1,0 +1,190 @@
+{
+  "groups": [
+    {
+      "accuracy": {
+        "catalogVersionMatchRate": 1.0,
+        "filterResultMatchRate": 1.0,
+        "fullCatalogMatchRate": 1.0
+      },
+      "condition": "clean",
+      "correctnessPassCount": 50,
+      "correctnessRate": 1.0,
+      "countTotals": {
+        "blocking_error_count": 0,
+        "duplicate_request_count": null,
+        "request_count": 0,
+        "response_body_bytes": 0,
+        "state_mismatch_count": 0
+      },
+      "failureCategories": {},
+      "falseSuccessCount": 0,
+      "flowSuccessCount": 50,
+      "metrics": {
+        "stale_age_ms": {
+          "p50": null,
+          "p90": null,
+          "p95": null
+        },
+        "time_to_expected_state_ms": {
+          "p50": 518,
+          "p90": 588,
+          "p95": 624
+        },
+        "time_to_first_usable_ms": {
+          "p50": 510,
+          "p90": 580,
+          "p95": 614
+        }
+      },
+      "outcomes": {
+        "success": 50
+      },
+      "phase": "single",
+      "scenario": "ROUTE_REENTRY",
+      "validAppAttemptCount": 50,
+      "variant": "after"
+    },
+    {
+      "accuracy": {
+        "catalogVersionMatchRate": 1.0,
+        "filterResultMatchRate": 1.0,
+        "fullCatalogMatchRate": 1.0
+      },
+      "condition": "latency_3000",
+      "correctnessPassCount": 50,
+      "correctnessRate": 1.0,
+      "countTotals": {
+        "blocking_error_count": 0,
+        "duplicate_request_count": null,
+        "request_count": 50,
+        "response_body_bytes": 0,
+        "state_mismatch_count": 0
+      },
+      "failureCategories": {},
+      "falseSuccessCount": 0,
+      "flowSuccessCount": 50,
+      "metrics": {
+        "stale_age_ms": {
+          "p50": 9649,
+          "p90": 9791,
+          "p95": 11738
+        },
+        "time_to_expected_state_ms": {
+          "p50": 3530,
+          "p90": 3569,
+          "p95": 3581
+        },
+        "time_to_first_usable_ms": {
+          "p50": 518,
+          "p90": 577,
+          "p95": 592
+        }
+      },
+      "outcomes": {
+        "success": 50
+      },
+      "phase": "single",
+      "scenario": "ROUTE_REENTRY",
+      "validAppAttemptCount": 50,
+      "variant": "after"
+    },
+    {
+      "accuracy": {
+        "catalogVersionMatchRate": 1.0,
+        "filterResultMatchRate": 1.0,
+        "fullCatalogMatchRate": null
+      },
+      "condition": "clean",
+      "correctnessPassCount": 50,
+      "correctnessRate": 1.0,
+      "countTotals": {
+        "blocking_error_count": 0,
+        "duplicate_request_count": null,
+        "request_count": 150,
+        "response_body_bytes": 306900,
+        "state_mismatch_count": 0
+      },
+      "failureCategories": {},
+      "falseSuccessCount": 0,
+      "flowSuccessCount": 50,
+      "metrics": {
+        "stale_age_ms": {
+          "p50": null,
+          "p90": null,
+          "p95": null
+        },
+        "time_to_expected_state_ms": {
+          "p50": 633,
+          "p90": 715,
+          "p95": 732
+        },
+        "time_to_first_usable_ms": {
+          "p50": 622,
+          "p90": 704,
+          "p95": 721
+        }
+      },
+      "outcomes": {
+        "success": 50
+      },
+      "phase": "single",
+      "scenario": "ROUTE_REENTRY",
+      "validAppAttemptCount": 50,
+      "variant": "baseline"
+    },
+    {
+      "accuracy": {
+        "catalogVersionMatchRate": 1.0,
+        "filterResultMatchRate": 1.0,
+        "fullCatalogMatchRate": null
+      },
+      "condition": "latency_3000",
+      "correctnessPassCount": 50,
+      "correctnessRate": 1.0,
+      "countTotals": {
+        "blocking_error_count": 0,
+        "duplicate_request_count": null,
+        "request_count": 150,
+        "response_body_bytes": 306900,
+        "state_mismatch_count": 0
+      },
+      "failureCategories": {},
+      "falseSuccessCount": 0,
+      "flowSuccessCount": 50,
+      "metrics": {
+        "stale_age_ms": {
+          "p50": null,
+          "p90": null,
+          "p95": null
+        },
+        "time_to_expected_state_ms": {
+          "p50": 9624,
+          "p90": 9716,
+          "p95": 9746
+        },
+        "time_to_first_usable_ms": {
+          "p50": 9618,
+          "p90": 9707,
+          "p95": 9737
+        }
+      },
+      "outcomes": {
+        "success": 50
+      },
+      "phase": "single",
+      "scenario": "ROUTE_REENTRY",
+      "validAppAttemptCount": 50,
+      "variant": "baseline"
+    }
+  ],
+  "measurementMatrix": {
+    "attemptsPerVariantCondition": 50,
+    "failureCategoryCounts": {},
+    "groupCount": 2,
+    "rowCount": 200
+  },
+  "sampleFiles": [
+    "route-cache-runs.csv"
+  ],
+  "schemaVersion": 3
+}

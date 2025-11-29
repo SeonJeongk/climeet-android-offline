@@ -1,0 +1,489 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "dd5fa8560c01cf221c341467022117ff",
+    "entities": [
+      {
+        "tableName": "route_catalog_metadata",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`gymId` INTEGER NOT NULL, `queryDate` TEXT NOT NULL, `serverTimePoint` TEXT NOT NULL, `etag` TEXT, `receivedAtEpochMs` INTEGER NOT NULL, `freshUntilEpochMs` INTEGER NOT NULL, `lastAccessedAtEpochMs` INTEGER NOT NULL, `estimatedBytes` INTEGER NOT NULL, `maxFloor` INTEGER NOT NULL, `layoutImageUrl` TEXT, `sectorCount` INTEGER NOT NULL, `difficultyCount` INTEGER NOT NULL, `routeCount` INTEGER NOT NULL, PRIMARY KEY(`gymId`, `queryDate`))",
+        "fields": [
+          {
+            "fieldPath": "gymId",
+            "columnName": "gymId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "queryDate",
+            "columnName": "queryDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serverTimePoint",
+            "columnName": "serverTimePoint",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "etag",
+            "columnName": "etag",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "receivedAtEpochMs",
+            "columnName": "receivedAtEpochMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "freshUntilEpochMs",
+            "columnName": "freshUntilEpochMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastAccessedAtEpochMs",
+            "columnName": "lastAccessedAtEpochMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "estimatedBytes",
+            "columnName": "estimatedBytes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "maxFloor",
+            "columnName": "maxFloor",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "layoutImageUrl",
+            "columnName": "layoutImageUrl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sectorCount",
+            "columnName": "sectorCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "difficultyCount",
+            "columnName": "difficultyCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "routeCount",
+            "columnName": "routeCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "gymId",
+            "queryDate"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "route_sector",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`gymId` INTEGER NOT NULL, `queryDate` TEXT NOT NULL, `sectorId` INTEGER NOT NULL, `floor` INTEGER NOT NULL, `name` TEXT NOT NULL, `sectorImageUrl` TEXT NOT NULL, PRIMARY KEY(`gymId`, `queryDate`, `sectorId`), FOREIGN KEY(`gymId`, `queryDate`) REFERENCES `route_catalog_metadata`(`gymId`, `queryDate`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "gymId",
+            "columnName": "gymId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "queryDate",
+            "columnName": "queryDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sectorId",
+            "columnName": "sectorId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "floor",
+            "columnName": "floor",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sectorImageUrl",
+            "columnName": "sectorImageUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "gymId",
+            "queryDate",
+            "sectorId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_route_sector_gymId_queryDate",
+            "unique": false,
+            "columnNames": [
+              "gymId",
+              "queryDate"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_route_sector_gymId_queryDate` ON `${TABLE_NAME}` (`gymId`, `queryDate`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "route_catalog_metadata",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "gymId",
+              "queryDate"
+            ],
+            "referencedColumns": [
+              "gymId",
+              "queryDate"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "route_difficulty",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`gymId` INTEGER NOT NULL, `queryDate` TEXT NOT NULL, `difficulty` INTEGER NOT NULL, `climeetDifficultyName` TEXT NOT NULL, `gymDifficultyName` TEXT NOT NULL, `gymDifficultyColor` TEXT NOT NULL, PRIMARY KEY(`gymId`, `queryDate`, `difficulty`), FOREIGN KEY(`gymId`, `queryDate`) REFERENCES `route_catalog_metadata`(`gymId`, `queryDate`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "gymId",
+            "columnName": "gymId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "queryDate",
+            "columnName": "queryDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "difficulty",
+            "columnName": "difficulty",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "climeetDifficultyName",
+            "columnName": "climeetDifficultyName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gymDifficultyName",
+            "columnName": "gymDifficultyName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gymDifficultyColor",
+            "columnName": "gymDifficultyColor",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "gymId",
+            "queryDate",
+            "difficulty"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_route_difficulty_gymId_queryDate",
+            "unique": false,
+            "columnNames": [
+              "gymId",
+              "queryDate"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_route_difficulty_gymId_queryDate` ON `${TABLE_NAME}` (`gymId`, `queryDate`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "route_catalog_metadata",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "gymId",
+              "queryDate"
+            ],
+            "referencedColumns": [
+              "gymId",
+              "queryDate"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "route_catalog_item",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`gymId` INTEGER NOT NULL, `queryDate` TEXT NOT NULL, `routeId` INTEGER NOT NULL, `sectorId` INTEGER NOT NULL, `sectorName` TEXT NOT NULL, `climeetDifficultyName` TEXT NOT NULL, `difficulty` INTEGER NOT NULL, `gymDifficultyName` TEXT NOT NULL, `gymDifficultyColor` TEXT NOT NULL, `routeImageUrl` TEXT NOT NULL, `holdColor` TEXT NOT NULL, PRIMARY KEY(`gymId`, `queryDate`, `routeId`), FOREIGN KEY(`gymId`, `queryDate`) REFERENCES `route_catalog_metadata`(`gymId`, `queryDate`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "gymId",
+            "columnName": "gymId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "queryDate",
+            "columnName": "queryDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "routeId",
+            "columnName": "routeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sectorId",
+            "columnName": "sectorId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sectorName",
+            "columnName": "sectorName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "climeetDifficultyName",
+            "columnName": "climeetDifficultyName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "difficulty",
+            "columnName": "difficulty",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gymDifficultyName",
+            "columnName": "gymDifficultyName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gymDifficultyColor",
+            "columnName": "gymDifficultyColor",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "routeImageUrl",
+            "columnName": "routeImageUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "holdColor",
+            "columnName": "holdColor",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "gymId",
+            "queryDate",
+            "routeId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_route_catalog_item_gymId_queryDate",
+            "unique": false,
+            "columnNames": [
+              "gymId",
+              "queryDate"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_route_catalog_item_gymId_queryDate` ON `${TABLE_NAME}` (`gymId`, `queryDate`)"
+          },
+          {
+            "name": "index_route_catalog_item_gymId_queryDate_sectorId",
+            "unique": false,
+            "columnNames": [
+              "gymId",
+              "queryDate",
+              "sectorId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_route_catalog_item_gymId_queryDate_sectorId` ON `${TABLE_NAME}` (`gymId`, `queryDate`, `sectorId`)"
+          },
+          {
+            "name": "index_route_catalog_item_gymId_queryDate_difficulty",
+            "unique": false,
+            "columnNames": [
+              "gymId",
+              "queryDate",
+              "difficulty"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_route_catalog_item_gymId_queryDate_difficulty` ON `${TABLE_NAME}` (`gymId`, `queryDate`, `difficulty`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "route_catalog_metadata",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "gymId",
+              "queryDate"
+            ],
+            "referencedColumns": [
+              "gymId",
+              "queryDate"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "home_gym_cache_metadata",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`accountId` INTEGER NOT NULL, `receivedAtEpochMs` INTEGER NOT NULL, PRIMARY KEY(`accountId`))",
+        "fields": [
+          {
+            "fieldPath": "accountId",
+            "columnName": "accountId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "receivedAtEpochMs",
+            "columnName": "receivedAtEpochMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "accountId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "home_gym_cache_item",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`accountId` INTEGER NOT NULL, `gymId` INTEGER NOT NULL, `sortOrder` INTEGER NOT NULL, `gymProfileUrl` TEXT NOT NULL, `gymName` TEXT NOT NULL, `followerCount` INTEGER NOT NULL, PRIMARY KEY(`accountId`, `gymId`), FOREIGN KEY(`accountId`) REFERENCES `home_gym_cache_metadata`(`accountId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "accountId",
+            "columnName": "accountId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gymId",
+            "columnName": "gymId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sortOrder",
+            "columnName": "sortOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gymProfileUrl",
+            "columnName": "gymProfileUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gymName",
+            "columnName": "gymName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "followerCount",
+            "columnName": "followerCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "accountId",
+            "gymId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_home_gym_cache_item_accountId",
+            "unique": false,
+            "columnNames": [
+              "accountId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_home_gym_cache_item_accountId` ON `${TABLE_NAME}` (`accountId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "home_gym_cache_metadata",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "accountId"
+            ],
+            "referencedColumns": [
+              "accountId"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dd5fa8560c01cf221c341467022117ff')"
+    ]
+  }
+}

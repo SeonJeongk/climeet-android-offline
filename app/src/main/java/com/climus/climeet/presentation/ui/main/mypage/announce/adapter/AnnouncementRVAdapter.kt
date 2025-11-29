@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.climus.climeet.databinding.ItemAnnouncementBinding
+import com.climus.climeet.presentation.bindingadapters.setClimberProfileImage
 import com.climus.climeet.presentation.ui.main.mypage.announce.MyPageAnnounceViewModel
 import com.climus.climeet.presentation.ui.main.mypage.announce.model.AnnouncementUiData
 
@@ -46,11 +47,7 @@ class AnnouncementViewHolder(
             viewModel.navigateToAnnounceDetail(item.boardId)
         }
 
-        if (item.profileImageUrl != null) {
-            Glide.with(binding.root.context)
-                .load(item.profileImageUrl)
-                .into(binding.ivAnnounceProfile)
-        }
+        binding.ivAnnounceProfile.setClimberProfileImage(item.profileImageUrl)
 
         if (item.image != null) {
             Glide.with(binding.root.context)

@@ -3,9 +3,9 @@ package com.climus.climeet.presentation.ui.main.home.recycler.popularcrag
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.climus.climeet.data.model.response.BestFollowGymSimpleResponse
 import com.climus.climeet.databinding.ItemPopularCragsBinding
+import com.climus.climeet.presentation.bindingadapters.setGymProfileImage
 import kotlin.math.min
 
 class FollowOrderPopularCragRVAdapter(
@@ -43,11 +43,7 @@ class FollowOrderPopularCragRVAdapter(
             binding.root.setOnClickListener {
                 onClickListener(crag.gymId)
             }
-            if (crag.profileImageUrl != null) {
-                Glide.with(binding.root.context)
-                    .load(crag.profileImageUrl)
-                    .into(binding.ivPopularCragProfile)
-            }
+            binding.ivPopularCragProfile.setGymProfileImage(crag.profileImageUrl)
             binding.tvItemCragName.text = crag.gymName
             binding.popularCragRanking.text = crag.ranking.toString()
             binding.tvItemFollowers.text = "팔로워 " + crag.thisWeekFollowerCount.toString()

@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from aggregate_evidence import COLUMNS, V2_COLUMNS, build_result, nearest_rank
+from aggregate_evidence import COLUMNS, V2_COLUMNS, V3_COLUMNS, build_result, nearest_rank
 
 
 class AggregateEvidenceTest(unittest.TestCase):
@@ -69,6 +69,23 @@ class AggregateEvidenceTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "one offline and one reconnect"):
                 build_result([path])
 
+    def test_v3_preserves_route_accuracy_and_stale_age_by_variant(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "route-cache.csv"
+            with path.open("w", newline="", encoding="utf-8") as stream:
+                writer = csv.DictWriter(stream, fieldnames=V3_COLUMNS)
+                writer.writeheader()
+                writer.writerow(self.v3_row("baseline", full_catalog="", stale_age=""))
+                writer.writerow(self.v3_row("after", full_catalog="true", stale_age="901000"))
+
+            result = build_result([path])
+            groups = {group["variant"]: group for group in result["groups"]}
+
+            self.assertEqual(3, result["schemaVersion"])
+            self.assertIsNone(groups["baseline"]["accuracy"]["fullCatalogMatchRate"])
+            self.assertEqual(1.0, groups["after"]["accuracy"]["fullCatalogMatchRate"])
+            self.assertEqual(901000, groups["after"]["metrics"]["stale_age_ms"]["p95"])
+
     @staticmethod
     def row(index, valid, reason, duration, outcome):
         return {
@@ -110,6 +127,32 @@ class AggregateEvidenceTest(unittest.TestCase):
             "blocking_error_count": 1 if outcome == "blocking_error" else 0,
             "local_record_loss_count": 0,
             "server_duplicate_count": 0,
+        }
+
+    @staticmethod
+    def v3_row(variant, full_catalog, stale_age):
+        return {
+            "run_index": 0,
+            "variant": variant,
+            "scenario": "ROUTE_REENTRY",
+            "condition": "latency_3000",
+            "phase": "single",
+            "outcome": "success",
+            "flow_success": "true",
+            "correctness_pass": "true",
+            "false_success": "false",
+            "catalog_version_match": "true",
+            "filter_result_match": "true",
+            "full_catalog_match": full_catalog,
+            "stale_age_ms": stale_age,
+            "failure_category": "",
+            "state_mismatch_count": 0,
+            "time_to_first_usable_ms": 50,
+            "time_to_expected_state_ms": 900,
+            "request_count": 1,
+            "duplicate_request_count": 0,
+            "response_body_bytes": 200,
+            "blocking_error_count": 0,
         }
 
 

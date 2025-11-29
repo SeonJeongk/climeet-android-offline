@@ -1,8 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <permission
+        android:name="com.climus.climeet.permission.BENCHMARK_CONTROL"
+        android:protectionLevel="signature" />
+
     <application>
         <profileable android:shell="true" />
+        <receiver
+            android:name=".benchmark.RouteCacheControlReceiver"
+            android:exported="true"
+            android:permission="com.climus.climeet.permission.BENCHMARK_CONTROL">
+            <intent-filter>
+                <action android:name="com.climus.climeet.benchmark.CLEAR_ROUTE_CACHE" />
+                <action android:name="com.climus.climeet.benchmark.EXPIRE_ROUTE_CACHE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

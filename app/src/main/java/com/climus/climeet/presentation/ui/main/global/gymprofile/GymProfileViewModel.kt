@@ -38,6 +38,14 @@ class GymProfileViewModel @Inject constructor(
 
     var isModeClimer = MutableStateFlow(true)
 
+    fun setCachedGymInfo(
+        id: Long,
+        name: String?,
+    ) {
+        if (id <= 0L || name.isNullOrBlank()) return
+        _uiState.update { it.copy(gymId = id, gymName = name) }
+    }
+
     fun setGymId(id: Long) {
         viewModelScope.launch {
             gymId.value = id
