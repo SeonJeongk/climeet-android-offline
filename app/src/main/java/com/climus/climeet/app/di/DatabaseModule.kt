@@ -5,8 +5,9 @@ import androidx.room.Room
 import com.climus.climeet.data.local.ClimbingDatabase
 import com.climus.climeet.data.local.ClimbingRecordDao
 import com.climus.climeet.data.local.RouteRecordDao
-import com.climus.climeet.data.local.routecache.RouteCacheDao
-import com.climus.climeet.data.local.routecache.RouteCacheDatabase
+import com.climus.climeet.data.local.cache.HomeGymCacheDao
+import com.climus.climeet.data.local.cache.OfflineCacheDatabase
+import com.climus.climeet.data.local.cache.RouteCacheDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,7 +19,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
     private const val DATABASE_NAME = "climeet.db"
-    private const val ROUTE_CACHE_DATABASE_NAME = "route_catalog_cache.db"
+    private const val OFFLINE_CACHE_DATABASE_NAME = "offline_cache.db"
 
     @Provides
     @Singleton
@@ -40,13 +41,17 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideRouteCacheDatabase(
+    fun provideOfflineCacheDatabase(
         @ApplicationContext context: Context,
-    ): RouteCacheDatabase =
-        Room.databaseBuilder(context, RouteCacheDatabase::class.java, ROUTE_CACHE_DATABASE_NAME)
+    ): OfflineCacheDatabase =
+        Room.databaseBuilder(context, OfflineCacheDatabase::class.java, OFFLINE_CACHE_DATABASE_NAME)
             .build()
 
     @Provides
     @Singleton
-    fun provideRouteCacheDao(database: RouteCacheDatabase): RouteCacheDao = database.routeCacheDao()
+    fun provideRouteCacheDao(database: OfflineCacheDatabase): RouteCacheDao = database.routeCacheDao()
+
+    @Provides
+    @Singleton
+    fun provideHomeGymCacheDao(database: OfflineCacheDatabase): HomeGymCacheDao = database.homeGymCacheDao()
 }

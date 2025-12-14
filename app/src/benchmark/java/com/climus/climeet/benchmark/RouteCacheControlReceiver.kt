@@ -5,7 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.room.Room
-import com.climus.climeet.data.local.routecache.RouteCacheDatabase
+import com.climus.climeet.data.local.cache.OfflineCacheDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
@@ -21,7 +21,7 @@ class RouteCacheControlReceiver : BroadcastReceiver() {
             return
         }
         runBlocking(Dispatchers.IO) {
-            val database = Room.databaseBuilder(context, RouteCacheDatabase::class.java, DATABASE_NAME).build()
+            val database = Room.databaseBuilder(context, OfflineCacheDatabase::class.java, DATABASE_NAME).build()
             try {
                 when (action) {
                     CLEAR_ACTION -> database.routeCacheDao().deleteAllCatalogs()
@@ -36,7 +36,7 @@ class RouteCacheControlReceiver : BroadcastReceiver() {
     }
 
     private companion object {
-        const val DATABASE_NAME = "route_catalog_cache.db"
+        const val DATABASE_NAME = "offline_cache.db"
         const val CLEAR_ACTION = "com.climus.climeet.benchmark.CLEAR_ROUTE_CACHE"
         const val EXPIRE_ACTION = "com.climus.climeet.benchmark.EXPIRE_ROUTE_CACHE"
     }

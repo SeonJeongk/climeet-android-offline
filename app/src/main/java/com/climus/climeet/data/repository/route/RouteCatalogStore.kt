@@ -1,10 +1,10 @@
 package com.climus.climeet.data.repository.route
 
-import com.climus.climeet.data.local.routecache.RouteCacheDao
-import com.climus.climeet.data.local.routecache.RouteCatalogMetadataEntity
-import com.climus.climeet.data.local.routecache.RouteDifficultyEntity
-import com.climus.climeet.data.local.routecache.RouteEntity
-import com.climus.climeet.data.local.routecache.RouteSectorEntity
+import com.climus.climeet.data.local.cache.RouteCacheDao
+import com.climus.climeet.data.local.cache.RouteCatalogMetadataEntity
+import com.climus.climeet.data.local.cache.RouteDifficultyEntity
+import com.climus.climeet.data.local.cache.RouteEntity
+import com.climus.climeet.data.local.cache.RouteSectorEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import java.time.LocalDate

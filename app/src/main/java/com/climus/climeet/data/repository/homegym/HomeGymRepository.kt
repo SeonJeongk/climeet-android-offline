@@ -1,8 +1,8 @@
 package com.climus.climeet.data.repository.homegym
 
-import com.climus.climeet.data.local.routecache.HomeGymCacheMetadataEntity
-import com.climus.climeet.data.local.routecache.HomeGymEntity
-import com.climus.climeet.data.local.routecache.RouteCacheDao
+import com.climus.climeet.data.local.cache.HomeGymCacheDao
+import com.climus.climeet.data.local.cache.HomeGymCacheMetadataEntity
+import com.climus.climeet.data.local.cache.HomeGymEntity
 import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.ErrorType
 import com.climus.climeet.data.model.response.UserHomeGymSimpleResponse
@@ -44,7 +44,7 @@ interface HomeGymRepository {
 
 @Singleton
 class HomeGymRepositoryImpl @Inject constructor(
-    private val dao: RouteCacheDao,
+    private val dao: HomeGymCacheDao,
     private val remote: HomeGymRemoteDataSource,
     private val clock: Clock,
 ) : HomeGymRepository {

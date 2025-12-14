@@ -1,4 +1,4 @@
-package com.climus.climeet.data.local.routecache
+package com.climus.climeet.data.local.cache
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -15,6 +15,8 @@ import androidx.room.RoomDatabase
     version = 1,
     exportSchema = true,
 )
-abstract class RouteCacheDatabase : RoomDatabase() {
+abstract class OfflineCacheDatabase : RoomDatabase() {
     abstract fun routeCacheDao(): RouteCacheDao
+
+    abstract fun homeGymCacheDao(): HomeGymCacheDao
 }

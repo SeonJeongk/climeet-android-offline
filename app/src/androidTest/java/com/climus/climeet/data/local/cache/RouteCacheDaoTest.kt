@@ -1,4 +1,4 @@
-package com.climus.climeet.data.local.routecache
+package com.climus.climeet.data.local.cache
 
 import android.content.Context
 import androidx.room.Room
@@ -16,14 +16,14 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class RouteCacheDaoTest {
-    private lateinit var database: RouteCacheDatabase
+    private lateinit var database: OfflineCacheDatabase
     private lateinit var dao: RouteCacheDao
 
     @Before
     fun setUp() {
         database = Room.inMemoryDatabaseBuilder(
             ApplicationProvider.getApplicationContext<Context>(),
-            RouteCacheDatabase::class.java,
+            OfflineCacheDatabase::class.java,
         ).build()
         dao = database.routeCacheDao()
     }
