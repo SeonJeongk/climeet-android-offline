@@ -15,6 +15,7 @@ import com.climus.climeet.app.App.Companion.sharedPreferences
 import com.climus.climeet.databinding.FragmentGymProfileBinding
 import com.climus.climeet.presentation.base.BaseFragment
 import com.climus.climeet.presentation.ui.main.global.gymprofile.adapter.GymTabAdapter
+import com.climus.climeet.presentation.util.Constants.GYM_PROFILE_TITLE_KEY
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,7 +43,7 @@ class GymProfileFragment : BaseFragment<FragmentGymProfileBinding>(R.layout.frag
 
     private fun initCragInfo() {
         sharedPreferences.edit { putLong("gymId", gymId) }
-        viewModel.setCachedGymInfo(gymId, sharedPreferences.getString(CACHED_GYM_NAME_KEY, null))
+        viewModel.setCachedGymInfo(gymId, sharedPreferences.getString(GYM_PROFILE_TITLE_KEY, null))
         viewModel.setGymId(gymId)
     }
 
@@ -93,9 +94,5 @@ class GymProfileFragment : BaseFragment<FragmentGymProfileBinding>(R.layout.frag
                 override fun onTabReselected(tab: TabLayout.Tab?) = Unit
             },
         )
-    }
-
-    private companion object {
-        const val CACHED_GYM_NAME_KEY = "cachedGymName"
     }
 }

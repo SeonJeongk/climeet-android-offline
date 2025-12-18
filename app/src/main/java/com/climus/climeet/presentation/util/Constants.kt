@@ -67,6 +67,8 @@ object Constants {
     const val STORAGE_PERMISSION_IMAGE = 1003
     const val STORAGE_PERMISSION_VIDEO = 1004
 
+    const val GYM_PROFILE_TITLE_KEY = "gymProfileTitle"
+
     val climeetColor = hashMapOf<String, String>(
         "VB" to "#FFFFFF",
         "V1" to "#F34040",
