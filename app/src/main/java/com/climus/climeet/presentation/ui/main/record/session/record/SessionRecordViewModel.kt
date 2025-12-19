@@ -40,7 +40,6 @@ import com.climus.climeet.presentation.util.formatStopwatchTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -77,20 +76,11 @@ sealed class SessionRecordEvent {
     ) : SessionRecordEvent()
 }
 
-private object EmptyRouteCatalogRepository : RouteCatalogRepository {
-    override fun observe(
-        key: RouteCatalogKey,
-        filter: Flow<RouteFilter>,
-    ) = flowOf<RouteCatalogState>(RouteCatalogState.Loading)
-}
-
 @HiltViewModel
 class SessionRecordViewModel @Inject constructor(
     private val repository: MainRepository,
     private val routeCatalogRepository: RouteCatalogRepository,
 ) : ViewModel() {
-    constructor(repository: MainRepository) : this(repository, EmptyRouteCatalogRepository)
-
     private val _uiState = MutableStateFlow(SessionRecordUiState())
     val uiState: StateFlow<SessionRecordUiState> = _uiState.asStateFlow()
 
