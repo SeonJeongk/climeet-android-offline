@@ -11,9 +11,7 @@ import com.climus.climeet.presentation.ui.main.global.selectsector.model.GymLeve
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.SectorNameUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.SelectedFilter
-import com.climus.climeet.presentation.ui.main.global.toGymLevelUiData
-import com.climus.climeet.presentation.ui.main.global.toRouteUiData
-import com.climus.climeet.presentation.ui.main.global.toSectorNameUiData
+import com.climus.climeet.presentation.ui.main.global.toRouteCatalogUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -159,21 +157,18 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
     }
 
     private fun renderCatalog(state: RouteCatalogState.Content) {
-        val filter = state.filter
-        sectorNameList = state.catalog.sectors.map { it.toSectorNameUiData(::selectSectorName) }
-        gymLevelList = state.catalog.difficulties.map { it.toGymLevelUiData(::selectGymLevel) }
-        val routes = state.catalog.routes.map { it.toRouteUiData(::selectRoute) }
+        val catalog = state.toRouteCatalogUi(::selectSectorName, ::selectGymLevel, ::selectRoute)
+        sectorNameList = catalog.sectors
+        gymLevelList = catalog.levels
         _uiState.update { uiState ->
             uiState.copy(
-                isSingleFloor = state.catalog.maxFloor == 1,
-                layoutImg = state.catalog.layoutImageUrl,
-                curFloor = filter.floor,
-                sectorNameList = sectorNameList.filter { it.floor == filter.floor }.map {
-                    it.copy(isSelected = it.sectorId == filter.sectorId)
-                },
-                gymLevelList = gymLevelList.map { it.copy(isSelected = it.difficulty == filter.difficulty) },
-                routeList = routes,
-                selectedRoute = uiState.selectedRoute.keptIn(routes),
+                isSingleFloor = catalog.isSingleFloor,
+                layoutImg = catalog.layoutImg,
+                curFloor = catalog.floor,
+                sectorNameList = catalog.floorSectors,
+                gymLevelList = catalog.selectedLevels,
+                routeList = catalog.routes,
+                selectedRoute = uiState.selectedRoute.keptIn(catalog.routes),
             )
         }
     }
