@@ -9,7 +9,8 @@ import com.climus.climeet.data.repository.route.RouteCatalog
 import com.climus.climeet.data.repository.route.RouteCatalogKey
 import com.climus.climeet.data.repository.route.RouteCatalogRepository
 import com.climus.climeet.data.repository.route.RouteCatalogState
-import com.climus.climeet.data.repository.route.RouteFilter
+import com.climus.climeet.presentation.ui.main.global.RouteFilter
+import com.climus.climeet.presentation.ui.main.global.filterRoutes
 import com.climus.climeet.presentation.ui.main.global.gymprofile.GymProfileData
 import com.climus.climeet.presentation.ui.main.global.keptIn
 import com.climus.climeet.presentation.ui.main.global.selectsector.FloorBtnState
@@ -119,7 +120,6 @@ class GymProfileRouteViewModel @Inject constructor(
     private var query: RouteQuery? = null
     private var catalog: RouteCatalog? = null
     private var loadJob: Job? = null
-    private val routeFilter = MutableStateFlow(RouteFilter(1))
 
     init {
         GymProfileData.setSelectedDate(initDate)
@@ -218,7 +218,6 @@ class GymProfileRouteViewModel @Inject constructor(
         snapshot: RouteQuery,
         restart: Boolean = false,
     ) {
-        // 빠른 필터 전환으로 이전 값에 돌아오면 새 결과가 오지 않으므로, 같은 키의 목록은 결과가 올 때까지 유지합니다.
         _uiState.update {
             it.copy(
                 routeList = if (restart) emptyList() else it.routeList,
@@ -231,12 +230,14 @@ class GymProfileRouteViewModel @Inject constructor(
             )
         }
         if (snapshot.gymId <= 0) return
-        routeFilter.value = RouteFilter(snapshot.floor, snapshot.sectorId, snapshot.difficulty)
-        if (!restart) return
+        if (!restart) {
+            renderRoutes(snapshot)
+            return
+        }
         val key = RouteCatalogKey(snapshot.gymId, LocalDate.parse(snapshot.timePoint))
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
-            repository.observe(key, routeFilter).collect(::render)
+            repository.observe(key).collect(::render)
         }
     }
 
@@ -262,7 +263,6 @@ class GymProfileRouteViewModel @Inject constructor(
 
     private fun renderContent(state: RouteCatalogState.Content) {
         val snapshot = query ?: return
-        if (state.filter != routeFilter.value) return
         catalog = state.catalog
         _isDataLoaded.value = true
         _uiState.update {
@@ -275,7 +275,13 @@ class GymProfileRouteViewModel @Inject constructor(
             )
         }
         updateSelection(snapshot)
-        val routes = state.catalog.routes.map { it.toRouteUiData(::selectRoute) }
+        renderRoutes(snapshot)
+    }
+
+    private fun renderRoutes(snapshot: RouteQuery) {
+        val current = catalog ?: return
+        val filter = RouteFilter(snapshot.floor, snapshot.sectorId, snapshot.difficulty)
+        val routes = current.filterRoutes(filter).map { it.toRouteUiData(::selectRoute) }
         _uiState.update {
             it.copy(
                 routeList = routes,

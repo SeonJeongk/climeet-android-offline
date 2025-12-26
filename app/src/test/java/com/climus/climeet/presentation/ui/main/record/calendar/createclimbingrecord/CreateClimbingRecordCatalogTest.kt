@@ -6,7 +6,6 @@ import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.ErrorType
 import com.climus.climeet.data.repository.MainRepository
 import com.climus.climeet.data.repository.route.CachedRoute
-import com.climus.climeet.data.repository.route.RouteFilter
 import com.climus.climeet.presentation.ui.main.global.gymprofile.route.FakeRouteCatalogRepository
 import com.climus.climeet.presentation.ui.main.global.gymprofile.route.routeCatalog
 import com.climus.climeet.presentation.ui.main.global.selectsector.FloorBtnState
@@ -96,7 +95,7 @@ class CreateClimbingRecordCatalogTest {
 
             assertEquals(FloorBtnState.FloorSelected, viewModel.uiState.value.firstFloorBtnState)
             assertEquals(FloorBtnState.FloorUnSelected, viewModel.uiState.value.secondFloorBtnState)
-            assertEquals(RouteFilter(1), repository.filters.last())
+            assertEquals(listOf(1L), viewModel.uiState.value.routeList.map { it.routeId })
             assertEquals(1, viewModel.uiState.value.curFloor)
         }
 
@@ -113,7 +112,7 @@ class CreateClimbingRecordCatalogTest {
             viewModel.setSelectedDate(viewModel.selectedDate.value)
             advanceUntilIdle()
 
-            assertEquals(RouteFilter(2, 201L), repository.filters.last())
+            assertEquals(listOf(2L), viewModel.uiState.value.routeList.map { it.routeId })
             assertEquals(FloorBtnState.FloorSelected, viewModel.uiState.value.secondFloorBtnState)
             assertEquals(201L, viewModel.uiState.value.selectedSector.sectorId)
         }
@@ -131,7 +130,7 @@ class CreateClimbingRecordCatalogTest {
             viewModel.uiState.value.gymLevelList.single().let { it.onClickListener(it) }
             advanceUntilIdle()
 
-            assertEquals(RouteFilter(2, null, 3), repository.filters.last())
+            assertEquals(listOf(2L), viewModel.uiState.value.routeList.map { it.routeId })
         }
 
     @Test
@@ -144,7 +143,6 @@ class CreateClimbingRecordCatalogTest {
             advanceUntilIdle()
 
             assertEquals(1, repository.observations.size)
-            assertEquals(RouteFilter(2), repository.filters.last())
             assertEquals(listOf(2L), viewModel.uiState.value.routeList.map { it.routeId })
         }
 

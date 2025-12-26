@@ -17,7 +17,6 @@ import com.climus.climeet.data.repository.route.RouteCatalog
 import com.climus.climeet.data.repository.route.RouteCatalogKey
 import com.climus.climeet.data.repository.route.RouteCatalogRepository
 import com.climus.climeet.data.repository.route.RouteCatalogState
-import com.climus.climeet.data.repository.route.RouteFilter
 import com.climus.climeet.presentation.customview.DeleteDialog
 import com.climus.climeet.presentation.ui.main.global.keptIn
 import com.climus.climeet.presentation.ui.main.global.selectsector.FloorBtnState
@@ -46,7 +45,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -286,7 +284,7 @@ class SessionRecordViewModel @Inject constructor(
         catalogKey = key
         catalogJob?.cancel()
         catalogJob = viewModelScope.launch {
-            routeCatalogRepository.observe(key, flowOf(RouteFilter(0))).collect { state ->
+            routeCatalogRepository.observe(key).collect { state ->
                 when (state) {
                     RouteCatalogState.Loading -> Unit
                     is RouteCatalogState.Failed -> {

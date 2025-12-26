@@ -13,7 +13,6 @@ import com.climus.climeet.data.repository.route.RouteCatalog
 import com.climus.climeet.data.repository.route.RouteCatalogKey
 import com.climus.climeet.data.repository.route.RouteCatalogRepository
 import com.climus.climeet.data.repository.route.RouteCatalogState
-import com.climus.climeet.data.repository.route.RouteFilter
 import com.climus.climeet.presentation.ui.main.record.session.record.SessionRecordViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -341,10 +340,7 @@ class SessionSubmissionTest {
 }
 
 private object LoadingRouteCatalogRepository : RouteCatalogRepository {
-    override fun observe(
-        key: RouteCatalogKey,
-        filter: Flow<RouteFilter>,
-    ): Flow<RouteCatalogState> = flowOf(RouteCatalogState.Loading)
+    override fun observe(key: RouteCatalogKey): Flow<RouteCatalogState> = flowOf(RouteCatalogState.Loading)
 }
 
 private class RetryRouteCatalogRepository(
@@ -353,10 +349,7 @@ private class RetryRouteCatalogRepository(
     var observeCount = 0
     val observedKeys = mutableListOf<RouteCatalogKey>()
 
-    override fun observe(
-        key: RouteCatalogKey,
-        filter: Flow<RouteFilter>,
-    ): Flow<RouteCatalogState> =
+    override fun observe(key: RouteCatalogKey): Flow<RouteCatalogState> =
         flow {
             observeCount++
             observedKeys += key
@@ -366,7 +359,6 @@ private class RetryRouteCatalogRepository(
                 emit(
                     RouteCatalogState.Content(
                         RouteCatalog(1, null, key.queryDate.toString(), emptyList(), emptyList(), emptyList()),
-                        RouteFilter(0),
                         Freshness.FRESH,
                         false,
                         1L,

@@ -32,10 +32,7 @@ data class CatalogWrite(
 )
 
 interface RouteCatalogStore {
-    fun observe(
-        key: RouteCatalogKey,
-        filter: RouteFilter,
-    ): Flow<StoredCatalog>
+    fun observe(key: RouteCatalogKey): Flow<StoredCatalog>
 
     suspend fun metadata(key: RouteCatalogKey): StoredCatalogMetadata?
 
@@ -60,16 +57,13 @@ interface RouteCatalogStore {
 class RoomRouteCatalogStore @Inject constructor(
     private val dao: RouteCacheDao,
 ) : RouteCatalogStore {
-    override fun observe(
-        key: RouteCatalogKey,
-        filter: RouteFilter,
-    ): Flow<StoredCatalog> {
+    override fun observe(key: RouteCatalogKey): Flow<StoredCatalog> {
         val date = key.queryDate.toString()
         return combine(
             dao.observeMetadata(key.gymId, date),
             dao.observeSectors(key.gymId, date),
             dao.observeDifficulties(key.gymId, date),
-            dao.observeRoutes(key.gymId, date, filter.floor, filter.sectorId, filter.difficulty),
+            dao.observeRoutes(key.gymId, date),
             dao.observeRouteCount(key.gymId, date),
         ) { metadata, sectors, difficulties, routes, routeCount ->
             val catalogComplete =

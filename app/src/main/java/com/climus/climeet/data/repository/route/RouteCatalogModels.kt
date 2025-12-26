@@ -8,12 +8,6 @@ data class RouteCatalogKey(
     val queryDate: LocalDate,
 )
 
-data class RouteFilter(
-    val floor: Int,
-    val sectorId: Long? = null,
-    val difficulty: Int? = null,
-)
-
 enum class Freshness {
     FRESH,
     STALE,
@@ -61,7 +55,6 @@ sealed interface RouteCatalogState {
 
     data class Content(
         val catalog: RouteCatalog,
-        val filter: RouteFilter,
         val freshness: Freshness,
         val isRefreshing: Boolean,
         val receivedAtEpochMs: Long?,

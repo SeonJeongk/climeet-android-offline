@@ -1,6 +1,6 @@
 package com.climus.climeet.presentation.ui.main.global
 
-import com.climus.climeet.data.repository.route.RouteCatalogState
+import com.climus.climeet.data.repository.route.RouteCatalog
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.GymLevelUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.SectorNameUiData
@@ -17,24 +17,25 @@ data class RouteCatalogUi(
     val routes: List<RouteUiData>,
 )
 
-fun RouteCatalogState.Content.toRouteCatalogUi(
+fun RouteCatalog.toRouteCatalogUi(
+    filter: RouteFilter,
     onSectorClick: (SectorNameUiData) -> Unit,
     onLevelClick: (GymLevelUiData) -> Unit,
     onRouteClick: (RouteUiData) -> Unit,
 ): RouteCatalogUi {
-    val sectors = catalog.sectors.map { it.toSectorNameUiData(onSectorClick) }
-    val levels = catalog.difficulties.map { it.toGymLevelUiData(onLevelClick) }
+    val sectorItems = sectors.map { it.toSectorNameUiData(onSectorClick) }
+    val levelItems = difficulties.map { it.toGymLevelUiData(onLevelClick) }
     return RouteCatalogUi(
-        isSingleFloor = catalog.maxFloor == 1,
-        layoutImg = catalog.layoutImageUrl,
+        isSingleFloor = maxFloor == 1,
+        layoutImg = layoutImageUrl,
         floor = filter.floor,
-        sectors = sectors,
-        levels = levels,
+        sectors = sectorItems,
+        levels = levelItems,
         floorSectors =
-            sectors
+            sectorItems
                 .filter { it.floor == filter.floor }
                 .map { it.copy(isSelected = it.sectorId == filter.sectorId) },
-        selectedLevels = levels.map { it.copy(isSelected = it.difficulty == filter.difficulty) },
-        routes = catalog.routes.map { it.toRouteUiData(onRouteClick) },
+        selectedLevels = levelItems.map { it.copy(isSelected = it.difficulty == filter.difficulty) },
+        routes = filterRoutes(filter).map { it.toRouteUiData(onRouteClick) },
     )
 }
