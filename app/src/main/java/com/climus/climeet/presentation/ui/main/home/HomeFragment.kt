@@ -37,6 +37,7 @@ import com.climus.climeet.presentation.ui.main.shorts.player.ShortsPlayerViewMod
 import com.climus.climeet.presentation.ui.toGymProfile
 import com.climus.climeet.presentation.ui.toSearchProfile
 import com.climus.climeet.presentation.ui.toShortsPlayer
+import com.climus.climeet.presentation.util.Constants.GYM_PROFILE_TITLE_KEY
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.Instant
@@ -306,13 +307,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     // 선택한 암장 프로필로 이동
     private fun navToGymProfile(gymId: Long) {
-        val cachedGymName = recyclerHomeGym.firstOrNull { it.gymId == gymId }?.gymName
+        val profileTitle = recyclerHomeGym.firstOrNull { it.gymId == gymId }?.gymName
         sharedPreferences.edit {
             putLong("gymId", gymId)
-            if (cachedGymName != null) {
-                putString(CACHED_GYM_NAME_KEY, cachedGymName)
+            if (profileTitle != null) {
+                putString(GYM_PROFILE_TITLE_KEY, profileTitle)
             } else {
-                remove(CACHED_GYM_NAME_KEY)
+                remove(GYM_PROFILE_TITLE_KEY)
             }
         }
         Log.d("gym_profile", "홈에서 암장 아이디 : $gymId")
@@ -379,7 +380,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     private companion object {
-        const val CACHED_GYM_NAME_KEY = "cachedGymName"
         val HOME_GYM_TIME_FORMAT: DateTimeFormatter =
             DateTimeFormatter.ofPattern("M월 d일 HH:mm").withZone(ZoneId.systemDefault())
     }

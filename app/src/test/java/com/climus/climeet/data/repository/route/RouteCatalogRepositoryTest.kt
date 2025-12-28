@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -86,7 +85,7 @@ class RouteCatalogRepositoryTest {
             val store = FakeStore(metadata = StoredCatalogMetadata("v1", 0L, 30_000L))
             val repository = repository(FakeRemote(mutableListOf()), store)
 
-            repository.observe(key, flowOf(RouteFilter(0))).first()
+            repository.observe(key).first()
 
             assertEquals(1_000L, store.lastAccessedAtEpochMs)
         }
@@ -105,7 +104,7 @@ class RouteCatalogRepositoryTest {
             )
             val repository = repository(FakeRemote(mutableListOf()), store)
 
-            repository.observe(key, flowOf(RouteFilter(0))).first()
+            repository.observe(key).first()
 
             assertEquals(listOf(oldest), store.deleted)
         }
@@ -117,7 +116,7 @@ class RouteCatalogRepositoryTest {
             val remote = FakeRemote(mutableListOf())
             val repository = repository(remote, store, offline = true)
 
-            val state = repository.observe(key, flowOf(RouteFilter(0))).first()
+            val state = repository.observe(key).first()
 
             assertTrue(state is RouteCatalogState.Content)
             assertEquals(Freshness.STALE, (state as RouteCatalogState.Content).freshness)
@@ -129,35 +128,16 @@ class RouteCatalogRepositoryTest {
         runTest {
             val remote = FakeRemote(mutableListOf())
             val repository = repository(remote, FakeStore(), offline = true)
-            val filter = MutableStateFlow(RouteFilter(1))
             val failures = mutableListOf<RouteCatalogState.Failed>()
 
             val job = launch(UnconfinedTestDispatcher(testScheduler)) {
-                repository.observe(key, filter).filterIsInstance<RouteCatalogState.Failed>().collect { failures += it }
+                repository.observe(key).filterIsInstance<RouteCatalogState.Failed>().collect { failures += it }
             }
             repository.refresh(key)
-            filter.value = RouteFilter(2)
             job.cancelAndJoin()
 
             assertEquals("OFFLINE", failures.single().error.code)
             assertEquals(0, remote.keyCalls)
-        }
-
-    @Test
-    fun filterChange_observe_requestsNetworkOnce() =
-        runTest {
-            val store = FakeStore(metadata = StoredCatalogMetadata("v1", 0L, 0L), catalog = catalog())
-            val remote = FakeRemote(mutableListOf(FilteringKeyResponse.NotModified("max-age=30")))
-            val repository = repository(remote, store)
-            val filter = MutableStateFlow(RouteFilter(1))
-
-            val states = repository.observe(key, filter)
-            states.first { it is RouteCatalogState.Content && it.freshness == Freshness.FRESH }
-            filter.value = RouteFilter(2)
-            val changed = states.first { it is RouteCatalogState.Content && it.filter == RouteFilter(2) }
-
-            assertEquals(Freshness.FRESH, (changed as RouteCatalogState.Content).freshness)
-            assertEquals(1, remote.keyCalls)
         }
 
     @Test
@@ -176,8 +156,8 @@ class RouteCatalogRepositoryTest {
                 FakeStore(),
             )
 
-            val failed = repository.observe(key, flowOf(RouteFilter(1))).first { it is RouteCatalogState.Failed }
-            val recovered = repository.observe(key, flowOf(RouteFilter(1))).first { it !is RouteCatalogState.Failed }
+            val failed = repository.observe(key).first { it is RouteCatalogState.Failed }
+            val recovered = repository.observe(key).first { it !is RouteCatalogState.Failed }
 
             assertEquals(error, (failed as RouteCatalogState.Failed).error)
             assertFalse(recovered is RouteCatalogState.Failed)
@@ -200,7 +180,7 @@ class RouteCatalogRepositoryTest {
             val store = FakeStore(failures = StoreFailures(observe = IllegalStateException("database closed")))
             val repository = repository(FakeRemote(mutableListOf()), store)
 
-            val state = repository.observe(key, flowOf(RouteFilter(1))).first()
+            val state = repository.observe(key).first()
 
             assertEquals("LOCAL_STORAGE", (state as RouteCatalogState.Failed).error.code)
         }
@@ -215,7 +195,7 @@ class RouteCatalogRepositoryTest {
             )
             val repository = repository(FakeRemote(mutableListOf()), store)
 
-            assertTrue(repository.observe(key, flowOf(RouteFilter(1))).first() is RouteCatalogState.Content)
+            assertTrue(repository.observe(key).first() is RouteCatalogState.Content)
         }
 
     @Test
@@ -409,7 +389,7 @@ class RouteCatalogRepositoryTest {
             )
             val repository = repository(remote, store)
             val observer = launch(UnconfinedTestDispatcher(testScheduler)) {
-                repository.observe(protectedKey, flowOf(RouteFilter(1))).collect {}
+                repository.observe(protectedKey).collect {}
             }
 
             repository.refresh(key)
@@ -542,10 +522,7 @@ private class FakeStore(
     var lastAccessedAtEpochMs: Long? = null
     val deleted = mutableListOf<RouteCatalogKey>()
 
-    override fun observe(
-        key: RouteCatalogKey,
-        filter: RouteFilter,
-    ): Flow<StoredCatalog> {
+    override fun observe(key: RouteCatalogKey): Flow<StoredCatalog> {
         failures.observe?.let { throw it }
         return stored
     }

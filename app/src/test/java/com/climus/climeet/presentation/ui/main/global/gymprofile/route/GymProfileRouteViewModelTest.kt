@@ -11,14 +11,13 @@ import com.climus.climeet.data.repository.route.RouteCatalogKey
 import com.climus.climeet.data.repository.route.RouteCatalogRepository
 import com.climus.climeet.data.repository.route.RouteCatalogState
 import com.climus.climeet.data.repository.route.RouteDifficulty
-import com.climus.climeet.data.repository.route.RouteFilter
 import com.climus.climeet.data.repository.route.RouteSector
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -71,7 +70,7 @@ class GymProfileRouteViewModelTest {
         }
 
     @Test
-    fun localFilters_selectValues_changeOnlyRoomObservation() =
+    fun localFilters_selectValues_filterWithoutNewObservation() =
         runTest(dispatcher) {
             viewModel.setSelectedDate(LocalDate.parse("2026-08-12"))
             viewModel.setCragInfo(1L, "Synthetic gym")
@@ -84,8 +83,8 @@ class GymProfileRouteViewModelTest {
             advanceUntilIdle()
 
             assertEquals(1, repository.observations.size)
-            assertEquals(RouteFilter(2, 201L, 3), repository.filters.last())
             assertEquals(2, viewModel.uiState.value.curFloor)
+            assertEquals(listOf(2L), viewModel.uiState.value.routeList.map { it.routeId })
         }
 
     @Test
@@ -101,7 +100,6 @@ class GymProfileRouteViewModelTest {
             advanceUntilIdle()
 
             assertEquals(1, repository.observations.size)
-            assertEquals(RouteFilter(1), repository.filters.last())
             assertEquals(1, viewModel.uiState.value.curFloor)
             assertEquals(listOf(1L), viewModel.uiState.value.routeList.map { it.routeId })
         }
@@ -194,34 +192,18 @@ internal class FakeRouteCatalogRepository(
 ) : RouteCatalogRepository {
     private val catalogVersion = MutableStateFlow(0)
     val observations = mutableListOf<RouteCatalogKey>()
-    val filters = mutableListOf<RouteFilter>()
     var isRefreshing: Boolean = false
     var failure: BaseState.Error? = null
 
-    override fun observe(
-        key: RouteCatalogKey,
-        filter: Flow<RouteFilter>,
-    ): Flow<RouteCatalogState> {
+    override fun observe(key: RouteCatalogKey): Flow<RouteCatalogState> {
         observations += key
         val currentFailure = failure
-        return combine(filter, catalogVersion) { current, _ ->
-            filters += current
-            if (currentFailure != null) return@combine RouteCatalogState.Failed(currentFailure)
-            val filteredRoutes = catalog.routes
-                .filter { route ->
-                    catalog.sectors.any { sector ->
-                        sector.floor == current.floor && sector.sectorId == route.sectorId
-                    }
-                }
-                .filter { current.sectorId == null || it.sectorId == current.sectorId }
-                .filter { current.difficulty == null || it.difficulty == current.difficulty }
-            RouteCatalogState.Content(
-                catalog.copy(routes = filteredRoutes),
-                current,
-                Freshness.STALE,
-                isRefreshing,
-                1L,
-            )
+        return catalogVersion.map {
+            if (currentFailure != null) {
+                RouteCatalogState.Failed(currentFailure)
+            } else {
+                RouteCatalogState.Content(catalog, Freshness.STALE, isRefreshing, 1L)
+            }
         }
     }
 

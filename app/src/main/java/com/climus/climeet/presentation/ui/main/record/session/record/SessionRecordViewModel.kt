@@ -17,7 +17,6 @@ import com.climus.climeet.data.repository.route.RouteCatalog
 import com.climus.climeet.data.repository.route.RouteCatalogKey
 import com.climus.climeet.data.repository.route.RouteCatalogRepository
 import com.climus.climeet.data.repository.route.RouteCatalogState
-import com.climus.climeet.data.repository.route.RouteFilter
 import com.climus.climeet.presentation.customview.DeleteDialog
 import com.climus.climeet.presentation.ui.main.global.keptIn
 import com.climus.climeet.presentation.ui.main.global.selectsector.FloorBtnState
@@ -40,14 +39,12 @@ import com.climus.climeet.presentation.util.formatStopwatchTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -77,20 +74,11 @@ sealed class SessionRecordEvent {
     ) : SessionRecordEvent()
 }
 
-private object EmptyRouteCatalogRepository : RouteCatalogRepository {
-    override fun observe(
-        key: RouteCatalogKey,
-        filter: Flow<RouteFilter>,
-    ) = flowOf<RouteCatalogState>(RouteCatalogState.Loading)
-}
-
 @HiltViewModel
 class SessionRecordViewModel @Inject constructor(
     private val repository: MainRepository,
     private val routeCatalogRepository: RouteCatalogRepository,
 ) : ViewModel() {
-    constructor(repository: MainRepository) : this(repository, EmptyRouteCatalogRepository)
-
     private val _uiState = MutableStateFlow(SessionRecordUiState())
     val uiState: StateFlow<SessionRecordUiState> = _uiState.asStateFlow()
 
@@ -296,7 +284,7 @@ class SessionRecordViewModel @Inject constructor(
         catalogKey = key
         catalogJob?.cancel()
         catalogJob = viewModelScope.launch {
-            routeCatalogRepository.observe(key, flowOf(RouteFilter(0))).collect { state ->
+            routeCatalogRepository.observe(key).collect { state ->
                 when (state) {
                     RouteCatalogState.Loading -> Unit
                     is RouteCatalogState.Failed -> {

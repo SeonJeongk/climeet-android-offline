@@ -1,10 +1,10 @@
 package com.climus.climeet.data.repository.route
 
-import com.climus.climeet.data.local.routecache.RouteCacheDao
-import com.climus.climeet.data.local.routecache.RouteCatalogMetadataEntity
-import com.climus.climeet.data.local.routecache.RouteDifficultyEntity
-import com.climus.climeet.data.local.routecache.RouteEntity
-import com.climus.climeet.data.local.routecache.RouteSectorEntity
+import com.climus.climeet.data.local.cache.RouteCacheDao
+import com.climus.climeet.data.local.cache.RouteCatalogMetadataEntity
+import com.climus.climeet.data.local.cache.RouteDifficultyEntity
+import com.climus.climeet.data.local.cache.RouteEntity
+import com.climus.climeet.data.local.cache.RouteSectorEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import java.time.LocalDate
@@ -32,10 +32,7 @@ data class CatalogWrite(
 )
 
 interface RouteCatalogStore {
-    fun observe(
-        key: RouteCatalogKey,
-        filter: RouteFilter,
-    ): Flow<StoredCatalog>
+    fun observe(key: RouteCatalogKey): Flow<StoredCatalog>
 
     suspend fun metadata(key: RouteCatalogKey): StoredCatalogMetadata?
 
@@ -60,16 +57,13 @@ interface RouteCatalogStore {
 class RoomRouteCatalogStore @Inject constructor(
     private val dao: RouteCacheDao,
 ) : RouteCatalogStore {
-    override fun observe(
-        key: RouteCatalogKey,
-        filter: RouteFilter,
-    ): Flow<StoredCatalog> {
+    override fun observe(key: RouteCatalogKey): Flow<StoredCatalog> {
         val date = key.queryDate.toString()
         return combine(
             dao.observeMetadata(key.gymId, date),
             dao.observeSectors(key.gymId, date),
             dao.observeDifficulties(key.gymId, date),
-            dao.observeRoutes(key.gymId, date, filter.floor, filter.sectorId, filter.difficulty),
+            dao.observeRoutes(key.gymId, date),
             dao.observeRouteCount(key.gymId, date),
         ) { metadata, sectors, difficulties, routes, routeCount ->
             val catalogComplete =

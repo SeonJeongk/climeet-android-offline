@@ -2,18 +2,17 @@ package com.climus.climeet.presentation.ui.main.global.selectsector
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.climus.climeet.data.repository.route.RouteCatalog
 import com.climus.climeet.data.repository.route.RouteCatalogKey
 import com.climus.climeet.data.repository.route.RouteCatalogRepository
 import com.climus.climeet.data.repository.route.RouteCatalogState
-import com.climus.climeet.data.repository.route.RouteFilter
+import com.climus.climeet.presentation.ui.main.global.RouteFilter
 import com.climus.climeet.presentation.ui.main.global.keptIn
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.GymLevelUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.SectorNameUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.SelectedFilter
-import com.climus.climeet.presentation.ui.main.global.toGymLevelUiData
-import com.climus.climeet.presentation.ui.main.global.toRouteUiData
-import com.climus.climeet.presentation.ui.main.global.toSectorNameUiData
+import com.climus.climeet.presentation.ui.main.global.toRouteCatalogUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -79,7 +78,8 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
     var cragId: Long = 0
     var cragName: String = ""
     private var catalogJob: Job? = null
-    private val routeFilter = MutableStateFlow(RouteFilter(1))
+    private var catalog: RouteCatalog? = null
+    private var routeFilter = RouteFilter(1)
 
     fun setCragInfo(
         id: Long,
@@ -140,40 +140,45 @@ class SelectSectorBottomSheetViewModel @Inject constructor(
         difficulty: Int? = null,
         restart: Boolean = false,
     ) {
-        routeFilter.value = RouteFilter(floor, sectorId, difficulty)
-        if (!restart) return
+        routeFilter = RouteFilter(floor, sectorId, difficulty)
+        if (!restart) {
+            renderCatalog()
+            return
+        }
         val key = RouteCatalogKey(cragId, LocalDate.now())
+        catalog = null
         catalogJob?.cancel()
         catalogJob = viewModelScope.launch {
-            repository.observe(key, routeFilter).collect { state ->
+            repository.observe(key).collect { state ->
                 when (state) {
                     RouteCatalogState.Loading -> Unit
                     is RouteCatalogState.Failed -> {
                         _event.emit(SelectSectorBottomSheetEvent.ShowToastMessage(state.error.msg))
                     }
 
-                    is RouteCatalogState.Content -> renderCatalog(state)
+                    is RouteCatalogState.Content -> {
+                        catalog = state.catalog
+                        renderCatalog()
+                    }
                 }
             }
         }
     }
 
-    private fun renderCatalog(state: RouteCatalogState.Content) {
-        val filter = state.filter
-        sectorNameList = state.catalog.sectors.map { it.toSectorNameUiData(::selectSectorName) }
-        gymLevelList = state.catalog.difficulties.map { it.toGymLevelUiData(::selectGymLevel) }
-        val routes = state.catalog.routes.map { it.toRouteUiData(::selectRoute) }
+    private fun renderCatalog() {
+        val current = catalog ?: return
+        val catalog = current.toRouteCatalogUi(routeFilter, ::selectSectorName, ::selectGymLevel, ::selectRoute)
+        sectorNameList = catalog.sectors
+        gymLevelList = catalog.levels
         _uiState.update { uiState ->
             uiState.copy(
-                isSingleFloor = state.catalog.maxFloor == 1,
-                layoutImg = state.catalog.layoutImageUrl,
-                curFloor = filter.floor,
-                sectorNameList = sectorNameList.filter { it.floor == filter.floor }.map {
-                    it.copy(isSelected = it.sectorId == filter.sectorId)
-                },
-                gymLevelList = gymLevelList.map { it.copy(isSelected = it.difficulty == filter.difficulty) },
-                routeList = routes,
-                selectedRoute = uiState.selectedRoute.keptIn(routes),
+                isSingleFloor = catalog.isSingleFloor,
+                layoutImg = catalog.layoutImg,
+                curFloor = catalog.floor,
+                sectorNameList = catalog.floorSectors,
+                gymLevelList = catalog.selectedLevels,
+                routeList = catalog.routes,
+                selectedRoute = uiState.selectedRoute.keptIn(catalog.routes),
             )
         }
     }

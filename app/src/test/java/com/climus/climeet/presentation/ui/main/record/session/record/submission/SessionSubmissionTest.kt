@@ -13,7 +13,6 @@ import com.climus.climeet.data.repository.route.RouteCatalog
 import com.climus.climeet.data.repository.route.RouteCatalogKey
 import com.climus.climeet.data.repository.route.RouteCatalogRepository
 import com.climus.climeet.data.repository.route.RouteCatalogState
-import com.climus.climeet.data.repository.route.RouteFilter
 import com.climus.climeet.presentation.ui.main.record.session.record.SessionRecordViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -27,6 +26,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -80,7 +80,7 @@ class SessionSubmissionTest {
         runTest(dispatcher) {
             coEvery { repository.finalizeSessionRecord(1, "01:02:03") } returns request
             coEvery { repository.createClimbingRecord(request) } returns BaseState.Success("".toResponseBody())
-            val viewModel = SessionRecordViewModel(repository)
+            val viewModel = SessionRecordViewModel(repository, LoadingRouteCatalogRepository)
             val effects = mutableListOf<SessionSubmissionEffect>()
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
                 viewModel.submissionEffect.collect(effects::add)
@@ -104,7 +104,7 @@ class SessionSubmissionTest {
         runTest(dispatcher) {
             coEvery { repository.finalizeSessionRecord(1, "01:02:03") } returns request
             coEvery { repository.createClimbingRecord(request) } returns BaseState.Error("server error", "500")
-            val viewModel = SessionRecordViewModel(repository)
+            val viewModel = SessionRecordViewModel(repository, LoadingRouteCatalogRepository)
             advanceUntilIdle()
 
             viewModel.submitRecord(3_723_000L)
@@ -125,7 +125,7 @@ class SessionSubmissionTest {
                 delay(800)
                 BaseState.Success("".toResponseBody())
             }
-            val viewModel = SessionRecordViewModel(repository)
+            val viewModel = SessionRecordViewModel(repository, LoadingRouteCatalogRepository)
             advanceUntilIdle()
 
             repeat(10) { viewModel.submitRecord(3_723_000L) }
@@ -175,14 +175,14 @@ class SessionSubmissionTest {
         runTest(dispatcher) {
             coEvery { repository.finalizeSessionRecord(1, "01:02:03") } returns request
             coEvery { repository.createClimbingRecord(request) } returns BaseState.Error("server error", "500")
-            val firstViewModel = SessionRecordViewModel(repository)
+            val firstViewModel = SessionRecordViewModel(repository, LoadingRouteCatalogRepository)
             advanceUntilIdle()
 
             firstViewModel.submitRecord(3_723_000L)
             advanceUntilIdle()
             coEvery { repository.getRecord(1) } returns savedRecord(time = "01:02:03")
 
-            val recreatedViewModel = SessionRecordViewModel(repository)
+            val recreatedViewModel = SessionRecordViewModel(repository, LoadingRouteCatalogRepository)
             advanceUntilIdle()
             recreatedViewModel.submitRecord(3_723_000L)
             advanceUntilIdle()
@@ -196,7 +196,7 @@ class SessionSubmissionTest {
         runTest(dispatcher) {
             coEvery { repository.getRecord(1) } returns savedRecord(time = "00:01:19")
 
-            val viewModel = SessionRecordViewModel(repository)
+            val viewModel = SessionRecordViewModel(repository, LoadingRouteCatalogRepository)
             advanceUntilIdle()
 
             assertEquals(79_000L, viewModel.restoredElapsedTimeMillis.value)
@@ -209,7 +209,7 @@ class SessionSubmissionTest {
             coEvery { repository.getRecord(1) } returns savedRecord(time = "")
             every { App.sharedPreferences.getLong("pauseTime", 0L) } returns 79_000L
 
-            val viewModel = SessionRecordViewModel(repository)
+            val viewModel = SessionRecordViewModel(repository, LoadingRouteCatalogRepository)
             advanceUntilIdle()
 
             assertEquals(SessionSubmissionState.Draft, viewModel.submissionState.value)
@@ -221,7 +221,7 @@ class SessionSubmissionTest {
     fun localSnapshotFailure_submit_returnsToDraftWithoutPosting() =
         runTest(dispatcher) {
             coEvery { repository.finalizeSessionRecord(1, "01:02:03") } throws IllegalStateException("disk")
-            val viewModel = SessionRecordViewModel(repository)
+            val viewModel = SessionRecordViewModel(repository, LoadingRouteCatalogRepository)
             advanceUntilIdle()
 
             viewModel.submitRecord(3_723_000L)
@@ -238,7 +238,7 @@ class SessionSubmissionTest {
             coEvery { repository.finalizeSessionRecord(1, "01:02:03") } returns request
             coEvery { repository.createClimbingRecord(request) } returns BaseState.Success("".toResponseBody())
             coEvery { repository.clearSessionDraft() } throws IllegalStateException("disk")
-            val viewModel = SessionRecordViewModel(repository)
+            val viewModel = SessionRecordViewModel(repository, LoadingRouteCatalogRepository)
             val effects = mutableListOf<SessionSubmissionEffect>()
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
                 viewModel.submissionEffect.collect(effects::add)
@@ -256,7 +256,7 @@ class SessionSubmissionTest {
     fun preservedDraft_confirmDiscard_clearsDraftAndEmitsDiscardOnce() =
         runTest(dispatcher) {
             coEvery { repository.getRecord(1) } returns savedRecord(time = "01:02:03")
-            val viewModel = SessionRecordViewModel(repository)
+            val viewModel = SessionRecordViewModel(repository, LoadingRouteCatalogRepository)
             val effects = mutableListOf<SessionSubmissionEffect>()
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
                 viewModel.submissionEffect.collect(effects::add)
@@ -339,16 +339,17 @@ class SessionSubmissionTest {
         )
 }
 
+private object LoadingRouteCatalogRepository : RouteCatalogRepository {
+    override fun observe(key: RouteCatalogKey): Flow<RouteCatalogState> = flowOf(RouteCatalogState.Loading)
+}
+
 private class RetryRouteCatalogRepository(
     private val alwaysFail: Boolean = false,
 ) : RouteCatalogRepository {
     var observeCount = 0
     val observedKeys = mutableListOf<RouteCatalogKey>()
 
-    override fun observe(
-        key: RouteCatalogKey,
-        filter: Flow<RouteFilter>,
-    ): Flow<RouteCatalogState> =
+    override fun observe(key: RouteCatalogKey): Flow<RouteCatalogState> =
         flow {
             observeCount++
             observedKeys += key
@@ -358,7 +359,6 @@ private class RetryRouteCatalogRepository(
                 emit(
                     RouteCatalogState.Content(
                         RouteCatalog(1, null, key.queryDate.toString(), emptyList(), emptyList(), emptyList()),
-                        RouteFilter(0),
                         Freshness.FRESH,
                         false,
                         1L,

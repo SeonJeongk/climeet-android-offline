@@ -7,7 +7,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +14,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -43,18 +43,10 @@ class RouteCatalogRepositoryImpl @Inject constructor(
     private val refreshStates = ConcurrentHashMap<RouteCatalogKey, MutableStateFlow<RefreshState>>()
     private val activeKeys = mutableMapOf<RouteCatalogKey, Int>()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun observe(
-        key: RouteCatalogKey,
-        filter: Flow<RouteFilter>,
-    ): Flow<RouteCatalogState> =
-        filter
-            .distinctUntilChanged()
-            .flatMapLatest { currentFilter ->
-                combine(store.observe(key, currentFilter), stateFor(key)) { stored, refresh ->
-                    stored.toState(currentFilter, refresh)
-                }
-            }.onStart {
+    override fun observe(key: RouteCatalogKey): Flow<RouteCatalogState> =
+        // 저장소 Flow를 만드는 단계의 실패도 아래 catch에서 Failed로 바꾸도록 구독 시점에 만듭니다.
+        flow { emitAll(combine(store.observe(key), stateFor(key)) { stored, refresh -> stored.toState(refresh) }) }
+            .onStart {
                 retain(key)
                 startRefresh(key)
                 prepareCache(key)
@@ -91,17 +83,13 @@ class RouteCatalogRepositoryImpl @Inject constructor(
         return deferred.await()
     }
 
-    private fun StoredCatalog.toState(
-        filter: RouteFilter,
-        refresh: RefreshState,
-    ): RouteCatalogState {
+    private fun StoredCatalog.toState(refresh: RefreshState): RouteCatalogState {
         val currentCatalog = catalog
         val completeMetadata = metadata?.takeIf { it.catalogComplete }
         val error = refresh.error
         return when {
             currentCatalog != null -> RouteCatalogState.Content(
                 catalog = currentCatalog,
-                filter = filter,
                 freshness = policy.freshness(completeMetadata?.freshUntilEpochMs),
                 isRefreshing = refresh.isRefreshing,
                 receivedAtEpochMs = completeMetadata?.receivedAtEpochMs,

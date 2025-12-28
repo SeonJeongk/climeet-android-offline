@@ -12,20 +12,19 @@ import com.climus.climeet.data.model.BaseState
 import com.climus.climeet.data.model.request.ClimbingRecord
 import com.climus.climeet.data.model.request.CreateClimbingRecordRequest
 import com.climus.climeet.data.repository.MainRepository
+import com.climus.climeet.data.repository.route.RouteCatalog
 import com.climus.climeet.data.repository.route.RouteCatalogKey
 import com.climus.climeet.data.repository.route.RouteCatalogRepository
 import com.climus.climeet.data.repository.route.RouteCatalogState
-import com.climus.climeet.data.repository.route.RouteFilter
 import com.climus.climeet.presentation.customview.DeleteDialog
+import com.climus.climeet.presentation.ui.main.global.RouteFilter
 import com.climus.climeet.presentation.ui.main.global.keptIn
 import com.climus.climeet.presentation.ui.main.global.selectsector.FloorBtnState
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.GymLevelUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.RouteUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.SectorNameUiData
 import com.climus.climeet.presentation.ui.main.global.selectsector.model.SelectedFilter
-import com.climus.climeet.presentation.ui.main.global.toGymLevelUiData
-import com.climus.climeet.presentation.ui.main.global.toRouteUiData
-import com.climus.climeet.presentation.ui.main.global.toSectorNameUiData
+import com.climus.climeet.presentation.ui.main.global.toRouteCatalogUi
 import com.climus.climeet.presentation.ui.main.record.model.CreateRecordData
 import com.climus.climeet.presentation.util.formatRecordTimeRange
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -114,7 +113,8 @@ class CreateClimbingRecordViewModel @Inject constructor(
     var cragName: String = ""
     private var catalogJob: Job? = null
     private var catalogKey: RouteCatalogKey? = null
-    private val routeFilter = MutableStateFlow(RouteFilter(1))
+    private var catalog: RouteCatalog? = null
+    private var routeFilter = RouteFilter(1)
 
     val defaultCrag = Pair<Long, String>(0, "클라이밍 암장을 선택해주세요")
     val isSelectedCrag = MutableStateFlow(false)
@@ -224,7 +224,8 @@ class CreateClimbingRecordViewModel @Inject constructor(
     }
 
     private fun setFloorInfo(floor: Int) {
-        routeFilter.value = RouteFilter(floor)
+        routeFilter = RouteFilter(floor)
+        renderCatalog()
     }
 
     private fun getRouteList(
@@ -232,24 +233,27 @@ class CreateClimbingRecordViewModel @Inject constructor(
         sectorId: Long? = null,
         difficulty: Int? = null,
     ) {
-        routeFilter.value = RouteFilter(floor, sectorId, difficulty)
+        routeFilter = RouteFilter(floor, sectorId, difficulty)
+        renderCatalog()
     }
 
-    /** 같은 암장·날짜를 다시 고르면 현재 층과 필터를 유지한 채 다시 구독합니다. */
     private fun loadCatalog() {
         val key = RouteCatalogKey(cragId, selectedDate.value)
         if (key != catalogKey) clearCatalog()
         catalogKey = key
         catalogJob?.cancel()
         catalogJob = viewModelScope.launch {
-            routeCatalogRepository.observe(key, routeFilter).collect { state ->
+            routeCatalogRepository.observe(key).collect { state ->
                 when (state) {
                     RouteCatalogState.Loading -> Unit
                     is RouteCatalogState.Failed -> {
                         _event.emit(CreateClimbingRecordEvent.ShowToastMessage(state.error.msg))
                     }
 
-                    is RouteCatalogState.Content -> renderCatalog(state)
+                    is RouteCatalogState.Content -> {
+                        catalog = state.catalog
+                        renderCatalog()
+                    }
                 }
             }
         }
@@ -257,9 +261,10 @@ class CreateClimbingRecordViewModel @Inject constructor(
 
     /** 다른 암장이나 날짜의 루트로 기록하지 않도록 이전 목록과 선택을 지웁니다. */
     private fun clearCatalog() {
+        catalog = null
         sectorNameList = emptyList()
         gymLevelList = emptyList()
-        routeFilter.value = RouteFilter(1)
+        routeFilter = RouteFilter(1)
         _uiState.update {
             it.copy(
                 curFloor = 1,
@@ -275,22 +280,20 @@ class CreateClimbingRecordViewModel @Inject constructor(
         }
     }
 
-    private fun renderCatalog(state: RouteCatalogState.Content) {
-        val filter = state.filter
-        sectorNameList = state.catalog.sectors.map { it.toSectorNameUiData(::selectSectorName) }
-        gymLevelList = state.catalog.difficulties.map { it.toGymLevelUiData(::selectGymLevel) }
-        val routes = state.catalog.routes.map { it.toRouteUiData(::selectRoute) }
+    private fun renderCatalog() {
+        val current = catalog ?: return
+        val catalog = current.toRouteCatalogUi(routeFilter, ::selectSectorName, ::selectGymLevel, ::selectRoute)
+        sectorNameList = catalog.sectors
+        gymLevelList = catalog.levels
         _uiState.update { uiState ->
             uiState.copy(
-                isSingleFloor = state.catalog.maxFloor == 1,
-                layoutImg = state.catalog.layoutImageUrl,
-                curFloor = filter.floor,
-                sectorNameList = sectorNameList.filter { it.floor == filter.floor }.map {
-                    it.copy(isSelected = it.sectorId == filter.sectorId)
-                },
-                gymLevelList = gymLevelList.map { it.copy(isSelected = it.difficulty == filter.difficulty) },
-                routeList = routes,
-                selectedRoute = uiState.selectedRoute.keptIn(routes),
+                isSingleFloor = catalog.isSingleFloor,
+                layoutImg = catalog.layoutImg,
+                curFloor = catalog.floor,
+                sectorNameList = catalog.floorSectors,
+                gymLevelList = catalog.selectedLevels,
+                routeList = catalog.routes,
+                selectedRoute = uiState.selectedRoute.keptIn(catalog.routes),
             )
         }
     }

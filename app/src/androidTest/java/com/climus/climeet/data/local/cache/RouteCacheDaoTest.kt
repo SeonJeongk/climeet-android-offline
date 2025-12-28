@@ -1,4 +1,4 @@
-package com.climus.climeet.data.local.routecache
+package com.climus.climeet.data.local.cache
 
 import android.content.Context
 import androidx.room.Room
@@ -16,14 +16,14 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class RouteCacheDaoTest {
-    private lateinit var database: RouteCacheDatabase
+    private lateinit var database: OfflineCacheDatabase
     private lateinit var dao: RouteCacheDao
 
     @Before
     fun setUp() {
         database = Room.inMemoryDatabaseBuilder(
             ApplicationProvider.getApplicationContext<Context>(),
-            RouteCacheDatabase::class.java,
+            OfflineCacheDatabase::class.java,
         ).build()
         dao = database.routeCacheDao()
     }
@@ -34,7 +34,7 @@ class RouteCacheDaoTest {
     }
 
     @Test
-    fun existingCatalog_replaceCatalog_removesOldRowsAndAppliesFilters() =
+    fun existingCatalog_replaceCatalog_removesOldRows() =
         runBlocking {
             dao.replaceCatalog(
                 metadata("v1"),
@@ -43,12 +43,7 @@ class RouteCacheDaoTest {
                 routes = listOf(route(1L, 10L, 1), route(2L, 20L, 2)),
             )
 
-            assertEquals(
-                listOf(2L),
-                dao.observeRoutes(GYM_ID, DATE, floor = 2, sectorId = null, difficulty = null)
-                    .first()
-                    .map(RouteEntity::routeId),
-            )
+            assertEquals(listOf(1L, 2L), dao.observeRoutes(GYM_ID, DATE).first().map(RouteEntity::routeId))
 
             dao.replaceCatalog(
                 metadata("v2"),
@@ -57,12 +52,7 @@ class RouteCacheDaoTest {
                 routes = listOf(route(3L, 30L, 3)),
             )
 
-            assertEquals(
-                listOf(3L),
-                dao.observeRoutes(GYM_ID, DATE, floor = 0, sectorId = null, difficulty = null)
-                    .first()
-                    .map(RouteEntity::routeId),
-            )
+            assertEquals(listOf(3L), dao.observeRoutes(GYM_ID, DATE).first().map(RouteEntity::routeId))
             assertEquals(listOf(30L), dao.observeSectors(GYM_ID, DATE).first().map(RouteSectorEntity::sectorId))
             assertEquals(
                 listOf(3),

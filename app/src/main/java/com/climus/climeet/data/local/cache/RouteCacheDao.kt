@@ -1,4 +1,4 @@
-package com.climus.climeet.data.local.routecache
+package com.climus.climeet.data.local.cache
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -72,24 +72,10 @@ abstract class RouteCacheDao {
         )
     }
 
-    @Query(
-        """
-        SELECT * FROM route_catalog_item
-        WHERE gymId = :gymId AND queryDate = :queryDate AND (:floor <= 0 OR sectorId IN (
-            SELECT sectorId FROM route_sector
-            WHERE gymId = :gymId AND queryDate = :queryDate AND floor = :floor
-        ))
-        AND (:sectorId IS NULL OR sectorId = :sectorId)
-        AND (:difficulty IS NULL OR difficulty = :difficulty)
-        ORDER BY routeId
-        """,
-    )
+    @Query("SELECT * FROM route_catalog_item WHERE gymId = :gymId AND queryDate = :queryDate ORDER BY routeId")
     abstract fun observeRoutes(
         gymId: Long,
         queryDate: String,
-        floor: Int,
-        sectorId: Long?,
-        difficulty: Int?,
     ): Flow<List<RouteEntity>>
 
     @Query("SELECT * FROM route_sector WHERE gymId = :gymId AND queryDate = :queryDate ORDER BY floor, sectorId")
@@ -170,29 +156,4 @@ abstract class RouteCacheDao {
 
     @Query("SELECT * FROM route_catalog_metadata ORDER BY lastAccessedAtEpochMs")
     abstract suspend fun cacheEntries(): List<RouteCatalogMetadataEntity>
-
-    @Query("SELECT * FROM home_gym_cache_item WHERE accountId = :accountId ORDER BY sortOrder")
-    abstract fun observeHomeGyms(accountId: Long): Flow<List<HomeGymEntity>>
-
-    @Query("SELECT * FROM home_gym_cache_metadata WHERE accountId = :accountId")
-    abstract fun observeHomeGymMetadata(accountId: Long): Flow<HomeGymCacheMetadataEntity?>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    protected abstract suspend fun insertHomeGymMetadata(entity: HomeGymCacheMetadataEntity)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    protected abstract suspend fun insertHomeGyms(entities: List<HomeGymEntity>)
-
-    @Query("DELETE FROM home_gym_cache_metadata WHERE accountId = :accountId")
-    abstract suspend fun clearHomeGyms(accountId: Long)
-
-    @Transaction
-    open suspend fun replaceHomeGyms(
-        metadata: HomeGymCacheMetadataEntity,
-        gyms: List<HomeGymEntity>,
-    ) {
-        clearHomeGyms(metadata.accountId)
-        insertHomeGymMetadata(metadata)
-        insertHomeGyms(gyms)
-    }
 }
