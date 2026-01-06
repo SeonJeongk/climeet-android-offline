@@ -36,8 +36,6 @@ data class HomeUiState(
     val page: Int = 0,
     val hasNext: Boolean = true,
     val myProfile: UserProfileInfoResponse? = null,
-    val homeGymReceivedAtEpochMs: Long? = null,
-    val homeGymRefreshError: BaseState.Error? = null,
 )
 
 sealed class HomeEvent {
@@ -173,7 +171,7 @@ class HomeViewModel @Inject constructor(
         accountId = 0L
         observedAccountId = 0L
         homeGymJob?.cancel()
-        _uiState.update { it.copy(homegymList = emptyList(), homeGymReceivedAtEpochMs = null) }
+        _uiState.update { it.copy(homegymList = emptyList()) }
         viewModelScope.launch { homeGymRepository.clear(previous) }
     }
 
@@ -200,13 +198,7 @@ class HomeViewModel @Inject constructor(
         observedAccountId = id
         homeGymJob = viewModelScope.launch {
             homeGymRepository.observe(id).collect { snapshot ->
-                _uiState.update {
-                    it.copy(
-                        homegymList = snapshot.gyms,
-                        homeGymReceivedAtEpochMs = snapshot.receivedAtEpochMs,
-                        homeGymRefreshError = snapshot.refreshError,
-                    )
-                }
+                _uiState.update { it.copy(homegymList = snapshot.gyms) }
             }
         }
     }
