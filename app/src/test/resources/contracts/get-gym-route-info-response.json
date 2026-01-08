@@ -5,7 +5,7 @@
     {
       "routeId": 1001,
       "sectorId": 101,
-      "sectorName": "Synthetic Sector 1A",
+      "sectorName": "메인월",
       "climeetDifficultyName": "VB",
       "difficulty": 0,
       "gymDifficultyName": "VB",
@@ -16,7 +16,7 @@
     {
       "routeId": 1002,
       "sectorId": 102,
-      "sectorName": "Synthetic Sector 1B",
+      "sectorName": "슬랩",
       "climeetDifficultyName": "V1",
       "difficulty": 1,
       "gymDifficultyName": "V1",
@@ -27,7 +27,7 @@
     {
       "routeId": 1003,
       "sectorId": 201,
-      "sectorName": "Synthetic Sector 2A",
+      "sectorName": "오버행",
       "climeetDifficultyName": "V2",
       "difficulty": 2,
       "gymDifficultyName": "V2",

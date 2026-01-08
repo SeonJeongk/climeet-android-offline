@@ -86,25 +86,25 @@
     {
       "sectorId": 101,
       "floor": 1,
-      "name": "Synthetic Sector 1A",
+      "name": "메인월",
       "sectorImageUrl": "https://example.invalid/images/sector-small-01.png"
     },
     {
       "sectorId": 102,
       "floor": 1,
-      "name": "Synthetic Sector 1B",
+      "name": "슬랩",
       "sectorImageUrl": "https://example.invalid/images/sector-small-02.png"
     },
     {
       "sectorId": 201,
       "floor": 2,
-      "name": "Synthetic Sector 2A",
+      "name": "오버행",
       "sectorImageUrl": "https://example.invalid/images/sector-small-03.png"
     },
     {
       "sectorId": 202,
       "floor": 2,
-      "name": "Synthetic Sector 2B",
+      "name": "아치",
       "sectorImageUrl": "https://example.invalid/images/sector-small-04.png"
     }
   ],
