@@ -110,6 +110,7 @@
                         <!--    팔로워 / 팔로잉    -->
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/layout_follow"
+                            android:visibility="@{vm.uiState.isTopInfoLoaded ? View.VISIBLE : View.INVISIBLE}"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginVertical="5dp"
@@ -174,6 +175,7 @@
                         <!--    별점 / 리뷰    -->
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/layout_rate_review"
+                            android:visibility="@{vm.uiState.isTopInfoLoaded ? View.VISIBLE : View.INVISIBLE}"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -254,6 +256,7 @@
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/layout_follow_btn"
+                        android:visibility="@{vm.uiState.isTopInfoLoaded ? View.VISIBLE : View.INVISIBLE}"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:layout_constraintEnd_toEndOf="parent"

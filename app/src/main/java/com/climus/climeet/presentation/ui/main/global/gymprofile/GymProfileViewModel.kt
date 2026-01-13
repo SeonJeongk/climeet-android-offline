@@ -23,6 +23,7 @@ data class GymProfileInfoUiState(
     val followingCount: Int = 0,
     val averageRating: Float = 0F,
     val reviewCount: Int = 0,
+    val isTopInfoLoaded: Boolean = false,
 )
 
 @HiltViewModel
@@ -69,6 +70,7 @@ class GymProfileViewModel @Inject constructor(
                                 followingCount = result.body.followingCount,
                                 averageRating = result.body.averageRating,
                                 reviewCount = result.body.reviewCount,
+                                isTopInfoLoaded = true,
                             )
                         }
                         followState.value = result.body.isFollower
